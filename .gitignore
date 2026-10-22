@@ -1,0 +1,54 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.local.*
+*.pem
+*.key
+
+# Personal and assistant state
+.label.toml
+.agents/
+.codex/
+.claude/
+.gemini/
+.vscode/
+.idea/
+[Aa][Gg][Ee][Nn][Tt][Ss].[Mm][Dd]
+[Cc][Ll][Aa][Uu][Dd][Ee].[Mm][Dd]
+[Gg][Ee][Mm][Ii][Nn][Ii].[Mm][Dd]
+
+# Python, build output, and caches
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+build/
+dist/
+install/
+
+# External models and raw experimental artifacts
+models/
+datasets/
+recordings/
+logs/
+log/
+runs/
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.bag
+*.mcap
+*.mp4
+*.avi
+*.mov
+
+# Operating-system files
+.DS_Store
+Thumbs.db
