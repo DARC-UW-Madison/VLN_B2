@@ -62,12 +62,15 @@ connecting the output to the robot.
 ## Model and robot boundary
 
 The inspected [upstream inference implementation](https://github.com/ucla-mobility/TIC-VLA/blob/main/DynaNav/ticvla.py)
-returns relative pose increments. Its asynchronous entry point accepts six
+instantiates a two-component action head. Package inference returns future XY
+offsets from the current frame without cumulative summation, whereas the paper
+describes three-component increments and integration. Its asynchronous entry point accepts six
 state values and reduces them to five before adding delay. This interface must
 be checked against a pinned revision and checkpoint before integration; paper
 notation alone does not define a compatible input tensor.
 
-Build a trajectory from the output according to that revision's conventions.
+Interpret the trajectory according to the pinned code and checkpoint. Do not
+apply cumulative summation to positions already relative to the current frame.
 Then use a validated tracking controller to obtain translational and yaw
 velocities. Do not pass pose increments directly as velocity commands.
 The [B2 SDK client](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py)

@@ -19,6 +19,7 @@ license, or laboratory affiliation has been assigned. There are no B2 measuremen
 
 ## Decisions in effect
 
+- The target is B2 without wheels; hardware and firmware details still need inspection.
 - Use the existing B2 walking controller; investigate a high-level navigation adapter.
 - Keep proposed behavior separate from verified implementation and experiment results.
 - Maintain English and Japanese documentation, with English code and configuration.

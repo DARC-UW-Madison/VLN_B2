@@ -12,6 +12,7 @@ Unitree B2でTIC-VLAによるナビゲーションを評価するための研究
 
 | 文書 | 内容 |
 | --- | --- |
+| [TIC-VLAの仕組み](docs/ticvla-explained.ja.md) | 推論，行動予測，遅延，学習，機体制御のつながり |
 | [導入前に集める情報](docs/deployment-intake.ja.md) | 実装方針を決める前に，実機と研究室で確認すること |
 | [開発の手引き](docs/development.ja.md) | 着手方法，各段階の検証，再現可能な実験の記録方法 |
 | [構成と仕組み](docs/architecture.ja.md) | 計画しているデータの流れ，時刻，座標系，制御の役割分担 |
