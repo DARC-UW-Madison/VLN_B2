@@ -22,6 +22,8 @@ The stages below isolate those questions before combining them.
 
 Record the following in a reviewed environment specification before installing
 model dependencies. Keep addresses and access credentials in laboratory storage.
+Use the [deployment information guide](deployment-intake.md) for detailed
+questions, read-only inspection commands, and an initial response template.
 
 | Area | Required information | Why it matters |
 | --- | --- | --- |

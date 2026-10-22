@@ -14,6 +14,7 @@ it is not an official release from the paper's authors or the robot manufacturer
 
 | Document | What it explains |
 | --- | --- |
+| [Deployment information](docs/deployment-intake.md) | What to collect from the robot and lab before choosing an implementation |
 | [Development guide](docs/development.md) | How to start, validate each stage, and record reproducible experiments |
 | [Architecture](docs/architecture.md) | The proposed data flow, timing, coordinate frames, and control boundaries |
 | [Project status](docs/status.md) | Completed work, unresolved questions, and the next deliverable |

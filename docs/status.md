@@ -10,7 +10,7 @@ license, or laboratory affiliation has been assigned. There are no B2 measuremen
 | Deliverable | State | Evidence or completion condition |
 | --- | --- | --- |
 | Shared documentation and development rules | Prepared | README, Contributing, architecture, development guide, and third-party review |
-| Hardware and software specification | Not started | Actual B2, compute, camera, state interface, and firmware are identified |
+| Hardware and software specification | Information guide prepared; target inventory pending | Deployment information guide defines the questions; actual B2 configuration remains unknown |
 | Upstream permissions and dependency revisions | Open | Research use and sharing conditions resolved; exact revisions recorded |
 | Offline inference | Not started | Reproducible prediction and failure-handling report |
 | Live observation without commands | Not started | Time/frame alignment and command rejection demonstrated |
@@ -30,7 +30,8 @@ license, or laboratory affiliation has been assigned. There are no B2 measuremen
 
 ## Next deliverable
 
-Prepare the environment specification described in [the development guide](development.md).
+Collect the initial facts using the [deployment information guide](deployment-intake.md),
+then prepare the environment specification described in [the development guide](development.md).
 It must establish the available GPU/OS, camera input, timestamped robot state,
 SDK/firmware compatibility, and operator stop procedure. Then choose an inference
 environment and define an offline validation task. Do not invent hardware values
