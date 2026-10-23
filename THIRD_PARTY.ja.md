@@ -2,8 +2,10 @@
 
 [English](THIRD_PARTY.md)
 
-以下は参考資料と依存先の候補である．このリポジトリには同梱せず，自動導入もしない．
-確認日：2026-10-22．既定ブランチへのリンク先は変更されるため，実装前に正確な版を固定する．
+以下は参考資料と任意の実行時依存先である．このリポジトリには同梱せず，自動導入もしない．
+独立して実装したアダプタは既存の公開APIを呼ぶ．模擬テストでは実際の外部実行環境を
+読み込まない．更新確認日：2026-10-23．既定ブランチへのリンク先は変更されるため，
+実モデルや実機での実験前に正確な版を固定する．
 
 | 資料 | 出典 | 現在の扱い |
 | --- | --- | --- |
@@ -27,3 +29,18 @@
 
 このプロジェクトで独自に作る成果物のライセンスと権利者は未定である．
 依存先のライセンスを，リポジトリ全体のライセンスとしてコピーしない．
+
+## 準備ツールの依存先
+
+| 資料 | 出典 | 用途と配布 |
+|---|---|---|
+| ZED SDK／Pythonバインディング | [公式画像取得手順](https://docs.stereolabs.com/docs/tutorials/image-capture)，[Jetson Docker手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson) | 任意の`pyzed.sl`呼び出し．SDK，ドライバ，イメージ，ベンダーモデルは非同梱．導入・共有前に選択したSDK・イメージの条件を確認する |
+| PyTorch | [公式文書](https://docs.pytorch.org/docs/stable/index.html) | 任意の重み読み込みと推論．未導入・非同梱．Jetsonに対応するビルドを選び，利用条件と表示事項を記録する |
+| Transformers／InternVL実行環境 | [Transformers文書](https://huggingface.co/docs/transformers/index)，[InternVL3-1B](https://huggingface.co/OpenGVLab/InternVL3-1B) | 上流モデルの任意のローダー．ローカルのみ参照するが，信頼したモデルのPythonコードは実行する．ソースと成果物の版を固定する |
+| Livoxドライバ | [公式ドライバ](https://github.com/Livox-SDK/livox_ros_driver2) | 参照のみで，実装上の依存先ではない．ソースは非同梱 |
+| ベースコンテナイメージ | [NVIDIAのJetson資料](https://developer.nvidia.com/embedded/jetson-cloud-native/) | 未選択・未取得・非同梱．テンプレートでは互換イメージの明示と，内容・条件の別途確認が必要 |
+
+標準ライブラリによる再生とテストにはベンダー環境は不要である．パッケージのビルドには
+`setuptools>=68`を宣言しているが，`PYTHONPATH=src`での実行はビルドや導入を必要としない．
+独立したアダプタへのベンダーコードのコピーはない．後から導入する依存先には推移的な依存が
+加わる可能性があり，この表は再配布監査の完了や公開許可を意味しない．

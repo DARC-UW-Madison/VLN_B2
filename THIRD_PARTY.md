@@ -2,9 +2,11 @@
 
 [日本語](THIRD_PARTY.ja.md)
 
-These are references and prospective dependencies. None is bundled or installed
-by this repository. Review date: 2026-10-22. Links to default branches may change;
-pin exact revisions before implementation.
+These are references and optional runtime dependencies. None is bundled or
+installed by this repository. Independent adapters call existing public APIs;
+their mocked tests do not load the actual third-party runtimes. Review updated:
+2026-10-23. Default-branch links may change; pin exact revisions before real-model
+or hardware experiments.
 
 | Material | Source | Current handling |
 | --- | --- | --- |
@@ -30,3 +32,19 @@ the outcome of the review. Keep restricted artifacts in approved storage.
 
 The license and rights holder for original work in this project remain undecided.
 No dependency's license should be copied as the license for this whole repository.
+
+## Preparation-tool dependencies
+
+| Material | Source | Use and distribution |
+|---|---|---|
+| ZED SDK / Python binding | [Official capture tutorial](https://docs.stereolabs.com/docs/tutorials/image-capture), [Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson) | Optional `pyzed.sl` calls; no SDK, driver, image, or vendor model bundled. Check the selected SDK/image terms before installation or sharing |
+| PyTorch | [Official documentation](https://docs.pytorch.org/docs/stable/index.html) | Optional checkpoint loading and inference; not installed or bundled. Select a Jetson-compatible build and record its license/notices |
+| Transformers / InternVL runtime | [Transformers documentation](https://huggingface.co/docs/transformers/index), [InternVL3-1B](https://huggingface.co/OpenGVLab/InternVL3-1B) | Optional upstream model loaders; local-only resolution. Trusted model Python code still executes; pin source and artifact revisions |
+| Livox driver | [Official driver](https://github.com/Livox-SDK/livox_ros_driver2) | Reference only; not an implemented dependency and no source bundled |
+| Base container image | [NVIDIA Jetson resources](https://developer.nvidia.com/embedded/jetson-cloud-native/) | Not selected, pulled, or bundled; the template requires an explicit compatible image and separate review of its contents and terms |
+
+The standard-library replay and tests need no vendor runtime. Packaging declares
+`setuptools>=68` as its build tool; running from `PYTHONPATH=src` needs no package
+build or install. No vendor code has been copied into the independent adapters.
+Installing dependencies later can introduce additional transitive requirements;
+this table is not a completed redistribution audit or permission to publish them.

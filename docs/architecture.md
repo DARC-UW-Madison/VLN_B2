@@ -2,7 +2,10 @@
 
 [日本語](architecture.ja.md) · [Home](../README.md)
 
-This is the proposed integration, not an implemented system.
+The full live system below is a proposed integration. The repository now
+implements observation adapters, synchronous offline inference, and candidate
+tracking for offline evaluation. It does not implement the asynchronous live
+cache or motor output. See [the current code boundary](#current-code-boundary).
 
 ## Problem and approach
 
@@ -101,3 +104,63 @@ distance may differ from the published platform. These are research variables,
 not parameters that can be inferred from the model name. Begin with the
 [staged validation procedure](development.md) and report observed failures
 before deciding whether adaptation or additional training is necessary.
+
+## Current code boundary
+
+The available flows are deliberately independent so that failures can be localized:
+
+```text
+inspect_target.py -> installed-system inventory (no SDK imports)
+ZedCamera -> JPEG + receipt time + unverified source time
+UnitreeStateReader -> finite state + receipt time + unverified frames
+                  -> observation.json + frame.jpg
+                  -> TicVlaPredictor -> offline future XY plan (no motor output)
+synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reason
+```
+
+| File | Responsibility |
+|---|---|
+| `tools/inspect_target.py` | Standalone Python 3.8+ inventory; no install or robot messages |
+| `src/b2_tic_vla/types.py` | Explicit image, state, plan, and velocity contracts |
+| `src/b2_tic_vla/hardware.py` | Lazy ZED capture and Unitree state subscriptions only |
+| `src/b2_tic_vla/recording.py` | Validated portable observation manifests; no overwrite |
+| `src/b2_tic_vla/inference.py` | Strict local-file loading and synchronous upstream package calls |
+| `src/b2_tic_vla/control.py` | Pure candidate tracking with freshness, frame, and limit checks |
+| `src/b2_tic_vla/cli.py` | Separate probe, recording, replay, and inference commands |
+| `examples/` | Synthetic data, unvalidated limits, and blank onsite notes |
+| `tests/` | Unit and command tests with synthetic data and fake vendor libraries |
+| `deploy/Dockerfile` | Source-only template requiring an explicitly matched base image |
+
+The new predictor calls `ticvla.models.ticvla.TICVLA.predict`, not the asynchronous
+DynaNav entry point. It supplies `[vx, vy, yaw_rate, 0, 0]` and zero delay: the
+last two values represent relative displacement, which is zero for this
+synchronous smoke test. It expects shape `[1, horizon, 2]` and preserves the
+returned relative XY positions without cumulative summation. Output times use
+an assumed 0.1-second waypoint interval from the inspected implementation; exact
+revision/checkpoint compatibility and physical timing remain to be validated.
+The CLI currently supplies one image as both the current and semantic reference
+observation. It does not reproduce a multi-image asynchronous observation history.
+
+`PathTracker` is a basic forward-only lookahead controller for evaluation. For a
+selected target `(x, y)` in the current body frame, it calculates curvature
+`2*y/(x*x+y*y)`, proposes `yaw_rate = vx*curvature`, reduces forward speed to meet
+the yaw bound, and limits changes in speed and yaw rate. Lateral velocity is
+always zero. Missing, stale, nonfinite, mismatched, or unsupported data produces
+a zero candidate with a rejection reason. The synthetic fixture checks straight,
+curved, and stale-image cases. The tracker neither checks obstacle clearance nor
+implements a stop-distance model, goal completion, or time-optimal tracking.
+It is not validated B2 navigation.
+
+Host receipt times are monotonic, while vendor clock values remain separate
+metadata. A verified capture timestamp must be converted into the same host
+clock before use. With unverified capture time, even an otherwise accepted
+candidate is marked `shadow_only_capture_time_unknown`. A fresh receipt cannot
+prove a camera frame is newly exposed. Replayed records start a new timing
+interval and cannot become fresh live inputs by relabeling recorded timestamps.
+
+No implemented module creates `SportClient`, calls `Move`, or publishes motor
+commands. Consequently, software rejection means a zero **candidate**, not a
+physical stop. Future motion integration needs validated clock/frame transforms,
+atomic asynchronous cache/reference metadata, control ownership, an independent
+command-expiry path, verified receiver behavior, and operator override. Follow
+[onsite preparation](onsite.md) to obtain the missing evidence before that work.

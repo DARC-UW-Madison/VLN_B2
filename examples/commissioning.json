@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "description": "Unvalidated example limits for shadow testing; no motor output is enabled.",
+  "limits": {
+    "max_forward_mps": 0.2,
+    "max_yaw_rps": 0.3,
+    "max_accel_mps2": 0.2,
+    "max_yaw_accel_rps2": 0.5,
+    "cruise_speed_mps": 0.1,
+    "lookahead_m": 0.4,
+    "max_observation_age_s": 0.5,
+    "max_state_age_s": 0.5,
+    "max_plan_age_s": 0.5,
+    "max_timestamp_skew_s": 0.2
+  }
+}

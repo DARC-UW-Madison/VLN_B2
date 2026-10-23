@@ -4,10 +4,12 @@
 
 ## Current stage
 
-Repository preparation with the main hardware identified. No target inspection
-or B2 measurements have been performed. The repository is local; lab GitHub
-hosting is authorized, but its destination and visibility are not yet specified.
-The rights holder and public-release license remain undecided.
+Preparation tools are implemented with the main hardware identified. No target
+inspection, real GPU inference, or B2 measurements have been performed. All CLI
+commands are observation-only or offline; none sends motor commands. The
+repository is local; lab GitHub hosting is authorized, but its destination and
+visibility are not yet specified. The rights holder and public-release license
+remain undecided.
 
 ## Target setup
 
@@ -28,11 +30,19 @@ choosing an image or proposing a host upgrade.
 | --- | --- | --- |
 | Shared documentation and development rules | Prepared | README, Contributing, architecture, development guide, and third-party review |
 | Hardware and software specification | Main hardware confirmed; software inventory pending | Target setup above; no target-side inspection yet |
+| Standalone target inventory | Implemented; target run pending | `tools/inspect_target.py`; Python standard library only |
+| Synthetic replay and candidate tracking | Implemented | `replay`, example trajectories, freshness checks, and velocity limits; no motor output |
 | Upstream permissions and dependency revisions | Open | Research use and sharing conditions resolved; exact revisions recorded |
-| Offline inference | Not started | Reproducible prediction and failure-handling report |
-| Live observation without commands | Not started | Time/frame alignment and command rejection demonstrated |
-| Command interface and stop behavior | Not started | Reviewed test results from the actual robot |
+| Offline inference | Synchronous local-file adapter implemented; real-model run pending | Strict checkpoint validation and recorded-observation input; no async cache |
+| Live observation without commands | Acquisition adapters implemented; target validation pending | ZED image capture, Unitree state subscription, and observation manifests; clocks and frames unverified |
+| Asynchronous inference and motion integration | Not implemented | Consistent cache metadata, live watchdog, validated tracking, and B2 command path |
+| Robot stop behavior | Not verified | Reviewed tests of the actual firmware, command loss, and operator override |
 | B2 navigation evaluation | Not started | Predefined tasks, complete trial counts, results and limitations |
+
+Local verification (79 tests and the stated limitations) is documented in
+[the development guide](development.md#preparation-verification). Synthetic
+replay and mocked tests exercise software behavior, not real drivers, model
+quality, or hardware performance. Example limits are not approved operating limits.
 
 ## Decisions in effect
 
@@ -44,15 +54,19 @@ choosing an image or proposing a host upgrade.
   chat transcripts, machine addresses, and private research data.
 - Keep upstream software and weights outside this repository. Do not assume that
   code, weights, and datasets share one license.
+- Keep the current tools free of motor output. Verify observations and the
+  synchronous model adapter before implementing asynchronous motion integration.
 - Use the lab GitHub destination once specified and accessible; resolve rights and the project license before public release.
 
 ## Next deliverable
 
-Obtain the lab repository URL and a way to inspect the Jetson. Record its current
-OS/JetPack, existing sensor software and working B2 control procedure, following
-the [deployment information guide](deployment-intake.md). Verify an RGB frame
-from the ZED 2i and timestamped robot state before model integration. Select the
-container from the measured platform, then define an offline inference task.
+Run the standalone inventory on the Jetson and review the resulting report,
+following [onsite preparation](onsite.md). Identify its OS/JetPack, existing
+sensor software, and working B2 control procedure. Then use the observation
+commands to verify an RGB frame from the ZED 2i and received robot state;
+establish clock and frame conventions before marking either verified. Select
+the container from the measured platform and test the synchronous adapter with
+approved local model files. Obtain the lab repository URL separately.
 
 Stereolabs provides an [official Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)
 with platform-specific image selection. NVIDIA documents the [Jetson container runtime](https://developer.nvidia.com/embedded/jetson-cloud-native/).

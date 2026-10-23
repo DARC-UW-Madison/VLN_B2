@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "description": "Copy to ignored local/ and fill verified facts only. Do not publish raw lab records.",
+  "inventory_report": null,
+  "hardware": {
+    "robot_variant_confirmed": null,
+    "orin_memory_gb": null,
+    "storage_available_gb": null,
+    "camera_usb_link_verified": null,
+    "robot_ethernet_link_verified": null,
+    "sensor_power_verified": null
+  },
+  "manual_control": {
+    "existing_interface": null,
+    "active_control_services": null,
+    "normal_stop_verified": null,
+    "operator_override_verified": null,
+    "command_loss_behavior": null,
+    "command_loss_evidence": null,
+    "exclusive_control_method": null
+  },
+  "coordinates_and_time": {
+    "velocity_frame": null,
+    "position_frame": null,
+    "axes_units_and_yaw_verified": null,
+    "camera_mount_geometry": null,
+    "camera_clock_and_buffering": null,
+    "image_state_alignment_evidence": null
+  },
+  "model_execution": {
+    "upstream_revision": null,
+    "base_model_revision": null,
+    "checkpoint_revision": null,
+    "peak_gpu_memory_gb": null,
+    "prediction_latency_seconds": null,
+    "thermal_observations": null
+  },
+  "next_step": null
+}

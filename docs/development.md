@@ -2,9 +2,42 @@
 
 [日本語](development.ja.md) · [Home](../README.md)
 
-This guide defines the route to a reproducible B2 experiment. Only repository
-preparation is complete. Later stages describe acceptance criteria, not working
-installation or robot-control instructions.
+This guide defines the route to a reproducible B2 experiment. Preparation tools
+are implemented, but target hardware, GPU inference, and robot motion remain
+unvalidated. Use [onsite preparation](onsite.md) for the current commands; the
+stages below describe what evidence is needed before advancing.
+
+## Run local checks first
+
+From the repository root with Python 3.10 or later:
+
+```sh
+PYTHONPATH=src python3 -m b2_tic_vla replay
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+git diff --check
+```
+
+The bundled replay evaluates three synthetic samples: two accepted candidate
+commands followed by a stale-image rejection with a zero command. It runs no
+neural model, connects to no hardware, and sends no motion commands. Acceptance
+means the configured software checks passed, not that a path is clear or safe
+for the B2. The example limits need separate approval and measurement before
+any real use. Tests exercise local logic with synthetic data and mocked vendor
+interfaces; they do not validate the actual drivers or trained model.
+
+### Preparation verification
+
+On 2026-10-23, the local development host (macOS, Python 3.14.7) passed 79
+standard-library tests, synthetic CLI replay, bytecode compilation, and source
+syntax parsing against Python 3.10 (package/tests) and Python 3.8 (standalone
+inspector). Syntax parsing is not execution on those older interpreters.
+The inspector also ran on that host, including creation of a missing output
+directory; this was not a Jetson inventory. All 20 Markdown files parsed as GFM
+with matching translations, valid local links/fragments, and required Japanese
+punctuation. Source scans found no secrets. Recheck Git history before sharing.
+Ruff was unavailable and could not be installed in this environment, so its
+configured lint/format checks have not run. No container build, GPU prediction,
+or real camera/robot probe has been validated.
 
 ## 1. Understand the system
 
@@ -33,24 +66,37 @@ questions, read-only inspection commands, and an initial response template.
 | State | Available velocity, position and orientation, frames, rate and timestamps | Reconstruct motion during inference |
 | Transport | SDK revision, interface, clock alignment, measured delay | Prevent mismatched or stale observations |
 
-On a Linux target, the following read-only commands can help identify the system:
+The standalone inspector uses Python 3.8 or later with no third-party packages:
 
 ```sh
-uname -m
-cat /etc/os-release
-python3 --version
-nvidia-smi
+python3 tools/inspect_target.py
 ```
 
-These commands have not been run on the target. `nvidia-smi` may be unavailable
-on a Jetson; obtain its JetPack and GPU details from the installed platform tools.
-Inspect output before sharing it. Do not infer a B2 configuration from another
-robot's setup guide. Confirm whether ROS 2 is needed before choosing a distribution.
+It reads installed system information and reports unknown, unavailable, and
+unchecked items explicitly. It does not install packages, contact a remote
+service, start sensors, or verify GPU container operation. Network addresses
+are excluded unless explicitly requested. Even the default report may contain
+laboratory information; review it before sharing. This tool has not been run
+on the target. Do not infer a B2 configuration from another robot's setup guide.
+Confirm whether ROS 2 is needed before choosing a distribution.
 
 **Completion:** a reviewer can identify the hardware and software without
 accessing a private chat, and each unknown has an explicit next check.
 
 ## 3. Reproduce model inference offline
+
+The implemented `infer` command loads existing local files and calls the
+upstream package's synchronous prediction API for a recorded observation. It
+uses zero semantic-cache delay and does not reproduce the paper's asynchronous
+execution. Its output is XY positions in the current robot frame, spaced at
+0.1-second intervals; do not cumulatively sum those positions. It checks the
+checkpoint architecture and uses strict parameter loading. Compatibility with
+the actual downloaded checkpoint has not been demonstrated.
+
+Replay starts a new host-clock interval. Original recording timestamps remain
+source metadata; they are not evidence that a replayed image is a fresh live
+observation. The output is a plan, not a command sent to the robot. See
+[onsite preparation](onsite.md) for required local files and command arguments.
 
 Resolve the [third-party conditions](../THIRD_PARTY.md) first. Record the upstream
 commit, model repository revisions, checkpoint checksum, dependency versions,
@@ -72,6 +118,14 @@ inputs and revisions. No robot motion interface is connected.
 
 ## 4. Observe live predictions without commanding motion
 
+The `camera`, `state`, and `record` commands provide observation acquisition.
+`record` saves one image and a received state sample, checking a receipt-time
+skew of at most 0.2 seconds. This is not hardware synchronization: vendor capture
+times remain unverified, and frames remain unknown unless explicitly confirmed.
+Do not relabel an unknown velocity frame just to make inference accept it.
+Continuous live prediction, atomic asynchronous cache updates, and a complete
+real-time observation/control loop are still to be implemented.
+
 Connect the actual camera and state reader. Keep the command sender disabled.
 Compare stationary, straight-motion, and rotation observations collected through
 an approved manual procedure. Verify image/state alignment, camera-to-body
@@ -86,6 +140,13 @@ the proposed command, and why that command would be accepted or rejected.
 command rejection. Nothing in this stage establishes autonomous driving performance.
 
 ## 5. Validate the command path, then evaluate navigation
+
+The repository currently has no motor command sender. The implemented
+`PathTracker` produces candidate velocities for observation-only evaluation:
+forward motion and yaw, with zero lateral velocity. It checks data validity,
+freshness, and configured limits. It does not verify obstacle clearance or
+provide a live watchdog or emergency stop. Integration with the B2 high-level
+motion interface is a separate future stage.
 
 Before enabling model-driven commands, agree on the test area, operator control,
 speed and acceleration limits, stopping distance, and recovery procedure.

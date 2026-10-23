@@ -6,14 +6,18 @@ Research workspace for evaluating TIC-VLA navigation on the Unitree B2.
 The goal is to connect language-conditioned navigation to the robot's existing
 walking controller and measure the effect of delayed model inference.
 
-**Status:** documentation only. No inference service, robot adapter, or B2
-experiment has been implemented or validated. This is an independent project;
-it is not an official release from the paper's authors or the robot manufacturer.
+**Status:** preparation tools are implemented for target inspection, synthetic
+replay, camera capture, state subscription, observation recording, and an optional
+offline inference check. They send no motor commands. Real ZED/B2 operation and
+GPU inference have not been validated. This is an independent project, not an
+official release from the paper's authors or the robot manufacturer.
 
 ## Read first
 
 | Document | What it explains |
 | --- | --- |
+| [First-visit card](docs/field-card.md) | Three initial checks and the facts to record |
+| [Onsite preparation](docs/onsite.md) | Commands to inspect the target, capture observations, and check local inference |
 | [Understanding TIC-VLA](docs/ticvla-explained.md) | How reasoning, action prediction, latency, training, and robot control fit together |
 | [Deployment information](docs/deployment-intake.md) | What to collect from the robot and lab before choosing an implementation |
 | [Development guide](docs/development.md) | How to start, validate each stage, and record reproducible experiments |
@@ -32,10 +36,41 @@ behavior have been verified. Training a new walking policy is outside this scope
 
 The available setup is B2, Jetson AGX Orin, ZED 2i and Livox Mid-360.
 Docker use and lab GitHub hosting are permitted. See [project status](docs/status.md)
-for confirmed facts and the next inspection. There is no installation or robot
-launch command yet; the installed software and working interfaces remain unverified.
-To inspect a local change, run `git diff --check` and follow the review steps in
-[Contributing](CONTRIBUTING.md).
+for confirmed facts and the next inspection. Installed target software, sensor
+connections, frames, and timing remain unverified. No asynchronous robot-control
+loop or motor command sender is implemented.
+
+## Try the preparation tools
+
+From the repository root, Python 3.10 or later can run the CLI and local tests
+without installing this package:
+
+```sh
+PYTHONPATH=src python3 -m b2_tic_vla --help
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+git diff --check
+```
+
+The standalone inventory tool needs only Python 3.8 or later and its standard
+library. It can be copied to a target independently of the package:
+
+```sh
+python3 tools/inspect_target.py --help
+```
+
+| CLI command | Purpose | Additional local requirements |
+| --- | --- | --- |
+| `replay` | Evaluate synthetic trajectories and rejection checks; no neural model | None |
+| `camera` | Save a ZED left color image | Connected camera, matching ZED SDK and Python binding |
+| `state` | Subscribe to Unitree sport state | Working SDK2/DDS installation and explicit network interface |
+| `record` | Save an image and corresponding received robot state | Both camera and state requirements |
+| `infer` | Check synchronous inference using existing local model files | Compatible upstream TIC-VLA package, model dependencies, weights, and GPU |
+
+See [onsite preparation](docs/onsite.md) for arguments and result interpretation.
+Dependencies and model files are not downloaded automatically. The example
+configuration contains unvalidated test limits, not approved B2 operating limits.
+Local tests use synthetic inputs and mocked optional dependencies; they do not
+establish sensor, model, or robot performance.
 
 ## License and publication
 
