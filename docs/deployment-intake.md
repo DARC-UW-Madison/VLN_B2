@@ -6,6 +6,10 @@ Use this guide to prepare the environment specification. An unknown is an
 acceptable answer: record what would establish it rather than guessing. Start
 with the first table; later measurements can be made together during integration.
 No inspection or motion command in this guide has been run on the target B2.
+The B2, Jetson AGX Orin, ZED 2i and Livox Mid-360 are now identified; Docker and
+lab GitHub use are permitted. See [target setup](status.md) before collecting
+information, and do not ask for already confirmed facts again. Software details
+can be inspected once access is available.
 
 ## Why the information must be specific
 
@@ -28,7 +32,7 @@ cannot stand in for all four. A script's existence is not proof it ran successfu
 
 | Information to obtain | What a useful answer contains | Decision it supports |
 | --- | --- | --- |
-| Robot and supported development access | B2 or B2-W; firmware and application versions; access to the manufacturer development manual; high-level control permission | Correct API and supported operation |
+| Robot and supported development access | B2 confirmed; firmware and application versions; access to the manufacturer development manual; high-level control permission | Correct API and supported operation |
 | Current working procedure | Which computer runs which script; SDK commit and local modifications; which state, image, motion, and stop operations have actually worked | Reuse an established baseline |
 | Compute on each host | CPU architecture; GPU and memory; system RAM; free disk; OS; Python environment; GPU driver, CUDA or JetPack; installed PyTorch if any | Inference placement and compatible packages |
 | Physical network layout | Workstation, onboard computer, motion controller and camera connected by named wired/wireless links; routing, bridge, VPN and container involvement | Where each process should run |
@@ -41,8 +45,8 @@ cannot stand in for all four. A script's existence is not proof it ran successfu
 Do not send passwords, private keys, serial numbers, or exact laboratory location.
 A schematic using host roles is enough initially. Store actual addresses,
 credentials, SSIDs and private network configuration in approved local storage.
-The project license and rights holder remain unresolved; this guide does not
-change the current decision to keep the repository local.
+The project license and rights holder remain unresolved. Lab hosting is
+authorized; the destination and visibility must be specified before pushing.
 
 ## Follow-up checks during integration
 

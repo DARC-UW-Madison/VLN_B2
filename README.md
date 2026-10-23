@@ -30,15 +30,18 @@ Start with recorded observations, then observe live predictions without sending
 movement commands. Controlled B2 trials follow only after the interface and stop
 behavior have been verified. Training a new walking policy is outside this scope.
 
-There is no installation or robot launch command yet. The target GPU, operating
-system, camera, SDK, and middleware remain to be selected from the actual hardware.
+The available setup is B2, Jetson AGX Orin, ZED 2i and Livox Mid-360.
+Docker use and lab GitHub hosting are permitted. See [project status](docs/status.md)
+for confirmed facts and the next inspection. There is no installation or robot
+launch command yet; the installed software and working interfaces remain unverified.
 To inspect a local change, run `git diff --check` and follow the review steps in
 [Contributing](CONTRIBUTING.md).
 
 ## License and publication
 
 The rights holder and license for original project work have not been selected.
-This repository remains local pending that decision. No upstream source code,
+Lab GitHub hosting is authorized; its destination and visibility still need to be
+specified. The repository is currently local. No upstream source code,
 model weights, recordings, or laboratory data are included. A future project
 license will not replace the terms of third-party materials.
 
