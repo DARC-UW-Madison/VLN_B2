@@ -48,3 +48,15 @@ The standard-library replay and tests need no vendor runtime. Packaging declares
 build or install. No vendor code has been copied into the independent adapters.
 Installing dependencies later can introduce additional transitive requirements;
 this table is not a completed redistribution audit or permission to publish them.
+
+## Optional host management and Python tooling
+
+Tailscale is selected for the planned host-management path, not bundled with the
+application. Its Linux client source uses [BSD-3-Clause](https://github.com/tailscale/tailscale/blob/main/LICENSE);
+tailnet enrollment, hosted-service terms and lab access rules are separate.
+Use the [official installer](https://tailscale.com/docs/install/linux). Target-side
+installation/enrollment and the exact installed version remain unverified.
+[pyenv](https://github.com/pyenv/pyenv) is optional per-user interpreter tooling
+under its [MIT license](https://github.com/pyenv/pyenv/blob/master/LICENSE), not a
+bundled dependency or GPU-runtime sandbox. Neither tool is installed by this
+repository. Review updated for these references: 2026-10-27.

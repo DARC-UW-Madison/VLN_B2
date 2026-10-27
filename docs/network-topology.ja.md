@@ -96,6 +96,9 @@ Pythonの[通信初期化部](https://github.com/unitreerobotics/unitree_sdk2_py
 
 ## 単体での環境構築，アカウント，遠隔操作
 
+具体的な操作は[ホストの初期設定手順](jetson-bootstrap.ja.md)を使う．
+遠隔経路にはTailscale SSHを選ぶ方針としたが，登録と対象機のアカウント作成は未確認である．
+
 外付けJetsonは，B2へ取り付ける前に机上で準備できる．目指すアプリケーションの流れは，
 画像・指示 → TIC-VLAの経路予測 → 追従計算 → Unitree SDKの速度要求 → 既存のB2歩行制御
 である．これは配置の目標であり，指令送信部と非同期ライブ推論の結合は未実装である．

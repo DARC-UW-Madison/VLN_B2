@@ -14,6 +14,7 @@ Unitree B2でTIC-VLAによるナビゲーションを評価するための研究
 
 | 文書 | 内容 |
 | --- | --- |
+| [Jetsonの初期設定](docs/jetson-bootstrap.ja.md) | 新規ログイン，Tailscale SSH，依存環境の分離，将来のCLI起動 |
 | [計算機とネットワーク](docs/network-topology.ja.md) | 各ホストの役割，SDK・ROS 2の区別，外付けJetsonでの最初の調査 |
 | [初回訪問の確認カード](docs/field-card.ja.md) | 最初の三つの確認と記録する項目 |
 | [現地での準備](docs/onsite.ja.md) | 対象機の調査，観測の取得，ローカル推論の確認コマンド |

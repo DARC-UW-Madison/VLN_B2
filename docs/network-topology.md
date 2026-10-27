@@ -107,6 +107,10 @@ record relevant environment settings, and make only justified per-process change
 
 ## Standalone setup, accounts, and remote operation
 
+Use [the host bootstrap procedure](jetson-bootstrap.md) for operator commands.
+The selected remote path is now Tailscale SSH; enrollment and target-side
+account creation remain unverified.
+
 The external Jetson can be prepared on the desk before attachment to B2. The
 intended application is images/instruction -> TIC-VLA path prediction -> tracking
 -> Unitree SDK velocity request -> existing B2 walking control. This is a target

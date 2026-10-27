@@ -44,3 +44,14 @@
 `setuptools>=68`を宣言しているが，`PYTHONPATH=src`での実行はビルドや導入を必要としない．
 独立したアダプタへのベンダーコードのコピーはない．後から導入する依存先には推移的な依存が
 加わる可能性があり，この表は再配布監査の完了や公開許可を意味しない．
+
+## 任意のホスト管理・Pythonツール
+
+Tailscaleはホスト管理用の経路として採用を計画し，アプリケーションには同梱しない．
+Linuxクライアントのソースは[BSD-3-Clause](https://github.com/tailscale/tailscale/blob/main/LICENSE)であり，
+tailnetへの登録，ホストされたサービスの条件，研究室のアクセス規則は別に扱う．
+[公式インストーラー](https://tailscale.com/docs/install/linux)を使う．対象機での導入・登録と，
+実際に導入された版は未確認である．[pyenv](https://github.com/pyenv/pyenv)は
+[MITライセンス](https://github.com/pyenv/pyenv/blob/master/LICENSE)の任意のユーザー用Python管理ツールであり，
+同梱する依存先やGPU実行環境の隔離ではない．どちらもこのリポジトリから自動導入しない．
+これらの参照の更新確認日：2026-10-27．

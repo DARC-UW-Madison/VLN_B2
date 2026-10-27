@@ -53,7 +53,7 @@ quality, or hardware performance. Example limits are not approved operating limi
 
 - The target is B2 with an external Jetson (AGX Orin previously reported), ZED 2i and Livox Mid-360. Inventory onboard computers separately; do not infer their service roles or wiring.
 - Use the existing B2 walking controller; investigate a high-level navigation adapter.
-- Prefer Mac-to-external-Jetson SSH for management, with VPN only as needed. Prepare the host account and GPU/application environment standalone; the proposed Wi-Fi/Ethernet paths remain unverified.
+- Prefer Mac-to-external-Jetson Tailscale SSH for management. A new host login and per-project dependency isolation are selected; target setup is not yet verified. Prepare the host account and GPU/application environment standalone; the proposed Wi-Fi/Ethernet paths remain unverified.
 - Keep proposed behavior separate from verified implementation and experiment results.
 - Maintain English and Japanese documentation, with English code and configuration.
 - Keep public-facing files free of personal labels, assistant instruction files,

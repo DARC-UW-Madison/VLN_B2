@@ -16,6 +16,7 @@ official release from the paper's authors or the robot manufacturer.
 
 | Document | What it explains |
 | --- | --- |
+| [Jetson bootstrap](docs/jetson-bootstrap.md) | New login, Tailscale SSH, dependency isolation, and later CLI boot |
 | [Computers and network](docs/network-topology.md) | Host roles, SDK/ROS 2 boundaries, and the first external-Jetson survey |
 | [First-visit card](docs/field-card.md) | Three initial checks and the facts to record |
 | [Onsite preparation](docs/onsite.md) | Commands to inspect the target, capture observations, and check local inference |
