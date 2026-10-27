@@ -9,13 +9,15 @@ walking controller and measure the effect of delayed model inference.
 **Status:** preparation tools are implemented for target inspection, synthetic
 replay, camera capture, state subscription, observation recording, and an optional
 offline inference check. They send no motor commands. Real ZED/B2 operation and
-GPU inference have not been validated. This is an independent project, not an
+GPU inference have not been validated. External-host inventory, management SSH,
+and a CUDA driver/device query are verified in [the baseline](docs/target-baseline.md). This is an independent project, not an
 official release from the paper's authors or the robot manufacturer.
 
 ## Read first
 
 | Document | What it explains |
 | --- | --- |
+| [Measured Jetson baseline](docs/target-baseline.md) | Verified host, GPU-driver, storage and network facts; runtime constraints |
 | [Jetson bootstrap](docs/jetson-bootstrap.md) | New login, Tailscale SSH, dependency isolation, and later CLI boot |
 | [Computers and network](docs/network-topology.md) | Host roles, SDK/ROS 2 boundaries, and the first external-Jetson survey |
 | [First-visit card](docs/field-card.md) | Three initial checks and the facts to record |

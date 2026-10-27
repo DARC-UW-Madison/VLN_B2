@@ -4,9 +4,11 @@
 
 The immediate goal is to establish who runs each service and how the external
 Jetson reaches it. Do this before adding ROS 2 packages, containers, network
-bridges, or model inference. The operator uses the **external Jetson** with a
-directly connected display and keyboard, separately from the robot. A B2 network
-connection and a Mac management link have not yet been demonstrated.
+bridges, or model inference. The **external Jetson** is operating separately
+from the robot. Direct display/keyboard access is available, and Mac-to-Jetson
+SSH over Tailscale has now been independently verified. The wired port has no
+carrier or address; no B2 connection has been demonstrated. See the
+[measured baseline](target-baseline.md).
 They also report an onboard Jetson and believe a separate motion-control computer
 is present. Their exact identities, service placement, and wiring remain unverified.
 
@@ -108,8 +110,8 @@ record relevant environment settings, and make only justified per-process change
 ## Standalone setup, accounts, and remote operation
 
 Use [the host bootstrap procedure](jetson-bootstrap.md) for operator commands.
-The selected remote path is now Tailscale SSH; enrollment and target-side
-account creation remain unverified.
+The selected remote path is Tailscale SSH; management access over Tailscale has
+now been independently verified. See the measured baseline for completed checks.
 
 The external Jetson can be prepared on the desk before attachment to B2. The
 intended application is images/instruction -> TIC-VLA path prediction -> tracking
@@ -162,13 +164,14 @@ images and explicitly labeled synthetic state allow software tests without B2;
 model files and approved inputs must still be obtained separately. A ZED attached
 to the desk setup can be tested there. Actual B2 state/control, sensor connections
 left on the robot, mounting geometry, command loss, and autonomous operation
-require later integration on the real robot. No SSH/VPN, account, runtime or
-model installation has yet been verified on the target.
+require later integration on the real robot. Management SSH and the host baseline are now verified. Application runtime,
+model loading and robot integration remain unverified.
 
 ## First collection on the external Jetson
 
-No remote connection to the Jetson has been established from this chat. Execute
-these commands in its own Linux terminal. No project checkout is needed:
+Remote SSH inspection has now completed; see the [baseline](target-baseline.md).
+The following remains a manual collection alternative in the Jetson's own Linux
+terminal. No project checkout is needed:
 
 ```sh
 cat /etc/os-release

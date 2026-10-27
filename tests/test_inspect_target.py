@@ -132,7 +132,7 @@ class TargetInspectionTests(unittest.TestCase):
         self.assertNotIn("private-host", json.dumps(result))
 
     def test_docker_runtime_configuration_is_not_emitted(self):
-        stdout = '"27.5.1"\n"runc"\n{"nvidia":{"path":"/home/private-user/runtime"},"runc":{}}'
+        stdout = json.dumps({"server_version": "27.5.1", "default_runtime": "runc", "runtimes": {"nvidia": {"path": "/home/private-user/runtime"}, "runc": {}}})
         with mock.patch.object(target, "_run_command", side_effect=[
             target._probe("available", "Docker version 27.5.1, build 1234567"),
             target._probe("available", stdout),
@@ -141,6 +141,24 @@ class TargetInspectionTests(unittest.TestCase):
         self.assertEqual(result["daemon"]["data"]["runtime_names"], ["nvidia", "runc"])
         self.assertNotIn("private-user", json.dumps(result))
         self.assertIn("unix:///var/run/docker.sock", run.call_args_list[1].args[0])
+
+    def test_docker_debian_build_suffix_is_recognized(self):
+        with mock.patch.object(target, "_run_command", side_effect=[
+            target._probe("available", "Docker version 25.0.5, build 25.0.5-0ubuntu1~22.04.1"),
+            target._probe("not_installed"),
+        ]):
+            result = target._docker()
+        self.assertEqual(result["client"], {"status": "available", "data": {"version": "25.0.5"}})
+
+    def test_zero_exit_empty_daemon_fields_do_not_mask_socket_permissions(self):
+        with mock.patch.object(target, "_run_command", side_effect=[
+            target._probe("available", "Docker version 25.0.5, build 1234567"),
+            target._probe("available", json.dumps({"server_version": "", "default_runtime": "", "runtimes": None})),
+        ]), mock.patch.object(target, "Path") as path, mock.patch.object(target.os, "access", return_value=False):
+            path.return_value.is_socket.return_value = True
+            result = target._docker()
+        self.assertEqual(result["daemon"]["status"], "error")
+        self.assertEqual(result["daemon"]["data"]["reason"], "local_socket_not_writable")
 
     def test_topology_keeps_selected_fields_without_aliases_or_nested_settings(self):
         records = [{

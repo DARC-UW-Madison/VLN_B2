@@ -4,27 +4,28 @@
 
 ## Current stage
 
-Preparation tools are implemented. The operator now has access to the external
-Jetson through its directly connected display and keyboard, operating separately
-from the robot. No robot-network link has been demonstrated. They report a separate onboard Jetson and a possible dedicated motion-control
-computer. Their service roles and physical network are not yet verified. No target
-inspection report, real GPU inference, or B2 measurements have been received. All CLI
-commands are observation-only or offline; none sends motor commands. The
-repository is local; lab GitHub hosting is authorized, but its destination and
-visibility are not yet specified. The rights holder and public-release license
-remain undecided.
+Initial read-only inspection of the external Jetson is complete. Mac-to-Jetson
+SSH over Tailscale, target-side inventory and a CUDA driver/device query worked.
+The host is an AGX Orin 64 GB class system running Ubuntu 20.04 / L4T 35.4.1.
+A separate 2 TB ext4 partition is unmounted; research storage and the compatible
+application runtime are not set up. See the [measured baseline](target-baseline.md).
+B2 is not connected through the wired port; no model inference, camera capture,
+or robot control has been validated. All project CLI commands remain
+observation-only or offline. The repository is local; lab GitHub hosting is
+authorized, but destination, visibility, original rights holder and license
+remain unresolved.
 
 ## Target setup
 
 | Component | Confirmed information | Still to inspect |
 | --- | --- | --- |
 | Robot | Unitree B2, without wheels | Firmware, working state/control interface, stop procedure |
-| External compute | Jetson, previously reported as AGX Orin; standalone with directly connected display/keyboard | Exact module, memory, storage, OS/JetPack, interfaces and cabling |
+| External compute | AGX Orin Developer Kit, 64 GB class; Ubuntu 20.04.6 / L4T 35.4.1; SSH verified | Dedicated storage, application runtime and model execution |
 | Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
 | Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
 | Camera | Stereolabs ZED 2i | Physical connection, installed ZED SDK or wrapper, working RGB stream and timestamps |
 | LiDAR | Livox Mid-360 | Existing connection/driver and intended role in this project |
-| Containers | Docker installation and use permitted | Current installation, GPU runtime and compatible image |
+| Containers | Docker 26.1.3; NVIDIA runtime registered; administrator query succeeds | Research-login access, compatible image and container GPU execution |
 | Collaboration | Push to lab GitHub permitted | Organization/repository URL, access and visibility |
 
 Component availability does not establish successful sensor or model operation.
@@ -34,8 +35,8 @@ choosing an image or proposing a host upgrade.
 | Deliverable | State | Evidence or completion condition |
 | --- | --- | --- |
 | Shared documentation and development rules | Prepared | README, Contributing, architecture, development guide, and third-party review |
-| Hardware and software specification | Main hardware confirmed; software inventory pending | Target setup above; no target-side inspection yet |
-| Standalone target inventory | Implemented; target run pending | `tools/inspect_target.py`; Python standard library only |
+| Hardware and software specification | External-host inventory verified; robot/sensors pending | [Measured baseline](target-baseline.md) |
+| Standalone target inventory | Executed on target Python 3.8.10 | `tools/inspect_target.py`; no installation or configuration changes |
 | Synthetic replay and candidate tracking | Implemented | `replay`, example trajectories, freshness checks, and velocity limits; no motor output |
 | Upstream permissions and dependency revisions | Open | Research use and sharing conditions resolved; exact revisions recorded |
 | Offline inference | Synchronous local-file adapter implemented; real-model run pending | Strict checkpoint validation and recorded-observation input; no async cache |
@@ -44,16 +45,16 @@ choosing an image or proposing a host upgrade.
 | Robot stop behavior | Not verified | Reviewed tests of the actual firmware, command loss, and operator override |
 | B2 navigation evaluation | Not started | Predefined tasks, complete trial counts, results and limitations |
 
-Local verification (83 tests and the stated limitations) is documented in
+Local verification (85 tests and the stated limitations) is documented in
 [the development guide](development.md#preparation-verification). Synthetic
 replay and mocked tests exercise software behavior, not real drivers, model
 quality, or hardware performance. Example limits are not approved operating limits.
 
 ## Decisions in effect
 
-- The target is B2 with an external Jetson (AGX Orin previously reported), ZED 2i and Livox Mid-360. Inventory onboard computers separately; do not infer their service roles or wiring.
+- The external compute is verified as AGX Orin, 64 GB class. B2, ZED 2i and Mid-360 integration remains pending. Inventory onboard computers separately; do not infer their roles or wiring.
 - Use the existing B2 walking controller; investigate a high-level navigation adapter.
-- Prefer Mac-to-external-Jetson Tailscale SSH for management. A new host login and per-project dependency isolation are selected; target setup is not yet verified. Prepare the host account and GPU/application environment standalone; the proposed Wi-Fi/Ethernet paths remain unverified.
+- Mac-to-external-Jetson SSH over Tailscale is verified. Keep per-project dependency isolation; preserve the existing OS, ROS, ZED, other accounts and data. Robot Ethernet remains unconnected.
 - Keep proposed behavior separate from verified implementation and experiment results.
 - Maintain English and Japanese documentation, with English code and configuration.
 - Keep public-facing files free of personal labels, assistant instruction files,
@@ -66,24 +67,22 @@ quality, or hardware performance. Example limits are not approved operating limi
 
 ## Next deliverable
 
-Start with [standalone setup and network discovery](network-topology.md): collect
-the external Jetson inventory, establish the host account and Mac SSH access,
-and check a compatible GPU/application runtime on the desk. VPN is optional;
-none of these target setup steps is verified yet. Identify cable endpoints and
-distinguish management from the robot-facing interface. Once B2 is available,
-map routes and the documented SDK service/domain before a state-only host probe. Follow [onsite preparation](onsite.md)
-for existing sensor software and the working B2 control procedure. Then use the observation
-commands to verify an RGB frame from the ZED 2i and received robot state;
-establish clock and frame conventions before marking either verified. Select
-the container from the measured platform and test the synchronous adapter with
-approved local model files. Obtain the lab repository URL separately.
+Establish research storage on the inspected system before large image/model
+acquisition. Inspect the existing SSD's intended use without formatting or
+moving other users' data. Select and test an inference-only GPU/Python/PyTorch
+combination against the installed L4T; do not apply the upstream training CUDA
+pins as a Jetson installer. Resolve Docker access and prove container GPU
+execution before model loading. The [baseline](target-baseline.md) defines the
+remaining checks and evidence boundaries. B2 wiring, service/domain, sensor
+frames/timing and stop behavior follow when the robot is connected. Obtain the
+lab repository URL separately.
 
 Stereolabs provides an [official Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)
 with platform-specific image selection. NVIDIA documents the [Jetson container runtime](https://developer.nvidia.com/embedded/jetson-cloud-native/).
 Start with ZED RGB input, model inference, path tracking and the B2 SDK. Decide
 ROS 2 and Mid-360 integration from existing services and a defined need; the
 [Livox ROS driver](https://github.com/Livox-SDK/livox_ros_driver2) is one available
-integration path, not an adopted dependency. No package or model has been downloaded.
+integration path, not an adopted dependency. This inspection installed no application package or model weight.
 
 ## Continuing the work
 

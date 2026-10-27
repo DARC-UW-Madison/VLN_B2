@@ -3,9 +3,11 @@
 [日本語](jetson-bootstrap.ja.md) · [Network design](network-topology.md) · [Home](../README.md)
 
 This is an operator-run procedure for an Ubuntu/systemd Jetson with internet
-access and a current administrator login. Commands below have not been run on
-the target. Keep its directly attached display and keyboard available during
-setup. Account names, passwords, authentication URLs, tailnet identities, and
+access and a current administrator login. The operator has completed bootstrap,
+and subsequent SSH inspection is independently verified in the
+[target baseline](target-baseline.md). Account/installation commands below are
+reference instructions, not a request to recreate the existing login. Keep its
+directly attached display and keyboard available during setup. Account names, passwords, authentication URLs, tailnet identities, and
 actual addresses belong in approved local storage, not this repository.
 
 ## 1. Create a new host login

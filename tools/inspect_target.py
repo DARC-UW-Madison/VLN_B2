@@ -180,25 +180,31 @@ def _docker():
     # Explicit fields avoid endpoints, usernames, labels, and daemon configuration.
     version = _run_command(["docker", "--version"])
     if version["status"] == "available":
-        match = re.fullmatch(r"Docker version ([A-Za-z0-9.+:~_-]+), build [A-Za-z0-9._-]+", version["data"])
+        match = re.fullmatch(r"Docker version ([A-Za-z0-9.+:~_-]+), build [A-Za-z0-9.+:~_-]+", version["data"])
         version = _probe("available", {"version": match.group(1)}) if match else _probe("unknown", next_step="Check Docker version locally; output format was not recognized.")
     runtime = _run_command([
         "docker", "--host", "unix:///var/run/docker.sock", "info", "--format",
-        '{{json .ServerVersion}}\n{{json .DefaultRuntime}}\n{{json .Runtimes}}',
+        '{"server_version":{{json .ServerVersion}},"default_runtime":{{json .DefaultRuntime}},"runtimes":{{json .Runtimes}}}',
     ])
     if runtime["status"] == "available":
         try:
-            lines = runtime["data"].splitlines()
-            server, default, runtimes = [json.loads(line) for line in lines]
-            if not isinstance(server, str) or not isinstance(default, str) or not isinstance(runtimes, dict):
+            data = json.loads(runtime["data"])
+            server, default, runtimes = data["server_version"], data["default_runtime"], data["runtimes"]
+            if not isinstance(server, str) or not server or not isinstance(default, str) or not default or not isinstance(runtimes, dict):
                 raise ValueError("Unexpected Docker data")
             names = sorted(name for name in runtimes if re.fullmatch(r"[a-zA-Z0-9_.-]{1,64}", name))
             runtime = _probe("available", {"server_version": server[:80], "default_runtime": default[:80], "runtime_names": names},
                              "A listed NVIDIA runtime does not verify GPU access inside a container.")
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, KeyError):
             runtime = _probe("unknown", next_step="Check Docker daemon and runtime information locally.")
     elif runtime["status"] == "error":
         runtime["next_step"] = "The local /var/run/docker.sock daemon may be stopped or inaccessible; rootless or custom local sockets are not inspected. Check locally without changing permissions automatically."
+    socket = Path("/var/run/docker.sock")
+    if socket.is_socket():
+        writable = os.access(str(socket), os.W_OK)
+        if not writable and runtime["status"] != "available":
+            runtime = _probe("error", {"reason": "local_socket_not_writable"},
+                             "The current user cannot access the standard Docker socket. Review approved administrator access; this tool changes no groups or permissions.")
     return {"client": version, "daemon": runtime}
 
 

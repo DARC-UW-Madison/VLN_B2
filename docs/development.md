@@ -46,6 +46,13 @@ Jetson report or robot-network validation has been obtained yet. The operator
 can now access an external Jetson; follow [network discovery](network-topology.md)
 before configuring DDS, ROS 2, or containers.
 
+On the same date, SSH inspection of the real external Jetson succeeded, including
+the inspector under Python 3.8.10 and a CUDA driver/device query. Docker client
+format and zero-exit permission behavior found on target led to two regression
+tests; the full local suite passed 85 tests. The revised inspector also ran on
+the target. See [the baseline](target-baseline.md); this does not validate
+container GPU execution, model inference, or robot operation.
+
 ## 1. Understand the system
 
 Read the [architecture](architecture.md) and [project status](status.md).
