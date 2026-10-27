@@ -53,6 +53,7 @@ quality, or hardware performance. Example limits are not approved operating limi
 
 - The target is B2 with an external Jetson (AGX Orin previously reported), ZED 2i and Livox Mid-360. Inventory onboard computers separately; do not infer their service roles or wiring.
 - Use the existing B2 walking controller; investigate a high-level navigation adapter.
+- Prefer Mac-to-external-Jetson SSH for management, with VPN only as needed. Prepare the host account and GPU/application environment standalone; the proposed Wi-Fi/Ethernet paths remain unverified.
 - Keep proposed behavior separate from verified implementation and experiment results.
 - Maintain English and Japanese documentation, with English code and configuration.
 - Keep public-facing files free of personal labels, assistant instruction files,
@@ -65,10 +66,12 @@ quality, or hardware performance. Example limits are not approved operating limi
 
 ## Next deliverable
 
-Start with [computer roles and network discovery](network-topology.md): collect
-the external Jetson inventory, identify cable endpoints, and distinguish the Mac
-management path from the robot-facing interface. Map routes and the documented
-SDK service/domain before a state-only host probe. Follow [onsite preparation](onsite.md)
+Start with [standalone setup and network discovery](network-topology.md): collect
+the external Jetson inventory, establish the host account and Mac SSH access,
+and check a compatible GPU/application runtime on the desk. VPN is optional;
+none of these target setup steps is verified yet. Identify cable endpoints and
+distinguish management from the robot-facing interface. Once B2 is available,
+map routes and the documented SDK service/domain before a state-only host probe. Follow [onsite preparation](onsite.md)
 for existing sensor software and the working B2 control procedure. Then use the observation
 commands to verify an RGB frame from the ZED 2i and received robot state;
 establish clock and frame conventions before marking either verified. Select

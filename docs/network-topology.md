@@ -105,6 +105,62 @@ how `CYCLONEDDS_URI` interacts with a programmatic configuration. Do not assume
 an environment variable always wins. Keep the first probe in a fresh terminal,
 record relevant environment settings, and make only justified per-process changes.
 
+## Standalone setup, accounts, and remote operation
+
+The external Jetson can be prepared on the desk before attachment to B2. The
+intended application is images/instruction -> TIC-VLA path prediction -> tracking
+-> Unitree SDK velocity request -> existing B2 walking control. This is a target
+architecture; the command sender and live asynchronous integration remain unimplemented.
+
+| Component | Responsibility | Initial approach |
+|---|---|---|
+| JetPack/CUDA and compatible PyTorch | Host GPU support and model execution | Inspect the existing L4T and runtime before choosing packages |
+| Unitree SDK2 | B2 state access and robot requests over DDS | First verify state reception on the host; no ROS 2 prerequisite |
+| ZED SDK | ZED camera access | Separate from Unitree SDK; verify the actual camera and matching binding |
+| ROS 2 | Optional sensor pipelines, SLAM, recording and visualization | Add for a defined dependency; preserve existing onboard services |
+| Docker | Package application dependencies for repeatable execution | Evaluate a compatible image after host inventory; it is not a robot-control protocol |
+
+Containerization does not replace the Jetson host's GPU drivers or make arbitrary
+CUDA/PyTorch/ZED versions compatible. Match the image to the installed platform
+and expose the required GPU/camera devices deliberately. The supplied Dockerfile
+is only an explicit-base template. See [NVIDIA JetPack setup](https://docs.nvidia.com/jetson/jetpack/install-setup/index.html)
+and [Stereolabs' Jetson container guidance](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson).
+
+For a lab device, use a host Linux account assigned to the researcher. If the
+current account already serves that purpose, another is optional; if it belongs
+to a previous user, create a new research login. Multiple researchers should
+have separate logins and SSH keys. Use ordinary permissions for routine work
+and administrator privileges only where needed. A new login separates home
+files and credentials; it does not create another OS or isolate system drivers.
+Host login accounts and users inside containers are different configuration
+layers. See [Ubuntu user management](https://ubuntu.com/server/docs/how-to/security/user-management/).
+
+Prefer Mac-to-Jetson SSH for development, with the connected display/keyboard
+available for initial setup and recovery. The SSH server runs on the Jetson
+host. An ordinary reachable LAN/Wi-Fi path is enough; VPN is optional for remote
+or otherwise separated networks. Same Wi-Fi does not guarantee peer access if
+client isolation or firewall rules block it. Use a lab-approved VPN for the
+management link when needed; reaching the Jetson is sufficient for this design,
+without advertising the robot subnet. A VPN does not replace SSH or the
+Jetson-to-B2 wired DDS connection. See [Ubuntu OpenSSH](https://ubuntu.com/server/docs/how-to/security/openssh-server/).
+
+Wi-Fi and robot Ethernet can remain active together. Preserve the intended
+management/internet route, avoid overlapping subnets, and identify the robot
+interface explicitly. Configure the robot-side address from the actual lab or
+manufacturer specification; do not add an unnecessary default route through B2.
+The physical destination is the supported B2-side Ethernet network, not necessarily
+a direct connection to the onboard Jetson's application. Its internal path remains
+to be mapped.
+
+Proceed with host inventory -> account and local SSH -> optional VPN -> GPU and
+compatible runtime checks -> SDK dependencies and offline model inference. Saved
+images and explicitly labeled synthetic state allow software tests without B2;
+model files and approved inputs must still be obtained separately. A ZED attached
+to the desk setup can be tested there. Actual B2 state/control, sensor connections
+left on the robot, mounting geometry, command loss, and autonomous operation
+require later integration on the real robot. No SSH/VPN, account, runtime or
+model installation has yet been verified on the target.
+
 ## First collection on the external Jetson
 
 No remote connection to the Jetson has been established from this chat. Execute
