@@ -5,7 +5,8 @@
 ## Current stage
 
 Preparation tools are implemented. The operator now has access to the external
-Jetson and reports a separate onboard Jetson and a possible dedicated motion-control
+Jetson through its directly connected display and keyboard, operating separately
+from the robot. No robot-network link has been demonstrated. They report a separate onboard Jetson and a possible dedicated motion-control
 computer. Their service roles and physical network are not yet verified. No target
 inspection report, real GPU inference, or B2 measurements have been received. All CLI
 commands are observation-only or offline; none sends motor commands. The
@@ -18,7 +19,7 @@ remain undecided.
 | Component | Confirmed information | Still to inspect |
 | --- | --- | --- |
 | Robot | Unitree B2, without wheels | Firmware, working state/control interface, stop procedure |
-| External compute | Jetson, previously reported as AGX Orin; operator access available | Exact module, memory, storage, OS/JetPack, interfaces and cabling |
+| External compute | Jetson, previously reported as AGX Orin; standalone with directly connected display/keyboard | Exact module, memory, storage, OS/JetPack, interfaces and cabling |
 | Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
 | Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
 | Camera | Stereolabs ZED 2i | Physical connection, installed ZED SDK or wrapper, working RGB stream and timestamps |

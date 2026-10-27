@@ -4,7 +4,9 @@
 
 The immediate goal is to establish who runs each service and how the external
 Jetson reaches it. Do this before adding ROS 2 packages, containers, network
-bridges, or model inference. The operator can now use the **external Jetson**.
+bridges, or model inference. The operator uses the **external Jetson** with a
+directly connected display and keyboard, separately from the robot. A B2 network
+connection and a Mac management link have not yet been demonstrated.
 They also report an onboard Jetson and believe a separate motion-control computer
 is present. Their exact identities, service placement, and wiring remain unverified.
 
