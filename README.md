@@ -18,6 +18,7 @@ official release from the paper's authors or the robot manufacturer.
 | Document | What it explains |
 | --- | --- |
 | [Measured Jetson baseline](docs/target-baseline.md) | Verified host, GPU-driver, storage and network facts; runtime constraints |
+| [Runtime compatibility](docs/runtime-compatibility.md) | Candidate inference stack, model-free checks, and unresolved checkpoint-loading constraints |
 | [Jetson bootstrap](docs/jetson-bootstrap.md) | New login, Tailscale SSH, dependency isolation, and later CLI boot |
 | [Computers and network](docs/network-topology.md) | Host roles, SDK/ROS 2 boundaries, and the first external-Jetson survey |
 | [First-visit card](docs/field-card.md) | Three initial checks and the facts to record |
@@ -40,8 +41,9 @@ behavior have been verified. Training a new walking policy is outside this scope
 
 The available setup is B2, Jetson AGX Orin, ZED 2i and Livox Mid-360.
 Docker use and lab GitHub hosting are permitted. See [project status](docs/status.md)
-for confirmed facts and the next inspection. Installed target software, sensor
-connections, frames, and timing remain unverified. No asynchronous robot-control
+for confirmed facts and the next inspection. External-host software inventory is
+verified; application-runtime behavior, sensor connections, frames, and timing
+remain unverified. No asynchronous robot-control
 loop or motor command sender is implemented.
 
 ## Try the preparation tools
@@ -87,6 +89,10 @@ The lab repository is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madiso
 No upstream source code, model weights, recordings, or laboratory data are
 included. Their terms remain separate; this license grants no rights to TIC-VLA
 or its weights. See [third-party materials](THIRD_PARTY.md).
+
+Future datasets, recordings, and trained or converted weights need an explicit
+release decision and artifact-specific terms; they do not automatically inherit
+this repository's MIT license. Review unpublished research before sharing it.
 
 Documentation was prepared with AI assistance and must be reviewed as research
 material; it does not constitute experimental evidence.

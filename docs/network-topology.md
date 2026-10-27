@@ -9,7 +9,7 @@ from the robot. Direct display/keyboard access is available, and Mac-to-Jetson
 SSH over Tailscale has now been independently verified. The wired port has no
 carrier or address; no B2 connection has been demonstrated. See the
 [measured baseline](target-baseline.md).
-They also report an onboard Jetson and believe a separate motion-control computer
+The operator also reports an onboard Jetson and believes a separate motion-control computer
 is present. Their exact identities, service placement, and wiring remain unverified.
 
 ## What the external Jetson can control
@@ -135,7 +135,9 @@ and [Stereolabs' Jetson container guidance](https://docs.stereolabs.com/docs/int
 For a lab device, use a host Linux account assigned to the researcher. If the
 current account already serves that purpose, another is optional; if it belongs
 to a previous user, create a new research login. Multiple researchers should
-have separate logins and SSH keys. Use ordinary permissions for routine work
+have separate logins and individual authentication identities. Use individual
+SSH keys with conventional OpenSSH; Tailscale SSH authenticates through tailnet
+identities and policy; see [Tailscale SSH](https://tailscale.com/docs/features/tailscale-ssh). Use ordinary permissions for routine work
 and administrator privileges only where needed. A new login separates home
 files and credentials; it does not create another OS or isolate system drivers.
 Host login accounts and users inside containers are different configuration

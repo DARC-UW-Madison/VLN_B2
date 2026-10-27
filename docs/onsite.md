@@ -4,7 +4,9 @@
 
 Use this guide at the Jetson itself. SSH and a GitHub URL are not required.
 Reported hardware is **B2 (without wheels), Jetson AGX Orin, ZED 2i, and Livox
-Mid-360**. The installed software, wiring, and control behavior remain unverified.
+Mid-360**. The external-host inventory and management SSH are verified in the
+[baseline](target-baseline.md). Sensor/runtime operation, B2 wiring, and control
+behavior remain unverified.
 All commands in this guide are observation or offline commands; this repository
 currently has **no motor-output command**.
 
@@ -72,7 +74,8 @@ Required only for the corresponding probe:
 Use the laboratory's existing setup first. If dependencies are missing, select
 their versions from the inventory and official instructions, then rerun the
 relevant probe. `pyenv` alone does not supply NVIDIA libraries or vendor bindings.
-There is no generic dependency installer here because the target is uninspected.
+There is no generic dependency installer: the host inventory does not establish
+compatible application packages or working sensor bindings.
 
 Run the camera probe on Jetson Linux with a process deadline. A native driver can
 hang beyond a Python retry limit; `timeout` provides an outer process bound.
@@ -153,6 +156,11 @@ this repository. The MIT license for original code and documentation does not
 cover these external assets. See [third-party terms](../THIRD_PARTY.md).
 
 When the compatible upstream environment and existing local files are available,
+first resolve the [checkpoint-loading constraint](runtime-compatibility.md#bounded-build-candidate).
+The old-PyTorch build candidate is for model-free checks only;
+`weights_only=True` alone does not resolve its published vulnerabilities.
+Do not use that candidate to load external checkpoints before a reviewed fix or
+alternative loading path is validated. Then
 replace all example paths below. Use a reviewed, pinned upstream checkout. It is
 added to the process import path; it is not copied into this project.
 

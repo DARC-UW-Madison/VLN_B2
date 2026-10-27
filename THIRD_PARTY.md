@@ -5,16 +5,16 @@
 These are references and optional runtime dependencies. None is bundled or
 installed by this repository. Independent adapters call existing public APIs;
 their mocked tests do not load the actual third-party runtimes. Review updated:
-2026-10-23. Default-branch links may change; pin exact revisions before real-model
+2026-10-27. Default-branch links may change; pin exact revisions before real-model
 or hardware experiments.
 
 | Material | Source | Current handling |
 | --- | --- | --- |
 | TIC-VLA paper | [arXiv, version 2](https://arxiv.org/abs/2602.02459v2) | Cite as the method's source; its results are not B2 validation |
-| TIC-VLA software | [Repository](https://github.com/ucla-mobility/TIC-VLA) and [license](https://github.com/ucla-mobility/TIC-VLA/blob/main/LICENSE.md) | Read for feasibility; no source copied into this project |
+| TIC-VLA software | [Repository](https://github.com/ucla-mobility/TIC-VLA) and [license at reviewed revision](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e121d5df5df071297bba8e5353ebb/LICENSE.md) | Academic Software License reviewed at `9fa6f8b`; no source copied into this project |
 | TIC-VLA checkpoint | [Official repository's linked checkpoint](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/main/TIC-VLA-model.ckpt) | Not downloaded; verify applicable artifact terms before use |
 | InternVL3-1B | [Model repository](https://huggingface.co/OpenGVLab/InternVL3-1B) | Candidate base model; terms and revision not yet reviewed for integration |
-| Unitree SDK2 Python | [B2 client](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py) | API inspected; package license, revision, and firmware compatibility remain to be checked |
+| Unitree SDK2 Python | [B2 client](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py), [BSD-3-Clause license](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | API inspected; license reviewed at `814556d`; runtime revision, dependencies, and firmware compatibility remain unverified |
 
 The inspected TIC-VLA software license permits specified educational or academic
 research use by academic or nonprofit researchers and prohibits onward transfer
@@ -34,6 +34,16 @@ The [MIT License](LICENSE) covers this project's original code and documentation
 only. It does not relicense dependencies, upstream software, model weights or
 data, and no dependency's license is adopted as the license for this repository.
 
+## Future research and sharing
+
+Independently written adapters, evaluation tools and documentation may remain
+under MIT. Modified upstream code, converted or fine-tuned weights, datasets and
+recordings require a separate release decision based on their source terms and
+applicable research agreements. Training or conversion does not by itself remove
+upstream restrictions. Publish methods and original contributions without
+assuming permission to redistribute restricted artifacts. Keep unpublished
+results and identifying recordings in approved laboratory storage.
+
 ## Preparation-tool dependencies
 
 | Material | Source | Use and distribution |
@@ -42,7 +52,7 @@ data, and no dependency's license is adopted as the license for this repository.
 | PyTorch | [Official documentation](https://docs.pytorch.org/docs/stable/index.html) | Optional checkpoint loading and inference; not installed or bundled. Select a Jetson-compatible build and record its license/notices |
 | Transformers / InternVL runtime | [Transformers documentation](https://huggingface.co/docs/transformers/index), [InternVL3-1B](https://huggingface.co/OpenGVLab/InternVL3-1B) | Optional upstream model loaders; local-only resolution. Trusted model Python code still executes; pin source and artifact revisions |
 | Livox driver | [Official driver](https://github.com/Livox-SDK/livox_ros_driver2) | Reference only; not an implemented dependency and no source bundled |
-| Base container image | [NVIDIA Jetson resources](https://developer.nvidia.com/embedded/jetson-cloud-native/) | Not selected, pulled, or bundled; the template requires an explicit compatible image and separate review of its contents and terms |
+| Base container image | [NVIDIA Jetson resources](https://developer.nvidia.com/embedded/jetson-cloud-native/) | A matching-L4T candidate is recorded in the [runtime review](docs/runtime-compatibility.md); not pulled, built, or bundled. Image contents and terms need review before use or sharing |
 
 The standard-library replay and tests need no vendor runtime. Packaging declares
 `setuptools>=68` as its build tool; running from `PYTHONPATH=src` needs no package
@@ -52,11 +62,11 @@ this table is not a completed redistribution audit or permission to publish them
 
 ## Optional host management and Python tooling
 
-Tailscale is selected for the planned host-management path, not bundled with the
+Tailscale is used for the verified host-management SSH path, not bundled with the
 application. Its Linux client source uses [BSD-3-Clause](https://github.com/tailscale/tailscale/blob/main/LICENSE);
 tailnet enrollment, hosted-service terms and lab access rules are separate.
-Use the [official installer](https://tailscale.com/docs/install/linux). Target-side
-installation/enrollment and the exact installed version remain unverified.
+Use the [official installer](https://tailscale.com/docs/install/linux). SSH over
+Tailscale is verified on the target; the exact client version remains uninspected.
 [pyenv](https://github.com/pyenv/pyenv) is optional per-user interpreter tooling
 under its [MIT license](https://github.com/pyenv/pyenv/blob/master/LICENSE), not a
 bundled dependency or GPU-runtime sandbox. Neither tool is installed by this

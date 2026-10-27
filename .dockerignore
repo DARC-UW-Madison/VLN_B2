@@ -1,6 +1,8 @@
 **
 !pyproject.toml
 !README.md
+!LICENSE
+!THIRD_PARTY.md
 !src/
 !src/**
 !examples/

@@ -10,7 +10,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-
 SPEC = importlib.util.spec_from_file_location(
     "inspect_target", Path(__file__).resolve().parents[1] / "tools" / "inspect_target.py"
 )

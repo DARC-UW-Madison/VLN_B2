@@ -121,7 +121,8 @@ Pythonの[通信初期化部](https://github.com/unitreerobotics/unitree_sdk2_py
 
 研究室の機器では，研究者に割り当てたホストのLinuxアカウントを使う．現在のアカウントが
 その用途なら追加は任意だが，以前の利用者のものなら研究用のログインを新しく作る．複数人で
-使う場合は，ログインとSSH鍵を各自で分ける．普段は通常の権限を使い，必要な作業だけ管理者
+使う場合は，ログインと認証IDを各自で分ける．通常のOpenSSHでは各自のSSH鍵を使い，
+[Tailscale SSH](https://tailscale.com/docs/features/tailscale-ssh)ではtailnetのIDとポリシーで認証する．普段は通常の権限を使い，必要な作業だけ管理者
 権限で行う．新しいログインはホームと認証情報を分けるもので，OSやシステムのドライバを
 分離するものではない．ホストのログインユーザーとコンテナ内のユーザーも別の設定である．
 [Ubuntuのユーザー管理](https://ubuntu.com/server/docs/how-to/security/user-management/)を参照する．

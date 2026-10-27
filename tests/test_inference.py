@@ -132,7 +132,7 @@ class InferenceTests(unittest.TestCase):
     def predict(self, predictor, instruction="Go to the door"):
         return predictor.predict([str(self.image)], instruction, self.state, time.monotonic())
 
-    def test_safe_local_loading_and_architecture(self):
+    def test_restricted_local_loading_and_architecture(self):
         predictor = self.predictor().load()
         self.assertEqual(self.load_arguments, {"map_location": "cpu", "weights_only": True})
         self.assertEqual(self.model_kwargs["action_horizon_steps"], 2)
@@ -157,7 +157,7 @@ class InferenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "upstream_root"):
             TicVlaPredictor(self.base, self.checkpoint_path, upstream_root=self.root).load()
 
-    def test_safe_loading_never_falls_back_to_pickle(self):
+    def test_restricted_loading_never_falls_back_to_pickle(self):
         calls = []
 
         def old_load(*args, **kwargs):

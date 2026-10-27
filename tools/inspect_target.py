@@ -21,7 +21,6 @@ import shutil
 import subprocess
 from pathlib import Path
 
-
 SCHEMA_VERSION = 1
 COMMAND_TIMEOUT_SECONDS = 3
 PACKAGES = (

@@ -3,8 +3,8 @@
 [日本語](development.ja.md) · [Home](../README.md)
 
 This guide defines the route to a reproducible B2 experiment. Preparation tools
-are implemented, but target hardware, GPU inference, and robot motion remain
-unvalidated. Use [onsite preparation](onsite.md) for the current commands; the
+are implemented. External-host inventory is verified; sensor operation, GPU
+inference, and robot motion remain unvalidated. Use [onsite preparation](onsite.md) for the current commands; the
 stages below describe what evidence is needed before advancing.
 
 ## Run local checks first
@@ -18,7 +18,7 @@ git diff --check
 ```
 
 The bundled replay evaluates three synthetic samples: two accepted candidate
-commands followed by a stale-image rejection with a zero command. It runs no
+commands followed by a stale-image rejection with a zero-valued candidate. It runs no
 neural model, connects to no hardware, and sends no motion commands. Acceptance
 means the configured software checks passed, not that a path is clear or safe
 for the B2. The example limits need separate approval and measurement before
@@ -27,31 +27,25 @@ interfaces; they do not validate the actual drivers or trained model.
 
 ### Preparation verification
 
-On 2026-10-23, the local development host (macOS, Python 3.14.7) passed 79
-standard-library tests, synthetic CLI replay, bytecode compilation, and source
-syntax parsing against Python 3.10 (package/tests) and Python 3.8 (standalone
-inspector). Syntax parsing is not execution on those older interpreters.
-The inspector also ran on that host, including creation of a missing output
-directory; this was not a Jetson inventory. All 20 Markdown files parsed as GFM
-with matching translations, valid local links/fragments, and required Japanese
-punctuation. Source scans found no secrets. Recheck Git history before sharing.
-Ruff was unavailable and could not be installed in this environment, so its
-configured lint/format checks have not run. No container build, GPU prediction,
-or real camera/robot probe has been validated.
+On **2026-10-27**, the local macOS host with Python 3.14.7 passed **85
+standard-library tests**, synthetic CLI replay, and Ruff 0.17.3's configured
+lint rules. Python syntax is checked against 3.10 for the package/tests and 3.8
+for the standalone inspector; parsing is not execution on those interpreters.
 
-On 2026-10-27, the extended optional network inventory passed the full 83-test
-suite locally. Added checks cover selected topology fields, missing/malformed
-responses, explicit opt-in, and cache/route inspection without peer probes. No
-Jetson report or robot-network validation has been obtained yet. The operator
-can now access an external Jetson; follow [network discovery](network-topology.md)
-before configuring DDS, ROS 2, or containers.
+The publication review covers all 53 tracked files, all 14 English/Japanese
+Markdown pairs, and every reachable Git revision. Review checks include rendered
+Markdown, links/fragments, matching command examples and citations, private-data
+and secret scans, and exclusion of local records and model artifacts. A local
+wheel builds and includes the MIT license; the Docker context and copy rules
+include license/provenance notices. No container build was performed.
 
-On the same date, SSH inspection of the real external Jetson succeeded, including
-the inspector under Python 3.8.10 and a CUDA driver/device query. Docker client
-format and zero-exit permission behavior found on target led to two regression
-tests; the full local suite passed 85 tests. The revised inspector also ran on
-the target. See [the baseline](target-baseline.md); this does not validate
-container GPU execution, model inference, or robot operation.
+Real external-Jetson SSH inspection ran the inspector under Python 3.8.10 and
+verified a CUDA driver/device query and privileged Docker metadata. See the
+[baseline](target-baseline.md). Container GPU computation, actual model loading,
+ZED capture and B2 operation remain unverified. The
+[runtime review](runtime-compatibility.md) records the unresolved checkpoint-loading
+constraint. Source/publication checks do not establish hardware readiness or
+permission to redistribute third-party assets.
 
 ## 1. Understand the system
 
@@ -90,8 +84,8 @@ It reads installed system information and reports unknown, unavailable, and
 unchecked items explicitly. It does not install packages, contact a remote
 service, start sensors, or verify GPU container operation. Network addresses
 are excluded unless explicitly requested. Even the default report may contain
-laboratory information; review it before sharing. This tool has not been run
-on the target. Do not infer a B2 configuration from another robot's setup guide.
+laboratory information; review it before sharing. This tool ran on the external
+Jetson; it does not inspect or validate the unconnected B2. Do not infer a B2 configuration from another robot's setup guide.
 Confirm whether ROS 2 is needed before choosing a distribution.
 
 **Completion:** a reviewer can identify the hardware and software without

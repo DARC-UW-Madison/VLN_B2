@@ -3,7 +3,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 WORKDIR /opt/b2-tic-vla
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md LICENSE THIRD_PARTY.md ./
 COPY src/ src/
 COPY examples/ examples/
 ENV PYTHONPATH=/opt/b2-tic-vla/src
