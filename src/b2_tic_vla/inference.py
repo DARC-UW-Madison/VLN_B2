@@ -102,7 +102,7 @@ class TicVlaPredictor:
         self._last_runtime_seconds = None
 
     def load(self):
-        """Load trusted existing local files with safe checkpoint deserialization."""
+        """Load trusted existing local files with restricted checkpoint deserialization."""
         if self._model is not None:
             return self
         if not self.base_model_path.is_dir() or not (self.base_model_path / "config.json").is_file():

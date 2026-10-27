@@ -49,11 +49,21 @@ explicitly rather than presenting Docker as absent. Administrator invocation
 works; the future container workflow must choose appropriate access explicitly.
 
 The root filesystem is roughly **61 GB total with 20 GB free** at inspection.
-A separate **2 TB NVMe SSD with an ext4 partition is present but unmounted**. Its contents, free
-space and ownership were not inspected. No formatting, mounting, relocation or
-shared Docker-storage changes occurred. Establish model-cache, image/build, and
-project storage before large downloads; a new home alone does not create more
-space or a separate disk.
+A separate **2 TB NVMe SSD with an ext4 partition is present but unmounted**.
+Read-only filesystem metadata reports approximately **1.05 TB free** and
+**0.95 TB allocated**, including filesystem overhead. It is not an empty disk.
+The superblock reports `clean` together with the `needs_recovery` feature;
+these values do not establish filesystem health or permission to reuse its data.
+Contents and ownership remain uninspected. No matching persistent-mount entry
+was found. No formatting, mounting, relocation or shared Docker-storage changes
+occurred. Establish model-cache, image/build, and project storage before large
+downloads; a new home alone does not create more space or a separate disk.
+
+Docker reports zero images and zero running containers, with its data root on
+the small root filesystem. Stopped containers and volumes have not been audited.
+The research login has no project workspace or Hugging Face cache yet. Preserve
+existing data and inspect storage before creating large caches or changing the
+shared Docker daemon.
 
 ## Observed management network
 
@@ -81,7 +91,8 @@ The inspected [upstream training requirements](https://github.com/ucla-mobility/
 pin Torch 2.8.0 with CUDA 12.8. They are not a deployment recipe for this CUDA
 11.4 Jetson. Training pins do not establish the minimum required inference
 versions or prove that a host upgrade is mandatory. An inference-only compatible
-combination still needs to be selected and tested; containerization alone does
+combination still needs to be tested; the [compatibility review](runtime-compatibility.md)
+records a candidate and its limitations. Containerization alone does
 not resolve the mismatch.
 
 ## Next implementation sequence

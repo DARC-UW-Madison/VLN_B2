@@ -11,9 +11,10 @@ A separate 2 TB ext4 partition is unmounted; research storage and the compatible
 application runtime are not set up. See the [measured baseline](target-baseline.md).
 B2 is not connected through the wired port; no model inference, camera capture,
 or robot control has been validated. All project CLI commands remain
-observation-only or offline. The repository is local; lab GitHub hosting is
-authorized, but destination, visibility, original rights holder and license
-remain unresolved.
+observation-only or offline. The source is still local. The public lab destination
+is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); access
+allows pushing, but no push has been made. Original code and documentation use
+the [MIT License](../LICENSE), with contributors retaining their respective rights.
 
 ## Target setup
 
@@ -26,7 +27,7 @@ remain unresolved.
 | Camera | Stereolabs ZED 2i | Physical connection, installed ZED SDK or wrapper, working RGB stream and timestamps |
 | LiDAR | Livox Mid-360 | Existing connection/driver and intended role in this project |
 | Containers | Docker 26.1.3; NVIDIA runtime registered; administrator query succeeds | Research-login access, compatible image and container GPU execution |
-| Collaboration | Push to lab GitHub permitted | Organization/repository URL, access and visibility |
+| Collaboration | Public lab repository identified; push access verified; MIT for original work | First reviewed source publication |
 
 Component availability does not establish successful sensor or model operation.
 Use the existing Jetson installation as the starting point; inspect it before
@@ -63,7 +64,7 @@ quality, or hardware performance. Example limits are not approved operating limi
   code, weights, and datasets share one license.
 - Keep the current tools free of motor output. Verify observations and the
   synchronous model adapter before implementing asynchronous motion integration.
-- Use the lab GitHub destination once specified and accessible; resolve rights and the project license before public release.
+- Publish original work under MIT to the specified lab repository after reviewing files and history. Keep restricted upstream materials outside Git.
 
 ## Next deliverable
 
@@ -74,8 +75,10 @@ combination against the installed L4T; do not apply the upstream training CUDA
 pins as a Jetson installer. Resolve Docker access and prove container GPU
 execution before model loading. The [baseline](target-baseline.md) defines the
 remaining checks and evidence boundaries. B2 wiring, service/domain, sensor
-frames/timing and stop behavior follow when the robot is connected. Obtain the
-lab repository URL separately.
+frames/timing and stop behavior follow when the robot is connected. The
+[runtime compatibility review](runtime-compatibility.md) records a model-free
+build candidate and the unresolved checkpoint-loading issue; it is not a
+working-runtime claim.
 
 Stereolabs provides an [official Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)
 with platform-specific image selection. NVIDIA documents the [Jetson container runtime](https://developer.nvidia.com/embedded/jetson-cloud-native/).
