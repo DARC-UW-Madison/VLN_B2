@@ -149,8 +149,8 @@ transform coordinates. Leave them unknown until verified.
 No model weights or upstream source are bundled. Before fetching them, agree on
 upstream terms, pinned revisions, download size, storage, and the lab's access
 rules. Use official caches and acquisition tools; do not redistribute weights in
-this repository. The original-code license and GitHub destination also remain
-unresolved. See [third-party terms](../THIRD_PARTY.md).
+this repository. The MIT license for original code and documentation does not
+cover these external assets. See [third-party terms](../THIRD_PARTY.md).
 
 When the compatible upstream environment and existing local files are available,
 replace all example paths below. Use a reviewed, pinned upstream checkout. It is

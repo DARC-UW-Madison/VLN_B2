@@ -13,6 +13,14 @@
 
 ## Git and review
 
+Submit original code and documentation under the repository's MIT License only
+when you have authority to do so. Retain applicable copyright notices. Contributions
+do not transfer ownership. Check any applicable employment, sponsor or university
+terms before submitting; repository hosting does not determine ownership. The
+[UW-Madison guidance](https://rsp.wisc.edu/contracts/terms.cfm) describes the
+university's general copyright approach. Keep restricted upstream code, model
+weights and lab data outside this repository.
+
 Use `main` for reviewed work. Start a short-lived branch such as
 `docs/experiment-guide`, `feat/observation-reader`, `fix/timestamp-alignment`, or
 `refactor/state-buffer`. These are examples, not existing implementations.

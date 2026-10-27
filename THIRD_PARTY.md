@@ -30,8 +30,9 @@ For each dependency actually adopted, add its exact revision, license source,
 use in the project, whether anything is redistributed, required notices, and
 the outcome of the review. Keep restricted artifacts in approved storage.
 
-The license and rights holder for original work in this project remain undecided.
-No dependency's license should be copied as the license for this whole repository.
+The [MIT License](LICENSE) covers this project's original code and documentation
+only. It does not relicense dependencies, upstream software, model weights or
+data, and no dependency's license is adopted as the license for this repository.
 
 ## Preparation-tool dependencies
 

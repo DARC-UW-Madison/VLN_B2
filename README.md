@@ -78,11 +78,15 @@ establish sensor, model, or robot performance.
 
 ## License and publication
 
-The rights holder and license for original project work have not been selected.
-Lab GitHub hosting is authorized; its destination and visibility still need to be
-specified. The repository is currently local. No upstream source code,
-model weights, recordings, or laboratory data are included. A future project
-license will not replace the terms of third-party materials.
+Original code and documentation use the [MIT License](LICENSE), with the
+collective notice `Copyright (c) 2026 VLN_B2 contributors`. Contributors retain
+their respective rights; this notice does not assign ownership to a person,
+laboratory, or university.
+
+The lab repository is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2).
+No upstream source code, model weights, recordings, or laboratory data are
+included. Their terms remain separate; this license grants no rights to TIC-VLA
+or its weights. See [third-party materials](THIRD_PARTY.md).
 
 Documentation was prepared with AI assistance and must be reviewed as research
 material; it does not constitute experimental evidence.

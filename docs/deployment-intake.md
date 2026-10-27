@@ -45,8 +45,9 @@ cannot stand in for all four. A script's existence is not proof it ran successfu
 Do not send passwords, private keys, serial numbers, or exact laboratory location.
 A schematic using host roles is enough initially. Store actual addresses,
 credentials, SSIDs and private network configuration in approved local storage.
-The project license and rights holder remain unresolved. Lab hosting is
-authorized; the destination and visibility must be specified before pushing.
+Original code and documentation use the [MIT License](../LICENSE). The public
+lab destination is [VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2), and push
+access is verified. Third-party software, weights and data retain their own terms.
 
 ## Follow-up checks during integration
 
