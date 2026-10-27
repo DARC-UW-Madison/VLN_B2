@@ -239,19 +239,85 @@ def _network():
             name = entry.get("ifname", "")
             if not re.fullmatch(r"[a-zA-Z0-9_.:@-]{1,64}", name):
                 continue
-            item = {"interface": name, "addresses": []}
+            item = {"interface": name, "addresses": [], "cidrs": []}
             mac = entry.get("address", "")
             if re.fullmatch(r"(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}", mac):
                 item["mac"] = mac
             for address in entry.get("addr_info", []):
                 try:
-                    item["addresses"].append(str(ipaddress.ip_address(address.get("local", ""))))
-                except ValueError:
+                    parsed = ipaddress.ip_address(address.get("local", ""))
+                    item["addresses"].append(str(parsed))
+                    prefix = address.get("prefixlen")
+                    if type(prefix) is int:
+                        item["cidrs"].append(str(ipaddress.ip_interface("{}/{}".format(parsed, prefix))))
+                except (ValueError, TypeError):
                     continue
             interfaces.append(item)
         return _probe("available", interfaces, "This optional section contains local addresses; keep it private and review before sharing.")
     except (ValueError, TypeError, AttributeError):
         return _probe("unknown", next_step="Inspect network interfaces locally; command output was not recognized.")
+
+
+def _network_records(arguments, fields):
+    """Keep selected local topology fields, not aliases or complete configuration."""
+    result = _run_command(arguments)
+    if result["status"] != "available":
+        return result
+    try:
+        records = json.loads(result["data"])
+        if not isinstance(records, list) or not all(isinstance(item, dict) for item in records):
+            raise ValueError("Expected records")
+        selected = []
+        for record in records:
+            item = {}
+            for key in fields:
+                value = record.get(key)
+                if isinstance(value, str) and len(value) <= 160 and value.isprintable():
+                    item[key] = value
+                elif type(value) is int:
+                    item[key] = value
+                elif isinstance(value, list) and all(
+                    isinstance(part, str) and len(part) <= 64 and part.isprintable()
+                    for part in value
+                ):
+                    item[key] = value
+            if item:
+                selected.append(item)
+        return _probe("available", selected)
+    except (ValueError, TypeError, AttributeError):
+        return _probe("unknown", next_step="Inspect topology locally; JSON output was not recognized.")
+
+
+def _network_details():
+    """Read local links, IPv4 routes and caches; never scan or contact peers."""
+    flags = {}
+    for name, path in (
+        ("ipv4_forwarding", "/proc/sys/net/ipv4/ip_forward"),
+        ("bridge_ipv4_filtering", "/proc/sys/net/bridge/bridge-nf-call-iptables"),
+    ):
+        value = _read_text(path)
+        flags[name] = _probe("available", int(value)) if value in ("0", "1") else _probe(
+            "unknown", next_step="This kernel flag is unavailable; no setting was changed.")
+    return {
+        "links": _network_records(["ip", "-j", "link", "show"], (
+            "ifindex", "ifname", "mtu", "flags", "operstate", "master", "link_index", "link_netnsid",
+        )),
+        "ipv4_routes": _network_records(["ip", "-j", "-4", "route", "show", "table", "all"], (
+            "dst", "gateway", "prefsrc", "dev", "metric", "table", "type", "scope", "protocol",
+        )),
+        "bridge_ports": _network_records(["bridge", "-j", "link", "show"], (
+            "ifindex", "ifname", "master", "state", "flags", "cost", "priority",
+        )),
+        "cached_neighbors": _network_records(["ip", "-j", "neigh", "show"], (
+            "dst", "dev", "lladdr", "state",
+        )),
+        "kernel_flags": flags,
+        "limitations": (
+            "Local network namespace only. No probes, packet capture, firewall-rule dump, "
+            "or peer identification. Cached neighbors can be stale; addresses do not identify computers. "
+            "An empty bridge list is not proof of direct controller access."
+        ),
+    }
 
 
 def collect_report(sdk_path=None, include_network=False):
@@ -277,6 +343,7 @@ def collect_report(sdk_path=None, include_network=False):
     }
     if include_network:
         report["network"] = _network()
+        report["network_details"] = _network_details()
     return report
 
 
@@ -284,7 +351,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, help="Write JSON to this file; otherwise print to stdout.")
     parser.add_argument("--sdk-path", type=Path, help="Inspect revision and dirty state of an existing SDK checkout.")
-    parser.add_argument("--include-network", action="store_true", help="Include private interface addresses and MACs; disabled by default.")
+    parser.add_argument("--include-network", action="store_true", help="Include private addresses, prefixes, routes and local topology; disabled by default.")
     args = parser.parse_args(argv)
     payload = json.dumps(collect_report(args.sdk_path, args.include_network), indent=2, sort_keys=True) + "\n"
     if args.output:

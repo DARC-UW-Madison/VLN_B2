@@ -4,8 +4,10 @@
 
 ## Current stage
 
-Preparation tools are implemented with the main hardware identified. No target
-inspection, real GPU inference, or B2 measurements have been performed. All CLI
+Preparation tools are implemented. The operator now has access to the external
+Jetson and reports a separate onboard Jetson and a possible dedicated motion-control
+computer. Their service roles and physical network are not yet verified. No target
+inspection report, real GPU inference, or B2 measurements have been received. All CLI
 commands are observation-only or offline; none sends motor commands. The
 repository is local; lab GitHub hosting is authorized, but its destination and
 visibility are not yet specified. The rights holder and public-release license
@@ -16,7 +18,9 @@ remain undecided.
 | Component | Confirmed information | Still to inspect |
 | --- | --- | --- |
 | Robot | Unitree B2, without wheels | Firmware, working state/control interface, stop procedure |
-| Compute | NVIDIA Jetson AGX Orin | Memory capacity, storage, installed OS/JetPack, access method |
+| External compute | Jetson, previously reported as AGX Orin; operator access available | Exact module, memory, storage, OS/JetPack, interfaces and cabling |
+| Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
+| Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
 | Camera | Stereolabs ZED 2i | Physical connection, installed ZED SDK or wrapper, working RGB stream and timestamps |
 | LiDAR | Livox Mid-360 | Existing connection/driver and intended role in this project |
 | Containers | Docker installation and use permitted | Current installation, GPU runtime and compatible image |
@@ -39,14 +43,14 @@ choosing an image or proposing a host upgrade.
 | Robot stop behavior | Not verified | Reviewed tests of the actual firmware, command loss, and operator override |
 | B2 navigation evaluation | Not started | Predefined tasks, complete trial counts, results and limitations |
 
-Local verification (79 tests and the stated limitations) is documented in
+Local verification (83 tests and the stated limitations) is documented in
 [the development guide](development.md#preparation-verification). Synthetic
 replay and mocked tests exercise software behavior, not real drivers, model
 quality, or hardware performance. Example limits are not approved operating limits.
 
 ## Decisions in effect
 
-- The target is B2 with Jetson AGX Orin, ZED 2i and Livox Mid-360; software and connections still need inspection.
+- The target is B2 with an external Jetson (AGX Orin previously reported), ZED 2i and Livox Mid-360. Inventory onboard computers separately; do not infer their service roles or wiring.
 - Use the existing B2 walking controller; investigate a high-level navigation adapter.
 - Keep proposed behavior separate from verified implementation and experiment results.
 - Maintain English and Japanese documentation, with English code and configuration.
@@ -60,9 +64,11 @@ quality, or hardware performance. Example limits are not approved operating limi
 
 ## Next deliverable
 
-Run the standalone inventory on the Jetson and review the resulting report,
-following [onsite preparation](onsite.md). Identify its OS/JetPack, existing
-sensor software, and working B2 control procedure. Then use the observation
+Start with [computer roles and network discovery](network-topology.md): collect
+the external Jetson inventory, identify cable endpoints, and distinguish the Mac
+management path from the robot-facing interface. Map routes and the documented
+SDK service/domain before a state-only host probe. Follow [onsite preparation](onsite.md)
+for existing sensor software and the working B2 control procedure. Then use the observation
 commands to verify an RGB frame from the ZED 2i and received robot state;
 establish clock and frame conventions before marking either verified. Select
 the container from the measured platform and test the synchronous adapter with

@@ -8,6 +8,11 @@ Mid-360**. The installed software, wiring, and control behavior remain unverifie
 All commands in this guide are observation or offline commands; this repository
 currently has **no motor-output command**.
 
+
+For the external Jetson and the separate onboard computers, start with
+[computer roles and network discovery](network-topology.md) to identify wiring
+and routes before probing SDK services.
+
 ## 1. Bring the project and inspect the Jetson
 
 Copy this repository to the Jetson using a USB drive or another laboratory-approved

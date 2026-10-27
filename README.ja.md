@@ -14,6 +14,7 @@ Unitree B2でTIC-VLAによるナビゲーションを評価するための研究
 
 | 文書 | 内容 |
 | --- | --- |
+| [計算機とネットワーク](docs/network-topology.ja.md) | 各ホストの役割，SDK・ROS 2の区別，外付けJetsonでの最初の調査 |
 | [初回訪問の確認カード](docs/field-card.ja.md) | 最初の三つの確認と記録する項目 |
 | [現地での準備](docs/onsite.ja.md) | 対象機の調査，観測の取得，ローカル推論の確認コマンド |
 | [TIC-VLAの仕組み](docs/ticvla-explained.ja.md) | 推論，行動予測，遅延，学習，機体制御のつながり |

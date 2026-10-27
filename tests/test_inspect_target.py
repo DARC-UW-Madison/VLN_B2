@@ -104,7 +104,7 @@ class TargetInspectionTests(unittest.TestCase):
             os.environ, {"USER": "private-user", "HOSTNAME": "private-host"}, clear=True
         ), mock.patch.object(target, "_network") as network, mock.patch.object(target.platform, "system", return_value="Linux"), mock.patch.object(
             target.platform, "machine", return_value="aarch64"
-        ), mock.patch.object(target.platform, "release", return_value="5.15.148-tegra"):
+        ), mock.patch.object(target.platform, "release", return_value="5.15.148-tegra"), mock.patch.object(target, "_network_details") as details:
             report = target.collect_report()
         self.assertEqual(report["schema_version"], 1)
         self.assertEqual(report["os"]["data"]["architecture"], "aarch64")
@@ -112,7 +112,9 @@ class TargetInspectionTests(unittest.TestCase):
         self.assertEqual(report["operational_checks"]["b2_state"]["status"], "not_checked")
         self.assertEqual(report["python_packages"]["torch"]["status"], "unknown")
         self.assertNotIn("network", report)
+        self.assertNotIn("network_details", report)
         network.assert_not_called()
+        details.assert_not_called()
         for private in ("private-user", "private-host", "private-data"):
             self.assertNotIn(private, json.dumps(report))
         self.assertRegex(report["collected_at_utc"], r"^\d{4}-\d{2}-\d{2}T.*\+00:00$")
@@ -120,11 +122,12 @@ class TargetInspectionTests(unittest.TestCase):
     def test_network_is_explicit_and_removes_unselected_fields(self):
         stdout = json.dumps([{
             "ifname": "eth0", "address": "02:00:00:00:00:01", "hostname": "private-host",
-            "addr_info": [{"local": "192.0.2.1"}, {"local": "not an address"}],
+            "addr_info": [{"local": "192.0.2.1", "prefixlen": 24}, {"local": "not an address"}],
         }])
         with mock.patch.object(target, "_run_command", return_value=target._probe("available", stdout)):
             result = target._network()
         self.assertEqual(result["data"][0]["addresses"], ["192.0.2.1"])
+        self.assertEqual(result["data"][0]["cidrs"], ["192.0.2.1/24"])
         self.assertEqual(result["data"][0]["mac"], "02:00:00:00:00:01")
         self.assertNotIn("private-host", json.dumps(result))
 
@@ -138,6 +141,45 @@ class TargetInspectionTests(unittest.TestCase):
         self.assertEqual(result["daemon"]["data"]["runtime_names"], ["nvidia", "runc"])
         self.assertNotIn("private-user", json.dumps(result))
         self.assertIn("unix:///var/run/docker.sock", run.call_args_list[1].args[0])
+
+    def test_topology_keeps_selected_fields_without_aliases_or_nested_settings(self):
+        records = [{
+            "ifname": "eth0", "master": "br0", "mtu": 1500,
+            "flags": ["UP", "LOWER_UP"], "alias": "private-lab-name",
+            "linkinfo": {"private": "secret"}, "unexpected": "private",
+        }]
+        with mock.patch.object(target, "_run_command", return_value=target._probe("available", json.dumps(records))):
+            result = target._network_records(["ip", "-j", "link"], ("ifname", "master", "mtu", "flags"))
+        self.assertEqual(result["data"], [{
+            "ifname": "eth0", "master": "br0", "mtu": 1500, "flags": ["UP", "LOWER_UP"],
+        }])
+        self.assertNotIn("private", json.dumps(result))
+
+    def test_malformed_topology_and_absent_tools_are_explicit(self):
+        for value in ("not-json", "{}", '["not-a-record"]'):
+            with self.subTest(value=value), mock.patch.object(target, "_run_command", return_value=target._probe("available", value)):
+                self.assertEqual(target._network_records(["ip"], ("dev",))["status"], "unknown")
+        with mock.patch.object(target, "_run_command", return_value=target._probe("not_installed")):
+            self.assertEqual(target._network_records(["bridge"], ("master",))["status"], "not_installed")
+
+    def test_topology_reads_caches_and_flags_without_peer_probes_or_changes(self):
+        with mock.patch.object(target, "_run_command", return_value=target._probe("available", "[]")) as run, mock.patch.object(target, "_read_text", side_effect=["0", "1"]):
+            result = target._network_details()
+        self.assertEqual(result["kernel_flags"]["ipv4_forwarding"]["data"], 0)
+        self.assertEqual(result["kernel_flags"]["bridge_ipv4_filtering"]["data"], 1)
+        self.assertEqual([call.args[0] for call in run.call_args_list], [
+            ["ip", "-j", "link", "show"],
+            ["ip", "-j", "-4", "route", "show", "table", "all"],
+            ["bridge", "-j", "link", "show"],
+            ["ip", "-j", "neigh", "show"],
+        ])
+        self.assertIn("Local network namespace", result["limitations"])
+
+    def test_topology_is_included_only_by_explicit_request(self):
+        with mock.patch.object(target, "_read_text", return_value=None), mock.patch.object(target, "_run_command", return_value=target._probe("not_installed")), mock.patch.object(target, "_network", return_value={"status": "available"}), mock.patch.object(target, "_network_details", return_value={"links": "synthetic"}) as details:
+            report = target.collect_report(include_network=True)
+        details.assert_called_once_with()
+        self.assertEqual(report["network_details"]["links"], "synthetic")
 
     def test_system_packages_keep_installed_metadata_only(self):
         output = (

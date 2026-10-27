@@ -39,6 +39,13 @@ Ruff was unavailable and could not be installed in this environment, so its
 configured lint/format checks have not run. No container build, GPU prediction,
 or real camera/robot probe has been validated.
 
+On 2026-10-27, the extended optional network inventory passed the full 83-test
+suite locally. Added checks cover selected topology fields, missing/malformed
+responses, explicit opt-in, and cache/route inspection without peer probes. No
+Jetson report or robot-network validation has been obtained yet. The operator
+can now access an external Jetson; follow [network discovery](network-topology.md)
+before configuring DDS, ROS 2, or containers.
+
 ## 1. Understand the system
 
 Read the [architecture](architecture.md) and [project status](status.md).
