@@ -2,6 +2,9 @@
 
 [日本語](target-baseline.ja.md) · [Status](status.md) · [Network design](network-topology.md)
 
+This is the initial survey snapshot. Subsequent interpreter, venv, native GPU
+and storage-inspection work is recorded in [runtime setup](jetson-runtime.md).
+
 Read-only inspection on **2026-10-27** established the external compute baseline
 below. SSH from Mac over the Tailscale network worked. The prepared inspector
 ran from standard input in the target's Python 3.8 environment; no project,

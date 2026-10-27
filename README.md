@@ -18,6 +18,7 @@ official release from the paper's authors or the robot manufacturer.
 | Document | What it explains |
 | --- | --- |
 | [Measured Jetson baseline](docs/target-baseline.md) | Verified host, GPU-driver, storage and network facts; runtime constraints |
+| [Jetson runtime setup](docs/jetson-runtime.md) | Host interpreter/venv, native CUDA check, storage and staged container builds |
 | [Runtime compatibility](docs/runtime-compatibility.md) | Candidate inference stack, model-free checks, and unresolved checkpoint-loading constraints |
 | [Jetson bootstrap](docs/jetson-bootstrap.md) | New login, Tailscale SSH, dependency isolation, and later CLI boot |
 | [Computers and network](docs/network-topology.md) | Host roles, SDK/ROS 2 boundaries, and the first external-Jetson survey |

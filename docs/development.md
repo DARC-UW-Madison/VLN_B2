@@ -32,7 +32,7 @@ standard-library tests**, synthetic CLI replay, and Ruff 0.17.3's configured
 lint rules. Python syntax is checked against 3.10 for the package/tests and 3.8
 for the standalone inspector; parsing is not execution on those interpreters.
 
-The publication review covers all 53 tracked files, all 14 English/Japanese
+The publication review at `0dcf950` covered 53 tracked files, 14 English/Japanese
 Markdown pairs, and every reachable Git revision. Review checks include rendered
 Markdown, links/fragments, matching command examples and citations, private-data
 and secret scans, and exclusion of local records and model artifacts. A local
@@ -44,7 +44,10 @@ verified a CUDA driver/device query and privileged Docker metadata. See the
 [baseline](target-baseline.md). Container GPU computation, actual model loading,
 ZED capture and B2 operation remain unverified. The
 [runtime review](runtime-compatibility.md) records the unresolved checkpoint-loading
-constraint. Source/publication checks do not establish hardware readiness or
+constraint. Subsequent [runtime setup](jetson-runtime.md) installed Python
+3.11.18 and a project venv on the Jetson; all 85 tests and synthetic replay also
+passed there. The native CUDA arithmetic check passed independently of Torch.
+Source/publication checks do not establish hardware readiness or
 permission to redistribute third-party assets.
 
 ## 1. Understand the system

@@ -2,8 +2,9 @@
 
 [日本語](THIRD_PARTY.ja.md)
 
-These are references and optional runtime dependencies. None is bundled or
-installed by this repository. Independent adapters call existing public APIs;
+These are references and optional runtime dependencies. Third-party code, models
+and packages are not bundled. Explicit host/container setup installs external
+software separately. Independent adapters call existing public APIs;
 their mocked tests do not load the actual third-party runtimes. Review updated:
 2026-10-27. Default-branch links may change; pin exact revisions before real-model
 or hardware experiments.
@@ -70,4 +71,9 @@ Tailscale is verified on the target; the exact client version remains uninspecte
 [pyenv](https://github.com/pyenv/pyenv) is optional per-user interpreter tooling
 under its [MIT license](https://github.com/pyenv/pyenv/blob/master/LICENSE), not a
 bundled dependency or GPU-runtime sandbox. Neither tool is installed by this
-repository. Review updated for these references: 2026-10-27.
+Python package. Host setup uses official pyenv `v2.8.14` at
+`3fb25668b463ad38ac2db6092dbf476ef744c0ca`, outside Git.
+[CPython 3.11.18](https://www.python.org/downloads/release/python-31118/)
+is installed per user under the [PSF License Agreement and included notices](https://github.com/python/cpython/blob/v3.11.18/LICENSE).
+No interpreter binary is redistributed. See [runtime setup](docs/jetson-runtime.md).
+Review updated for these references: 2026-10-27.

@@ -3,19 +3,20 @@
 [日本語](runtime-compatibility.ja.md) · [Target baseline](target-baseline.md)
 
 Research date: **2026-10-27**. This is a candidate and validation plan, not a
-working-runtime claim. No host change, image/package/model download, installation,
-container execution, or robot access was performed for this research.
+working-runtime claim. See [runtime setup](jetson-runtime.md) for executed host
+steps and storage prerequisites. The container and model remain untested.
 
 ## Decision
 
 Keep Ubuntu 20.04, L4T 35.4.1, CUDA 11.4, ROS Foxy and ZED intact. Evaluate a
 **custom arm64 inference container based on `nvcr.io/nvidia/l4t-jetpack:r35.4.1`,
-with Python 3.10 and source-built PyTorch 2.2.2**. This is a bounded engineering
+with Python 3.11.18 and source-built PyTorch 2.2.2**. This is a bounded engineering
 candidate; a successful build and GPU smoke test are still required. The evidence
 does **not** establish that changing the host OS or JetPack is unavoidable.
 
 The [observed host](target-baseline.md) has a working native CUDA driver query,
-but neither GPU access from Docker nor PyTorch execution has been tested.
+and a passing native GPU arithmetic check, but neither GPU access from Docker
+nor PyTorch execution has been tested.
 Docker shares the host kernel/driver interfaces; selecting a newer CUDA image
 does not establish compatibility.
 
@@ -23,10 +24,10 @@ does not establish compatibility.
 
 | Layer | Finding and implication |
 |---|---|
-| Python | This package and [upstream](https://github.com/ucla-mobility/TIC-VLA/blob/main/pyproject.toml) require 3.10+. The host default is 3.8.10. Preserve system Python; build the application interpreter inside the container. |
-| Official JetPack 5 wheel | NVIDIA lists `torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl` for JetPack 5.1.2. It is ARM64 GPU software but its CPython 3.8 ABI cannot serve Python 3.10. See [NVIDIA's download center](https://developer.nvidia.com/embedded/downloads). |
+| Python | This package and [upstream](https://github.com/ucla-mobility/TIC-VLA/blob/main/pyproject.toml) require 3.10+. The host default is 3.8.10. Preserve system Python; build the application interpreter inside the container. Use [3.11.18](https://www.python.org/downloads/release/python-31118/) for this candidate; the [3.10 series](https://www.python.org/downloads/release/python-31019/) is now unsupported. |
+| Official JetPack 5 wheel | NVIDIA lists `torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl` for JetPack 5.1.2. It is ARM64 GPU software but its CPython 3.8 ABI cannot serve the selected Python 3.11. See [NVIDIA's download center](https://developer.nvidia.com/embedded/downloads). |
 | Official matching base | [NGC tags](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-jetpack/tags) confirm `nvcr.io/nvidia/l4t-jetpack:r35.4.1`, `linux/arm64`, compressed size **4.9 GB**, manifest digest `sha256:d1c8e971ab994235840eacc31c4ef4173bf9156317b1bf8aabe7e01eb21b2a0e`. It supplies JetPack libraries, not the proposed Python/PyTorch stack. |
-| Existing PyTorch image | [NGC](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-pytorch/tags) confirms `nvcr.io/nvidia/l4t-pytorch:r35.2.1-pth2.0-py3`, `linux/arm64`, **5.66 GB** compressed. This is an older L4T tag and does not establish a Python 3.10 runtime for this project. No ready-made official image satisfying all constraints was verified. |
+| Existing PyTorch image | [NGC](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-pytorch/tags) confirms `nvcr.io/nvidia/l4t-pytorch:r35.2.1-pth2.0-py3`, `linux/arm64`, **5.66 GB** compressed. This is an older L4T tag and does not establish a Python 3.11 runtime for this project. No ready-made official image satisfying all constraints was verified. |
 | Training versus inference | [Training requirements](https://github.com/ucla-mobility/TIC-VLA/blob/main/requirements-train.txt) pin Torch 2.8.0/cu128. They are not a demonstrated inference minimum. NVIDIA's [Tegra compatibility table](https://docs.nvidia.com/cuda/cuda-for-tegra-appnote/) limits JetPack 5 CUDA upgrade packages to 11.8–12.2; CUDA 12.3 onward is unsupported there. The existing 11.4 driver query is not approval for cu128. |
 | FlashAttention | [TIC-VLA's loader](https://github.com/ucla-mobility/TIC-VLA/blob/main/ticvla/models/vlm.py) explicitly sets `use_flash_attn=False`. [InternVL3-1B code](https://huggingface.co/OpenGVLab/InternVL3-1B/blob/main/modeling_internvl_chat.py) then selects eager language attention and disables vision FlashAttention. Do not install FlashAttention for this first candidate. Even historical [FlashAttention 2.3.6](https://github.com/Dao-AILab/flash-attention/blob/v2.3.6/README.md) requires CUDA 11.6+, above the current toolkit. |
 | Inference dependencies | `ticvla.models.vlm` imports `ticvla.data.vlm_data`, which imports Lightning. A model-only import therefore still needs Lightning and its bounded dependencies unless a separately reviewed upstream compatibility patch removes that coupling. Do not install the complete training/robotics requirements blindly. |
@@ -37,7 +38,7 @@ does not establish compatibility.
 After storage preparation, use the matching base above, pinned by digest. Keep
 image layers/build cache and application artifacts on dedicated SSD storage. Review base-image and dependency terms before use.
 
-1. Build an isolated **CPython 3.10** interpreter and an ARM64 wheelhouse inside
+1. Build an isolated **CPython 3.11.18** interpreter and an ARM64 wheelhouse inside
    the image; leave the container's vendor Python and the host interpreter alone.
 2. Build **PyTorch v2.2.2** from its exact upstream source/submodule revisions
    against CUDA 11.4 and the base's cuDNN. Its [CUDA CMake check](https://github.com/pytorch/pytorch/blob/v2.2.2/cmake/public/cuda.cmake)
@@ -83,7 +84,7 @@ not been performed. After building and checking the image, run it with `--pull=n
 `--runtime=nvidia`, `--network=none`, no robot devices/sockets and Hugging Face
 offline settings. No model is needed for these acceptance checks:
 
-- Assert ARM64, Python 3.10, the intended Torch/torchvision/Transformers versions,
+- Assert ARM64, Python 3.11, the intended Torch/torchvision/Transformers versions,
   `torch.version.cuda == "11.4"`, CUDA device availability and capability 8.7.
 - Synchronize actual GPU operations: FP32 and BF16 matrix multiplication,
   convolution, layer normalization and multihead attention; require finite

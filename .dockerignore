@@ -3,6 +3,10 @@
 !README.md
 !LICENSE
 !THIRD_PARTY.md
+!deploy/
+deploy/*
+!deploy/runtime-requirements.txt
+!deploy/runtime-smoke.py
 !src/
 !src/**
 !examples/

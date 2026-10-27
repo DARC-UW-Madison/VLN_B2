@@ -5,13 +5,18 @@
 ## Current stage
 
 Initial read-only inspection of the external Jetson is complete. Mac-to-Jetson
-SSH over Tailscale, target-side inventory and a CUDA driver/device query worked.
+SSH over Tailscale, target-side inventory and native CUDA arithmetic worked.
 The host is an AGX Orin 64 GB class system running Ubuntu 20.04 / L4T 35.4.1.
-A separate 2 TB ext4 partition is unmounted; research storage and the compatible
-application runtime are not set up. See the [measured baseline](target-baseline.md).
+CPython 3.11.18, a dedicated project venv and the CLI are installed; all 85
+tests and synthetic replay passed on the target. A separate 2 TB ext4 partition
+was inspected with `ro,noload`, then mounted writable with explicit operator
+permission. Journal recovery succeeded without observed ext4 errors. Docker
+storage and an empty standard Hugging Face cache are now on a dedicated SSD area.
+See [runtime setup](jetson-runtime.md) and the [initial baseline](target-baseline.md).
 B2 is not connected through the wired port; no model inference, camera capture,
 or robot control has been validated. All project CLI commands remain
-observation-only or offline. The source is still local. The public lab destination
+observation-only or offline. A reviewed source archive is on the Jetson; the
+source has not been published. The public lab destination
 is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); access
 allows pushing, but no push has been made. Original code and documentation use
 the [MIT License](../LICENSE), with contributors retaining their respective rights.
@@ -21,7 +26,7 @@ the [MIT License](../LICENSE), with contributors retaining their respective righ
 | Component | Confirmed information | Still to inspect |
 | --- | --- | --- |
 | Robot | Unitree B2, without wheels | Firmware, working state/control interface, stop procedure |
-| External compute | AGX Orin Developer Kit, 64 GB class; Ubuntu 20.04.6 / L4T 35.4.1; SSH verified | Dedicated storage, application runtime and model execution |
+| External compute | AGX Orin 64 GB class; SSH, native CUDA, Python 3.11.18/venv and 85 tests verified | Model container and inference |
 | Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
 | Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
 | Camera | Stereolabs ZED 2i | Physical connection, installed ZED SDK or wrapper, working RGB stream and timestamps |
@@ -46,7 +51,7 @@ choosing an image or proposing a host upgrade.
 | Robot stop behavior | Not verified | Reviewed tests of the actual firmware, command loss, and operator override |
 | B2 navigation evaluation | Not started | Predefined tasks, complete trial counts, results and limitations |
 
-Local verification (85 tests and the stated limitations) is documented in
+Development-host and target verification (85 tests and the stated limitations) is documented in
 [the development guide](development.md#preparation-verification). Synthetic
 replay and mocked tests exercise software behavior, not real drivers, model
 quality, or hardware performance. Example limits are not approved operating limits.
@@ -68,10 +73,11 @@ quality, or hardware performance. Example limits are not approved operating limi
 
 ## Next deliverable
 
-Establish research storage on the inspected system before large image/model
-acquisition. Inspect the existing SSD's intended use without formatting or
-moving other users' data. Select and test an inference-only GPU/Python/PyTorch
-combination against the installed L4T; do not apply the upstream training CUDA
+Build the prepared Python container stage and verify NVIDIA device visibility,
+then build and test the inference-only GPU/Python/PyTorch
+combination against the installed L4T. SSD storage is established; the
+[setup guide](jetson-runtime.md#storage-prerequisite) records its configuration
+and recovery plan. Do not apply the upstream training CUDA
 pins as a Jetson installer. Resolve Docker access and prove container GPU
 execution before model loading. The [baseline](target-baseline.md) defines the
 remaining checks and evidence boundaries. B2 wiring, service/domain, sensor
@@ -85,7 +91,7 @@ with platform-specific image selection. NVIDIA documents the [Jetson container r
 Start with ZED RGB input, model inference, path tracking and the B2 SDK. Decide
 ROS 2 and Mid-360 integration from existing services and a defined need; the
 [Livox ROS driver](https://github.com/Livox-SDK/livox_ros_driver2) is one available
-integration path, not an adopted dependency. This inspection installed no application package or model weight.
+integration path, not an adopted dependency. The host venv contains this project; no model weight has been acquired.
 
 ## Continuing the work
 

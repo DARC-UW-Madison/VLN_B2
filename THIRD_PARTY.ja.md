@@ -2,7 +2,8 @@
 
 [English](THIRD_PARTY.md)
 
-以下は参考資料と任意の実行時依存先である．このリポジトリには同梱せず，自動導入もしない．
+以下は参考資料と任意の実行時依存先である．外部コード，モデル，パッケージは同梱しない．
+ホストやコンテナの構築を明示的に実行した場合に，外部ソフトウェアを別途導入する．
 独立して実装したアダプタは既存の公開APIを呼ぶ．模擬テストでは実際の外部実行環境を
 読み込まない．更新確認日：2026-10-27．既定ブランチへのリンク先は変更されるため，
 実モデルや実機での実験前に正確な版を固定する．
@@ -61,5 +62,9 @@ tailnetへの登録，ホストされたサービスの条件，研究室のア�
 [公式インストーラー](https://tailscale.com/docs/install/linux)を使う．対象機へのTailscale経由のSSHは
 確認済みで，クライアントの正確な版は未調査である．[pyenv](https://github.com/pyenv/pyenv)は
 [MITライセンス](https://github.com/pyenv/pyenv/blob/master/LICENSE)の任意のユーザー用Python管理ツールであり，
-同梱する依存先やGPU実行環境の隔離ではない．どちらもこのリポジトリから自動導入しない．
+同梱する依存先やGPU実行環境の隔離ではない．いずれも本Pythonパッケージから導入しない．
+ホスト構築では，公式pyenvの`v2.8.14`，コミット`3fb25668b463ad38ac2db6092dbf476ef744c0ca`をGit管理外で使う．
+[CPython 3.11.18](https://www.python.org/downloads/release/python-31118/)を，
+[PSF License Agreementと同梱の表示事項](https://github.com/python/cpython/blob/v3.11.18/LICENSE)に従って
+ユーザー用に導入した．インタープリタのバイナリは再配布しない．[実行環境構築](docs/jetson-runtime.ja.md)を参照する．
 これらの参照の更新確認日：2026-10-27．
