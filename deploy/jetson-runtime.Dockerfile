@@ -91,6 +91,7 @@ RUN python3.11 -m pip install --no-cache-dir pillow==10.4.0 && \
     rm -rf /opt/build/vision
 COPY deploy/runtime-requirements.txt /opt/runtime-requirements.txt
 RUN python3.11 -m pip install --no-cache-dir -r /opt/runtime-requirements.txt && \
+    python3.11 -m pip uninstall --yes cmake ninja && \
     python3.11 -m pip check && \
     python3.11 -m pip freeze --all > /opt/runtime-metadata/python-packages.txt
 CMD ["python3.11", "/opt/runtime-smoke.py", "--stage", "torch"]

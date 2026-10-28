@@ -165,12 +165,18 @@ Torch and reported CUDA available, distributed available and RPC unavailable.
 
 Preserve successful build layers and failed-attempt logs. A source-derived,
 ignored resume Dockerfile can start from the verified completed Torch image and
-include everything after the canonical recipe's `Resume boundary` marker:
+retain the canonical default `ARG` declarations and include everything after
+the recipe's `Resume boundary` marker:
 the guard, current notices/check script, vision and remaining dependencies.
 Verify and record the exact image ID, Torch revision, CUDA generation and build
 settings before reuse. Do not trust an arbitrary similarly named image. The
 canonical Dockerfile remains the complete build-from-source recipe. Full GPU
 operations and import checks still decide whether the complete candidate works.
+
+The pinned build-only CMake/Ninja wheels have misplaced platform-tag metadata.
+Their binaries completed compilation, but `pip check` rejects their metadata.
+Remove those tools after compilation and require `pip check` to pass for the
+remaining runtime. Keep their build versions in the recipe and build logs.
 
 ### Upstream import check
 
