@@ -56,6 +56,11 @@ PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
 合成データの再生が成功した．これらのテストは，メーカーの接続部には引き続きモックを使う．
 編集可能なパッケージ導入，CLIのヘルプ，`pip check`も通った．
 
+管理者権限で既存ZED SDKのヘッダを読むと**4.1.2**で，共有ライブラリとバインディング用の
+導入スクリプトも存在する．導入先はモード`0770`で，研究用ログインには閲覧権限がない．
+権限は変更していない．カメラを接続する際に，アクセス方法か互換性のあるセンサー用の隔離環境を
+整える．ヘッダの存在は，撮影やPythonバインディングの動作確認ではない．
+
 ## ホスト上のCUDA確認
 
 独立した確認用プログラムがGPUに小さなバッファを三つ確保し，256個のFP32要素について
@@ -69,7 +74,8 @@ timeout -k 5s 30s ./local/native-smoke/cuda-smoke
 ```
 
 2026-10-27に外付けJetsonで成功した．compute capabilityは8.7，driver／runtime APIは11040，
-最大絶対誤差は0だった．コンテナ内のGPU，BF16・PyTorchの実行，ナビゲーション能力の確認ではない．
+最大絶対誤差は0だった．同じバイナリは，固定したNVIDIA基底コンテナ内でも，`--runtime=nvidia`と
+`--network=none`で成功した．BF16・PyTorchの実行とナビゲーションは引き続き未検証である．
 
 ## 保存先の前提
 
@@ -102,7 +108,8 @@ SSDの新しい空のディレクトリへ接続した．モデルは取得し�
 ## コンテナのビルドとモデル不要の確認
 
 準備したDockerfileは，L4Tに対応する基底イメージのdigestとPython／Torch／torchvisionのソースを
-固定した未ビルドの候補である．直接依存の固定は，推移的依存まで含む完全なlockではない．
+固定している．Python段階はビルドでき，オフラインの検査でPython 3.11.18，ARM64，CUDAデバイス1台を確認した．
+Torchを含む段階は別のソースビルド候補である．直接依存の固定は，推移的依存まで含む完全なlockではない．
 ビルド成功時はDebianとPythonのパッケージ一覧をイメージ内に保存する．解決後のイメージIDとログは
 ローカルの実験記録に残す．保存先を準備した後，軽いPython段階から始める．
 
@@ -121,6 +128,18 @@ sudo docker run --rm --pull=never --runtime=nvidia --network=none \
 FP32／BF16のGPU演算を調べる．いずれもモデルを読み込まない．任意の`--stage full`は，版と条件を
 確認した上流チェックアウトを読み取り専用で接続してimportするが，モデルは作らない．
 カメラ，ロボットのデバイス，モデルキャッシュ，Dockerソケットは，これらの試験へ接続しない．
+
+上流のソースはプロジェクト外の`~/Developer/External/TIC-VLA`に置き，
+`9fa6f8b66b9e121d5df5df071297bba8e5353ebb`へ固定した．sparse checkoutではPythonパッケージ，
+ライセンス，パッケージ情報だけを選び，モデルのblobは選んでいない．Torchの検査が通った後，
+この確認済みソースを使って任意のimport検査を行う．
+
+```sh
+sudo docker run --rm --pull=never --runtime=nvidia --network=none \
+  --mount type=bind,source="$HOME/Developer/External/TIC-VLA",target=/opt/upstream,readonly \
+  vln-b2-runtime:jp5 python3.11 /opt/runtime-smoke.py \
+  --stage full --upstream-root /opt/upstream
+```
 
 **旧Torchの候補では，チェックポイントの読み込みは保留する．** 公表済みの脆弱性を修正するか，
 別の変換・読込経路を検証してから外部の重みを使う．モデル取得では，対象ファイル，版，条件，

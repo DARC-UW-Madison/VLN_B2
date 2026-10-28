@@ -29,9 +29,9 @@ the [MIT License](../LICENSE), with contributors retaining their respective righ
 | External compute | AGX Orin 64 GB class; SSH, native CUDA, Python 3.11.18/venv and 85 tests verified | Model container and inference |
 | Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
 | Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
-| Camera | Stereolabs ZED 2i | Physical connection, installed ZED SDK or wrapper, working RGB stream and timestamps |
+| Camera | ZED 2i reported; existing SDK headers report 4.1.2 | Research-login SDK access, physical connection, bindings, RGB stream and timestamps |
 | LiDAR | Livox Mid-360 | Existing connection/driver and intended role in this project |
-| Containers | Docker 26.1.3; NVIDIA runtime registered; administrator query succeeds | Research-login access, compatible image and container GPU execution |
+| Containers | Docker on SSD; matching base CUDA arithmetic and Python 3.11 stage pass | Full Torch build and BF16/import checks |
 | Collaboration | Public lab repository identified; push access verified; MIT for original work | First reviewed source publication |
 
 Component availability does not establish successful sensor or model operation.
@@ -73,8 +73,8 @@ quality, or hardware performance. Example limits are not approved operating limi
 
 ## Next deliverable
 
-Build the prepared Python container stage and verify NVIDIA device visibility,
-then build and test the inference-only GPU/Python/PyTorch
+The Python container stage and device-visibility check passed. Complete the
+source build and test the inference-only GPU/Python/PyTorch
 combination against the installed L4T. SSD storage is established; the
 [setup guide](jetson-runtime.md#storage-prerequisite) records its configuration
 and recovery plan. Do not apply the upstream training CUDA
@@ -85,6 +85,15 @@ frames/timing and stop behavior follow when the robot is connected. The
 [runtime compatibility review](runtime-compatibility.md) records a model-free
 build candidate and the unresolved checkpoint-loading issue; it is not a
 working-runtime claim.
+
+The current source build runs in the background on the Jetson. A one-shot local
+verification job waits for successful completion, then runs the Torch and full
+import checks without models. Logs and result JSON stay under
+`/mnt/b2-research/VLN_B2/build-logs`. `runtime-build.exit` records the build exit
+code; `runtime-verify.exit` records verification. Code `0` means that stage
+passed; a missing record does not establish success. Inspect `runtime-build.log`,
+`torch-smoke.json` and `full-smoke.json` when continuing. No automatic model
+download or robot integration follows these checks.
 
 Stereolabs provides an [official Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)
 with platform-specific image selection. NVIDIA documents the [Jetson container runtime](https://developer.nvidia.com/embedded/jetson-cloud-native/).

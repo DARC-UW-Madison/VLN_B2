@@ -38,7 +38,7 @@ int main() {
     std::vector<float> x(count), y(count), output(count);
     for (int i = 0; i < count; ++i) {
       x[i] = i / 16.0f;
-      y[i] = (count - i) / 8.0f;
+      y[i] = (count - i) / 32.0f;
     }
     DeviceBuffer dx(bytes), dy(bytes), result(bytes);
     check(cudaMemcpy(dx.data, x.data(), bytes, cudaMemcpyHostToDevice));

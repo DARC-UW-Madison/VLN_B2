@@ -12,7 +12,7 @@ or hardware experiments.
 | Material | Source | Current handling |
 | --- | --- | --- |
 | TIC-VLA paper | [arXiv, version 2](https://arxiv.org/abs/2602.02459v2) | Cite as the method's source; its results are not B2 validation |
-| TIC-VLA software | [Repository](https://github.com/ucla-mobility/TIC-VLA) and [license at reviewed revision](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e121d5df5df071297bba8e5353ebb/LICENSE.md) | Academic Software License reviewed at `9fa6f8b`; no source copied into this project |
+| TIC-VLA software | [Repository](https://github.com/ucla-mobility/TIC-VLA) and [license at reviewed revision](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e121d5df5df071297bba8e5353ebb/LICENSE.md) | Academic Software License reviewed at `9fa6f8b`; source-only checkout outside the project for import checks; no source copied into this project |
 | TIC-VLA checkpoint | [Official repository's linked checkpoint](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/main/TIC-VLA-model.ckpt) | Not downloaded; verify applicable artifact terms before use |
 | InternVL3-1B | [Model repository](https://huggingface.co/OpenGVLab/InternVL3-1B) | Candidate base model; terms and revision not yet reviewed for integration |
 | Unitree SDK2 Python | [B2 client](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py), [BSD-3-Clause license](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | API inspected; license reviewed at `814556d`; runtime revision, dependencies, and firmware compatibility remain unverified |
@@ -53,7 +53,7 @@ results and identifying recordings in approved laboratory storage.
 | PyTorch | [Official documentation](https://docs.pytorch.org/docs/stable/index.html) | Optional checkpoint loading and inference; not installed or bundled. Select a Jetson-compatible build and record its license/notices |
 | Transformers / InternVL runtime | [Transformers documentation](https://huggingface.co/docs/transformers/index), [InternVL3-1B](https://huggingface.co/OpenGVLab/InternVL3-1B) | Optional upstream model loaders; local-only resolution. Trusted model Python code still executes; pin source and artifact revisions |
 | Livox driver | [Official driver](https://github.com/Livox-SDK/livox_ros_driver2) | Reference only; not an implemented dependency and no source bundled |
-| Base container image | [NVIDIA Jetson resources](https://developer.nvidia.com/embedded/jetson-cloud-native/) | A matching-L4T candidate is recorded in the [runtime review](docs/runtime-compatibility.md); not pulled, built, or bundled. Image contents and terms need review before use or sharing |
+| Base container image | [NVIDIA Jetson resources](https://developer.nvidia.com/embedded/jetson-cloud-native/), [publisher's JetPack EULA](https://docs.nvidia.com/jetson/jetpack/eula/index.html) | Matching-L4T base pulled for local Orin use; Python stage built. Image and component notices remain applicable; no binary image is bundled or published |
 
 The standard-library replay and tests need no vendor runtime. Packaging declares
 `setuptools>=68` as its build tool; running from `PYTHONPATH=src` needs no package

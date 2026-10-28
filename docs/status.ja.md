@@ -26,9 +26,9 @@ push権限を確認したが，pushは未実施である．独自コードと文
 | 外付け計算機 | AGX Orinの64 GBクラス．SSH，ネイティブCUDA，Python 3.11.18・venv，85件のテストを確認 | モデル用コンテナ，推論 |
 | 内蔵計算機 | 別のJetsonがあると操作者から報告 | 型式，サービス，センサーの接続先，ネットワークの到達性 |
 | 動作制御用計算機 | 別の計算機があると操作者が推定 | 実体，公開サービスの動作先，制御権，接続経路 |
-| カメラ | Stereolabs ZED 2i | 物理接続，導入済みZED SDKまたはwrapper，RGB映像と時刻の取得 |
+| カメラ | ZED 2iの報告あり．既存SDKヘッダは4.1.2 | 研究用ログインのSDKアクセス，物理接続，バインディング，RGB映像と時刻 |
 | LiDAR | Livox Mid-360 | 既存の接続・ドライバと，本プロジェクトでの用途 |
-| コンテナ | Docker 26.1.3，NVIDIAランタイム登録済み，管理者の照会成功 | 研究用ログインの権限，互換イメージ，コンテナのGPU演算 |
+| コンテナ | DockerをSSDへ移設．一致する基底のCUDA演算とPython 3.11段階が成功 | Torchのビルド，BF16演算，importの検査 |
 | 共同作業 | 公開の研究室リポジトリとpush権限を確認．独自成果物はMIT | レビュー済みソースの初回公開 |
 
 機器が利用可能であることは，センサーやモデルの動作に成功したことを意味しない．
@@ -66,14 +66,21 @@ push権限を確認したが，pushは未実施である．独自コードと文
 
 ## 次の成果物
 
-準備したコンテナのPython段階をビルドしてNVIDIAデバイスの可視性を確認し，次に推論用の
-GPU／Python／PyTorchをビルドして調べる．SSDの保存先は構築済みで，
+コンテナのPython段階とデバイスの可視性は確認済みである．推論用のGPU／Python／PyTorchの
+ソースビルドを完了し，動作を調べる．SSDの保存先は構築済みで，
 [構築ガイド](jetson-runtime.ja.md#保存先の前提)に設定と復旧の手順を記した．
 上流の学習用CUDA指定をJetsonのインストーラーとして使わない．
 Dockerの権限とコンテナ内のGPU演算を確認してからモデルを読み込む．[確認済み構成](target-baseline.ja.md)に
 残る確認と証拠の範囲を示す．B2の配線，サービス・ドメイン，センサーの座標・時刻，停止動作は
 実機への接続後に確認する．[実行環境の互換性調査](runtime-compatibility.ja.md)には，モデル不要の
 ビルド候補と未解決のチェックポイント読込問題を記した．動作確認済み環境ではない．
+
+現在のソースビルドはJetson上のバックグラウンドで動く．ローカルの一回限りの検証ジョブが
+ビルド成功を待ち，モデル不要のTorch検査と全import検査を実行する．ログと結果JSONは
+`/mnt/b2-research/VLN_B2/build-logs`へ保存する．`runtime-build.exit`がビルド，
+`runtime-verify.exit`が検証の終了コードで，`0`なら該当段階は成功である．記録がないことは
+成功の証拠ではない．再開時は`runtime-build.log`，`torch-smoke.json`，`full-smoke.json`を確認する．
+これらの後にモデル取得や機体との結合を自動実行することはない．
 
 Stereolabsには，対応するイメージを選ぶための[Jetson向け公式Docker手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)がある．
 NVIDIAは[Jetsonのコンテナruntime](https://developer.nvidia.com/embedded/jetson-cloud-native/)を説明している．

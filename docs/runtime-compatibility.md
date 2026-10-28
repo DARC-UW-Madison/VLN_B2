@@ -4,7 +4,8 @@
 
 Research date: **2026-10-27**. This is a candidate and validation plan, not a
 working-runtime claim. See [runtime setup](jetson-runtime.md) for executed host
-steps and storage prerequisites. The container and model remain untested.
+steps and storage prerequisites. The Python container and native CUDA check
+have passed; the full Torch build and model remain unvalidated.
 
 ## Decision
 
@@ -14,9 +15,9 @@ with Python 3.11.18 and source-built PyTorch 2.2.2**. This is a bounded engineer
 candidate; a successful build and GPU smoke test are still required. The evidence
 does **not** establish that changing the host OS or JetPack is unavoidable.
 
-The [observed host](target-baseline.md) has a working native CUDA driver query,
-and a passing native GPU arithmetic check, but neither GPU access from Docker
-nor PyTorch execution has been tested.
+The [observed host](target-baseline.md) has a working native CUDA driver query
+and GPU arithmetic check. Arithmetic also passed in the matching base container,
+and the Python stage exposes a CUDA device; PyTorch execution remains untested.
 Docker shares the host kernel/driver interfaces; selecting a newer CUDA image
 does not establish compatibility.
 

@@ -62,6 +62,12 @@ imports passed, and all 85 project tests plus synthetic replay passed in this
 Jetson venv. These tests still use mocked vendor interfaces.
 Editable package installation, CLI help and `pip check` also passed.
 
+An administrator-only read of the existing ZED SDK headers reports **4.1.2**;
+the shared library and binding installer are present. The installation directory
+is mode `0770` and inaccessible to the research login. No permission was changed.
+Resolve access or a compatible isolated sensor environment when connecting the
+camera; header presence does not establish working capture or Python bindings.
+
 ## Native CUDA check
 
 The independent check allocates three small GPU buffers, computes
@@ -76,8 +82,9 @@ timeout -k 5s 30s ./local/native-smoke/cuda-smoke
 ```
 
 On 2026-10-27 this passed on the external Jetson: compute capability 8.7,
-driver/runtime API 11040, and maximum absolute error 0. Container GPU availability,
-BF16/PyTorch operations and navigation capability remain unverified.
+driver/runtime API 11040, and maximum absolute error 0. The same binary also
+passed inside the pinned NVIDIA base container with `--runtime=nvidia` and
+`--network=none`. BF16/PyTorch operations and navigation remain unverified.
 
 ## Storage prerequisite
 
@@ -118,7 +125,9 @@ was changed and no reboot has been performed. The standard
 ## Container build and model-free checks
 
 The prepared Dockerfile uses an exact matching-L4T base digest and pinned
-Python/Torch/torchvision sources. It is an unbuilt candidate. Direct dependency
+Python/Torch/torchvision sources. The Python stage built and passed its offline
+check: Python 3.11.18, ARM64 and one visible CUDA device. The full Torch stage
+is a separate source-build candidate. Direct dependency
 pins are not a complete transitive lock; successful builds record Debian and
 Python package inventories inside the image. Keep resolved image IDs and logs
 in local experiment records.
@@ -141,6 +150,19 @@ checks Torch/vision versions and actual FP32/BF16 GPU operations. Neither loads
 models. The optional `--stage full` also imports a pinned upstream checkout
 mounted read-only, without constructing a model; review its terms first.
 Do not mount cameras, robot devices, model caches or Docker sockets for these checks.
+
+The source-only upstream checkout is outside the project at
+`~/Developer/External/TIC-VLA`, pinned to
+`9fa6f8b66b9e121d5df5df071297bba8e5353ebb`. Sparse checkout selects the Python
+package, license and package metadata only. No model blob was selected. Once
+the Torch checks pass, run the optional import check with that reviewed source:
+
+```sh
+sudo docker run --rm --pull=never --runtime=nvidia --network=none \
+  --mount type=bind,source="$HOME/Developer/External/TIC-VLA",target=/opt/upstream,readonly \
+  vln-b2-runtime:jp5 python3.11 /opt/runtime-smoke.py \
+  --stage full --upstream-root /opt/upstream
+```
 
 **Checkpoint loading remains blocked in this old-Torch candidate.** Resolve the
 published loading vulnerabilities or validate a separate conversion/loading
