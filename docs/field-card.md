@@ -16,6 +16,28 @@ source .venv/bin/activate
 python3 --version
 ```
 
+## Visit agenda
+
+Follow [the Ethernet/onboard procedure](field-network.md) in this order:
+
+1. Confirm local recovery and the existing robot stop/control procedure.
+2. Save the external host's current interfaces/routes before plugging Ethernet.
+3. Identify the B2 port, documented subnet, unused client IP and DDS domain;
+   establish the link while preserving management, then verify route and reachability.
+4. Receive B2 state without motor commands; identify accessible onboard computers,
+   actual services and control ownership using authorized lab access.
+5. Attach the external ZED 2i by USB; map built-in camera/sensor exports and
+   Mid-360 wiring separately. Built-in USB access from this Jetson is unavailable.
+6. Complete boot/credential tests; validate Mac remote desktop with and without
+   HDMI, then local management and process lifetime without campus Wi-Fi.
+7. Record axes/timestamps, sensor origins, remaining dependencies and next action.
+   Motion, operator-link-loss behavior and physical stopping require later validation.
+
+These steps are prepared, not already completed. SDK/camera bindings are still
+required before the probes below. Keep private values/results in `local/`.
+
+## Observation probes
+
 1. **Inspect the existing installation** — Python 3.8+, no extra dependencies:
 
    ```sh
@@ -33,10 +55,12 @@ python3 --version
 3. **Check B2 state** — requires SDK2/DDS. Replace `IFACE` with the actual wired interface:
 
    ```sh
-   PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --seconds 3 --output local/state-01.json
+   PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --domain-id DOMAIN_ID --seconds 3 --output local/state-01.json
    ```
 
-   Check valid counts and active topic. Received fields do not verify frame conventions.
+   Replace `DOMAIN_ID` with the verified lab value. Check valid counts and active
+   topic. DDS discovery/subscription traffic is sent, but no motor request.
+   Received fields do not verify frame conventions.
 
 4. **Keep the results locally** — copy `examples/onsite-notes.json` into `local/` and
    record the existing manual control/stop procedure, command-loss behavior,

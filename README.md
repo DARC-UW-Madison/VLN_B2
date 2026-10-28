@@ -19,12 +19,15 @@ official release from the paper's authors or the robot manufacturer.
 | --- | --- |
 | [System overview](docs/system-overview.md) | Actual specifications, storage, isolation, GUI, unattended access and computer roles |
 | [From files to robot motion](docs/runtime-flow.md) | Source sharing, upstream/weights, Docker execution and communication by layer |
+| [Build fundamentals](docs/build-fundamentals.md) | Source, compiler/linker, native Python packages, CUDA, image construction and what needs rebuilding |
+| [Field Ethernet procedure](docs/field-network.md) | Cable/IP/route/DDS sequence, onboard inventory, sensor paths and mobile operation |
+| [Remote desktop](docs/remote-desktop.md) | Existing Vino state, SSH-tunneled screen sharing and headless/login acceptance |
 | [Measured Jetson baseline](docs/target-baseline.md) | Verified host, GPU-driver, storage and network facts; runtime constraints |
 | [Jetson runtime setup](docs/jetson-runtime.md) | Host interpreter/venv, native CUDA check, storage and staged container builds |
 | [Runtime compatibility](docs/runtime-compatibility.md) | Candidate inference stack, model-free checks, and unresolved checkpoint-loading constraints |
 | [Jetson bootstrap](docs/jetson-bootstrap.md) | New login, Tailscale SSH, dependency isolation, and later CLI boot |
 | [Computers and network](docs/network-topology.md) | Host roles, SDK/ROS 2 boundaries, and the first external-Jetson survey |
-| [First-visit card](docs/field-card.md) | Three initial checks and the facts to record |
+| [First-visit card](docs/field-card.md) | Visit agenda, observation probes and the facts to record |
 | [Onsite preparation](docs/onsite.md) | Commands to inspect the target, capture observations, and check local inference |
 | [Understanding TIC-VLA](docs/ticvla-explained.md) | How reasoning, action prediction, latency, training, and robot control fit together |
 | [Deployment information](docs/deployment-intake.md) | What to collect from the robot and lab before choosing an implementation |
@@ -45,8 +48,8 @@ behavior have been verified. Training a new walking policy is outside this scope
 The available setup is B2, Jetson AGX Orin, ZED 2i and Livox Mid-360.
 Docker use and lab GitHub hosting are permitted. See [project status](docs/status.md)
 for confirmed facts and the next inspection. External-host software inventory is
-verified; application-runtime behavior, sensor connections, frames, and timing
-remain unverified. No asynchronous robot-control
+verified, and model-free GPU/import checks pass. Actual model/sensor integration,
+connections, frames and timing remain unverified. No asynchronous robot-control
 loop or motor command sender is implemented.
 
 ## Try the preparation tools

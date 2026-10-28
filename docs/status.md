@@ -77,6 +77,16 @@ personal credential saving nor a new GUI login target has been applied.
 
 ## Decisions in effect
 
+Learning and field preparation now include [build fundamentals](build-fundamentals.md),
+[the Ethernet/onboard runbook](field-network.md) and [remote desktop](remote-desktop.md).
+The visit agenda covers route/DDS verification, onboard service inventory,
+external-USB versus built-in network sensor paths, boot/headless access and
+operation without campus Wi-Fi. The notes template includes evidence fields.
+Vino is installed but not running/listening. Tailscale client/daemon 1.104.2 and
+enabled Tailscale SSH were observed; review the documented fixed version/update
+with recovery access before forwarding tests. No desktop/network/update settings
+were changed. The future local robot service and link-loss policy remain unimplemented.
+
 - The external compute is verified as AGX Orin, 64 GB class. B2, ZED 2i and Mid-360 integration remains pending. Inventory onboard computers separately; do not infer their roles or wiring.
 - Use the existing B2 walking controller; investigate a high-level navigation adapter.
 - Mac-to-external-Jetson SSH over Tailscale is verified. Keep per-project dependency isolation; preserve the existing OS, ROS, ZED, other accounts and data. Robot Ethernet remains unconnected.

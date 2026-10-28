@@ -81,7 +81,9 @@ GPUイメージはモデル実行環境の候補用である．カメラや状�
 
 目標は，給電→Ubuntu起動→システムのWi-Fi接続→Tailscale→SSHである．GUIの自動ログインは
 現地の操作に便利だが，ネットワークサービスの起動には本来不要である．NetworkManager，tailscaled，SSHは
-起動時に有効で，現在も動作している．Tailscaleはログイン状態を保持するため，通常は起動ごとに
+起動時に有効で，現在も動作している．
+Macからの画面操作は[リモートデスクトップ](remote-desktop.ja.md)を参照する．既存Vinoは未起動で，
+画面なし・ログイン時の動作は現地で検証する．Tailscaleはログイン状態を保持するため，通常は起動ごとに
 `tailscale up`をやり直さない．認証キーの期限は，別途[Tailscaleの管理画面](https://tailscale.com/docs/features/access-control/key-expiry)で確認する．
 
 現在の企業向けWi-Fiプロファイルは，ユーザーのsecret agentでパスワードを扱う設定

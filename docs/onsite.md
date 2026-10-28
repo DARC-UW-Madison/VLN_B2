@@ -15,6 +15,12 @@ For the external Jetson and the separate onboard computers, start with
 [computer roles and network discovery](network-topology.md) to identify wiring
 and routes before probing SDK services.
 
+For this visit, start with [the Ethernet/onboard procedure](field-network.md)
+and [the field card](field-card.md). The external ZED 2i can use USB; built-in
+sensors need their existing network export. Replace `IFACE` and `DOMAIN_ID`
+with verified lab values, not assumed defaults. Model-free GPU checks passed;
+the real sensor/robot probes below have not been completed.
+
 ## 1. Bring the project and inspect the Jetson
 
 Copy this repository to the Jetson using a USB drive or another laboratory-approved
@@ -96,7 +102,7 @@ or interface. Use the lab's documented cabling and address settings without
 changing unrelated network settings.
 
 ```sh
-PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --seconds 3 --output local/state-01.json
+PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --domain-id DOMAIN_ID --seconds 3 --output local/state-01.json
 ```
 
 `auto` listens to both `rt/sportmodestate` and `rt/lf/sportmodestate`. The JSON lists
@@ -136,7 +142,7 @@ an RGB image and read B2 state. See the [intake](deployment-intake.md) for conte
 Once the two probes work, capture an image with a nearby state sample:
 
 ```sh
-PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla record --interface IFACE --output-dir local/observation-01
+PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla record --interface IFACE --domain-id DOMAIN_ID --output-dir local/observation-01
 ```
 
 This creates `frame.jpg` and `observation.json`. Receipt-time skew must be at most

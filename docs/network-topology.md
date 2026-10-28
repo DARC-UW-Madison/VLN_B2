@@ -166,8 +166,57 @@ images and explicitly labeled synthetic state allow software tests without B2;
 model files and approved inputs must still be obtained separately. A ZED attached
 to the desk setup can be tested there. Actual B2 state/control, sensor connections
 left on the robot, mounting geometry, command loss, and autonomous operation
-require later integration on the real robot. Management SSH and the host baseline are now verified. Application runtime,
-model loading and robot integration remain unverified.
+require later integration on the real robot. Management SSH, the host baseline
+and model-free GPU/import checks are verified. Model loading and robot
+integration remain unverified.
+
+## Operation away from campus Wi-Fi
+
+Campus Wi-Fi is a current management/internet connection, not the intended
+robot-control transport. Roaming between access points can interrupt traffic;
+outside coverage there may be no connection. Tailscale needs an underlying
+network path and cannot supply radio coverage.
+
+The intended local data loop is camera/state → local inference → local tracking
+and supervision → SDK2/DDS over robot Ethernet. Reviewed code, model assets,
+instruction/configuration and logs must be local before an offline run. Mac is
+an optional management/visualization endpoint, not an inference server or a
+required relay for every velocity request. No cloud call is planned for that loop.
+The current model-free image runs with `--network=none`; this does not prove
+future live inference or offline robot integration, which remain unimplemented.
+
+An ordinary SSH foreground process can depend on its terminal session. A
+detached process, terminal multiplexer, systemd service and container are
+different lifetime/supervision mechanisms: creating a container does not by
+itself detach its terminal or implement a robot watchdog. The existing build was
+detached. The future robot application should have a local supervised lifecycle
+and explicit arm/stop state; it is not installed as a service. See
+[systemd service semantics](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html).
+Restarting software must not automatically authorize movement after a fault.
+
+For mobile monitoring, prefer an approved local management Wi-Fi network with
+Mac and Jetson on the same reachable LAN, such as a portable lab access point.
+It need not provide internet for ordinary local SSH after authentication is set
+up. Keep B2 on a separate Ethernet path; no campus/robot bridge or subnet router
+is required. A phone hotspot or Jetson-hosted AP needs its own client-isolation,
+radio-capability and power/roaming checks. No AP, new Wi-Fi profile or subnet
+router has been configured. Do not assume Tailscale peer setup/coordination will
+always work without internet; verify direct local SSH as a fallback.
+
+Define two different events: loss of the **management/operator link** and loss
+of **robot control/state/sensor data**. The core loop should not require an open
+Mac SSH terminal. Whether it may continue after operator-link loss depends on
+the trial's supervision/stop policy. A deadman-controlled trial may deliberately
+require stopping. Robot Ethernet loss, stale live inputs, inference hangs and
+process failure need independent expiry/watchdog behavior and measured receiver
+response. Neither Tailscale nor a container restart policy supplies that safety
+contract. Existing robot stop and override procedures remain essential.
+
+Use [the field procedure](field-network.md) for cable attachment, IP/route
+verification, state-only DDS, onboard inventory, sensor mapping and mobile tests.
+The external ZED 2i can be USB-connected to the external Jetson; built-in B2
+sensors require their existing onboard/network path. No direct built-in USB
+connection to the external Jetson is available in the reported setup.
 
 ## First collection on the external Jetson
 

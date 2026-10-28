@@ -91,6 +91,8 @@ once. On this 64 GB system, CLI-only boot is not currently required.
 The desired sequence is power-on → Ubuntu → system Wi-Fi → Tailscale → SSH.
 GUI automatic login is optional for network services, though useful for local
 operation. NetworkManager, tailscaled and SSH are already enabled and active.
+For Mac screen control, see [remote desktop](remote-desktop.md); installed Vino
+is not currently running, and headless/login behavior requires field validation.
 Tailscale retains login state; it does not normally require `tailscale up` on
 every boot. Its node-key expiry must still be checked in the
 [Tailscale admin console](https://tailscale.com/docs/features/access-control/key-expiry).

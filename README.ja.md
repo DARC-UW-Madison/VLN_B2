@@ -18,12 +18,15 @@ Unitree B2でTIC-VLAによるナビゲーションを評価するための研究
 | --- | --- |
 | [システム全体像](docs/system-overview.ja.md) | 実機の性能，保存先，隔離範囲，GUI，無人アクセス，計算機の担当 |
 | [ファイルから機体の動作まで](docs/runtime-flow.ja.md) | ソースの共有，本家・重み，Dockerの実行，レイヤごとの通信 |
+| [ビルドの基礎](docs/build-fundamentals.ja.md) | ソース，コンパイル・結合，Python拡張，CUDA，イメージ構築，作り直しの範囲 |
+| [現地のEthernet手順](docs/field-network.ja.md) | 配線・IP・経路・DDSの順序，内蔵調査，センサー経路，移動中の運用 |
+| [リモートデスクトップ](docs/remote-desktop.ja.md) | 現在のVino，SSH経由の画面共有，画面なし・ログイン時の合格条件 |
 | [確認済みのJetson構成](docs/target-baseline.ja.md) | ホスト，GPUドライバ，容量，ネットワークの実測と実行環境の条件 |
 | [Jetsonの実行環境構築](docs/jetson-runtime.ja.md) | ホストのPython・venv，CUDA演算確認，保存先，段階的なコンテナ構築 |
 | [実行環境の互換性](docs/runtime-compatibility.ja.md) | 推論環境の候補，モデル不要の確認，未解決のチェックポイント読込制約 |
 | [Jetsonの初期設定](docs/jetson-bootstrap.ja.md) | 新規ログイン，Tailscale SSH，依存環境の分離，将来のCLI起動 |
 | [計算機とネットワーク](docs/network-topology.ja.md) | 各ホストの役割，SDK・ROS 2の区別，外付けJetsonでの最初の調査 |
-| [初回訪問の確認カード](docs/field-card.ja.md) | 最初の三つの確認と記録する項目 |
+| [初回訪問の確認カード](docs/field-card.ja.md) | 現地作業の順序，観測の確認，記録する項目 |
 | [現地での準備](docs/onsite.ja.md) | 対象機の調査，観測の取得，ローカル推論の確認コマンド |
 | [TIC-VLAの仕組み](docs/ticvla-explained.ja.md) | 推論，行動予測，遅延，学習，機体制御のつながり |
 | [導入前に集める情報](docs/deployment-intake.ja.md) | 実装方針を決める前に，実機と研究室で確認すること |
@@ -42,8 +45,8 @@ Unitree B2でTIC-VLAによるナビゲーションを評価するための研究
 
 利用できる構成はB2，Jetson AGX Orin，ZED 2i，Livox Mid-360である．Dockerと研究室GitHubの利用許可がある．
 確定事項と次の調査は[進捗](docs/status.ja.md)にまとめる．
-外付けホストに導入済みのソフトウェアの情報は確認したが，アプリ実行環境の動作，
-センサーの接続，座標系，時刻の対応は未確認である．
+外付けホストの情報とモデル不要のGPU・import検査は確認した．実モデル・センサーの結合，
+接続，座標系，時刻の対応は未確認である．
 非同期の実機制御ループと，モーターへの指令送信部はまだ実装していない．
 
 ## 準備用ツールを試す

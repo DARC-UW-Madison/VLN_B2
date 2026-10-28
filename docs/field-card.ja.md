@@ -15,6 +15,26 @@ source .venv/bin/activate
 python3 --version
 ```
 
+## 今回の現地作業
+
+[Ethernet・内蔵調査の手順](field-network.ja.md)を，次の順で進める．
+
+1. 現地の復旧方法と，既存の機体の停止・制御手順を確認する．
+2. Ethernetを挿す前に，外付けホストのインターフェース・経路を保存する．
+3. B2のポート，既知のサブネット，未使用の接続IP，DDSドメインを確認する．
+   管理接続を維持してリンクを作り，経路と到達性を調べる．
+4. モーター指令なしでB2状態を受信し，研究室の正規アクセスで内蔵計算機，実際のサービス，制御権を特定する．
+5. 外付けZED 2iをUSB接続し，内蔵カメラ・センサーの配信とMid-360の配線は別に調べる．
+   内蔵USBをこのJetsonへ直接つなぐ経路はない．
+6. 起動・認証情報の試験を行い，HDMIあり・なしでMacの遠隔画面を検証する．
+   続いて大学Wi-Fiなしのローカル管理接続と，プロセスの寿命を確認する．
+7. 軸・時刻，センサーの元，残る依存先，次の行動を残す．移動，操作者との通信断時，実際の停止は後の検証とする．
+
+準備した手順であり，実行済みではない．以下の確認にもSDK・カメラのバインディングが必要である．
+個別の値と結果は`local/`へ置く．
+
+## 観測の確認
+
 1. **導入済み環境を調べる** — Python 3.8以上，追加の依存なし．
 
    ```sh
@@ -32,10 +52,11 @@ python3 --version
 3. **B2の状態を受信する** — SDK2／DDSが必要．`IFACE`を実際の有線インターフェースに置換．
 
    ```sh
-   PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --seconds 3 --output local/state-01.json
+   PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --domain-id DOMAIN_ID --seconds 3 --output local/state-01.json
    ```
 
-   有効受信数とトピックを確認します．受信できても座標系の規約は未確認です．
+   `DOMAIN_ID`を確認した研究室の値へ置き換え，有効受信数とトピックを調べる．
+   DDSの発見・購読の通信は送るが，モーター指令は送らない．受信できても座標系の規約は未確認である．
 
 4. **結果をローカルに残す** — `examples/onsite-notes.json`を`local/`へコピーし，既存の手動操作・
    停止手順，通信断時の挙動，座標系，カメラの取付け・時刻の情報を記録します．未確認はnullの

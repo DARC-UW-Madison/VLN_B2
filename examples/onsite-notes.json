@@ -35,5 +35,37 @@
     "prediction_latency_seconds": null,
     "thermal_observations": null
   },
+  "network_survey": {
+    "robot_port_endpoint": null,
+    "external_robot_interface": null,
+    "external_robot_cidr": null,
+    "robot_service_address": null,
+    "management_route_preserved": null,
+    "robot_route_verified": null,
+    "dds_domain_id": null,
+    "state_topic_and_counts": null,
+    "onboard_hosts_and_services": []
+  },
+  "sensor_paths": {
+    "external_zed_usb_host": null,
+    "external_zed_rgb_verified": null,
+    "depth_used_by_project": null,
+    "built_in_exports": [],
+    "mid360_receiving_host_and_driver": null,
+    "frames_and_source_clocks_verified": null
+  },
+  "access_and_offline": {
+    "console_recovery_verified": null,
+    "boot_wifi_before_gui_login_verified": null,
+    "tailscale_running_version_and_update_review": null,
+    "remote_desktop_with_hdmi_verified": null,
+    "remote_desktop_without_hdmi_verified": null,
+    "mobile_management_network": null,
+    "local_ssh_without_campus_internet_verified": null,
+    "process_survives_ssh_disconnect_verified": null,
+    "management_link_loss_policy": null,
+    "robot_link_loss_policy": null,
+    "physical_stop_evidence": null
+  },
   "next_step": null
 }

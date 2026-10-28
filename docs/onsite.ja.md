@@ -13,6 +13,11 @@ B2の配線と制御は未確認です．以下は観測またはオフライン
 [計算機の役割とネットワーク調査](network-topology.ja.md)から始め，SDKのサービスを試す前に
 配線と経路を特定する．
 
+今回の訪問では，[Ethernet・内蔵計算機の手順](field-network.ja.md)と[確認カード](field-card.ja.md)を先に使う．
+外付けZED 2iはUSB接続できるが，内蔵センサーにはネットワークの配信経路が必要である．
+`IFACE`と`DOMAIN_ID`は研究室で確認した値へ置き換え，既定値を機体の実測値と扱わない．
+GPUのモデル不要検査は通ったが，以下の実センサー・機体の確認は未実施である．
+
 ## 1．プロジェクトを持参し，Jetsonを調べる
 
 USBメモリなど研究室で認められた方法でリポジトリをJetsonにコピーし，ルートフォルダで
@@ -91,7 +96,7 @@ B2については，任意のネットワーク調査結果または`ip -brief l
 ネットワーク設定は変更しません．
 
 ```sh
-PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --seconds 3 --output local/state-01.json
+PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --domain-id DOMAIN_ID --seconds 3 --output local/state-01.json
 ```
 
 `auto`は`rt/sportmodestate`と`rt/lf/sportmodestate`の両方を購読します．JSONには受信数と
@@ -128,7 +133,7 @@ PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE -
 二つの確認が通ったら，時刻の近い状態と画像を保存します．
 
 ```sh
-PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla record --interface IFACE --output-dir local/observation-01
+PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla record --interface IFACE --domain-id DOMAIN_ID --output-dir local/observation-01
 ```
 
 `frame.jpg`と`observation.json`を作ります．受信時刻の差を0.2秒以下に制限していますが，

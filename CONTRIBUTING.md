@@ -7,6 +7,9 @@
 - Read the README, project status, and the relevant guide before changing files.
 - Keep each change focused. Explain the problem, the result, and its evidence.
 - Distinguish proposed behavior, implemented behavior, and measured results.
+- Before environment changes, explain purpose, mechanism, inputs/outputs and
+  affected scope. Explain significant command options and validation limits;
+  preserve reusable explanations in the relevant guide, not only progress logs.
 - Keep private records, machine addresses, credentials, and unpublished lab
   materials outside this repository. Do not add personal labels, chat exports,
   or assistant-specific instruction files.
