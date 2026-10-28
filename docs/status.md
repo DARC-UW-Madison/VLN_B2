@@ -82,9 +82,25 @@ the mechanisms and decision boundaries in both languages. No separate AP is
 available; a Jetson-hosted local AP is a candidate, Mac is optional for the core
 loop, and B2's existing remote requires priority/stop verification. RDP/Windows
 App is the preferred remote-GUI candidate, not a proven stability result.
-A fresh SSH attempt on 2026-10-28 timed out before authentication; its cause is
-unknown. No remote install/configuration/source transfer was performed in that
-continuation; the latest local documentation is not yet verified on Jetson.
+On 2026-10-28 management access was restored with operator authentication.
+Direct LAN OpenSSH was verified before upgrading only Tailscale to 1.104.4;
+the running daemon and a new SSH/TCP-forward test passed. The preceding
+82-file source revision was hash-verified on Jetson. The current final source
+revision must be checked again after any subsequent documentation update.
+
+The pinned RDP source bundle built after resolving test-library/feature
+requirements; all 213 upstream test cases passed with no skips. The approximately
+20 MB bundle was installed in `/opt/b2-remote`, with dedicated service identity,
+allow group, PAM entry and units. Both units are manually active and disabled
+for boot. Loopback-only listening, service privileges, verified TLS 1.3, Xorg/X11
+query, Windows App authentication/desktop display and the post-install eight
+FP32/BF16 GPU checks passed. Input/settings, reconnect and cold boot remain
+pending. Existing NoMachine/GDM remain in place. See [RDP build and commissioning](rdp-build.md).
+
+The [model-artifact plan](model-artifacts.md) identifies pinned candidates totaling
+3,827,163,803 bytes and a separate CPU conversion proposal. It is metadata-only;
+terms, acquisition approval, converter implementation and real inference remain
+open. No model files were acquired.
 
 ## Decisions in effect
 
@@ -93,10 +109,13 @@ Learning and field preparation now include [build fundamentals](build-fundamenta
 The visit agenda covers route/DDS verification, onboard service inventory,
 external-USB versus built-in network sensor paths, boot/headless access and
 operation without campus Wi-Fi. The notes template includes evidence fields.
-Vino is installed but not running/listening. Tailscale client/daemon 1.104.2 and
-enabled Tailscale SSH were observed; review the documented fixed version/update
-with recovery access before forwarding tests. No desktop/network/update settings
-were changed. The future local robot service and link-loss policy remain unimplemented.
+Vino remains stopped; existing NoMachine was discovered and preserved.
+Tailscale client/daemon 1.104.4 and the controlled RDP milestones are recorded
+above. AP support was reported by NetworkManager and iw, but no hotspot or
+Wi-Fi credential/GDM autologin change was applied. The active Wi-Fi profile is
+not the earlier inspected enterprise profile; verify the intended connection
+before using the credential helper. The future local robot service and link-loss
+policy remain unimplemented.
 
 - The external compute is verified as AGX Orin, 64 GB class. B2, ZED 2i and Mid-360 integration remains pending. Inventory onboard computers separately; do not infer their roles or wiring.
 - Use the existing B2 walking controller; investigate a high-level navigation adapter.
@@ -120,9 +139,10 @@ FP32/BF16 GPU operations; Transformers, Lightning, timm and the pinned upstream
 TIC-VLA module imported without constructing a model. Build and verification
 exit codes are both `0`. No model weights were acquired or loaded.
 
-The next deliverable is a reviewed artifact/loading plan: resolve the old-Torch
-checkpoint vulnerabilities, then obtain separate approval for exact model files,
-revisions, terms, sizes and official-cache location before any acquisition.
+The artifact/loading plan is prepared. Next implement and test the reviewed
+CPU conversion and safetensors-only path with synthetic tensors, resolve
+artifact-specific terms, then obtain separate approval for exact model files,
+revisions, sizes and official-cache location before acquisition.
 Run recorded-observation inference only after that review. The
 [runtime compatibility review](runtime-compatibility.md) preserves these constraints.
 In parallel, complete the deferred onsite boot/credential checks and map B2's

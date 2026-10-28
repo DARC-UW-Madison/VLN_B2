@@ -4,7 +4,9 @@
 
 Use SSH for ordinary terminal work. Prepare RDP as the preferred option for the
 occasional graphical settings task, with Microsoft's Windows App on Mac and an
-xrdp server on Jetson. This is a proposed configuration, not a working service.
+xrdp server on Jetson. The pinned server is now installed and manually running; authentication and
+desktop display from Windows App passed on 2026-10-28. Input, settings permission,
+reconnect and cold-boot acceptance remain separate checks.
 RDP has not been measured against VNC on this Jetson, so the preference is not a
 claim that it is more stable. Remote desktop is a management tool; inference and
 future robot control must run locally without requiring a desktop connection.
@@ -22,6 +24,34 @@ A management SSH attempt on **2026-10-28** timed out. Its cause has not been
 established; a timeout alone does not identify a Wi-Fi, authentication, power or
 host failure. The configuration below was prepared without reaching the target.
 Do not assume that installing an RDP client on Mac will restore host connectivity.
+
+A later **2026-10-28** inspection succeeded after the operator restored Tailscale
+and completed its SSH identity check. Direct LAN OpenSSH was also verified with
+the host key obtained through the trusted session. This independent path stayed
+connected while only Tailscale was upgraded to **1.104.4**; both client and running
+daemon report that version. A new Tailscale SSH connection and a temporary
+loopback TCP forward to host OpenSSH passed; the test tunnel was then stopped.
+These checks establish terminal/forwarding access, not a working RDP desktop.
+
+The inventory also found existing **NoMachine 8.20.1-5**, enabled and listening
+on TCP 4000 on IPv4/IPv6 interfaces. It was already present and was not installed,
+reconfigured or disabled here. It is a separate remote-desktop protocol, not
+xrdp or proof of Windows App compatibility. Its Mac client/session was not tested.
+The research console GUI was normally logged out after the operator's response;
+GNOME reported no logout inhibitors. The subsequent RDP authentication and
+desktop display passed. The GDM autologin target was not changed.
+
+The local package metadata offers xrdp `0.9.12-1ubuntu0.1`, xorgxrdp
+`1:0.2.12-1` and new dependency ssl-cert `1.0.39`; simulation would install three
+packages with no upgrades/removals. However, the xrdp candidate lacks the ESM
+revision identified by [Ubuntu USN-8476-1](https://ubuntu.com/security/notices/USN-8476-1).
+Do not install that old candidate as the prepared solution. No Ubuntu Pro
+entitlement or ESM repository has been enabled. A separately pinned source-build
+candidate can be evaluated without replacing the host graphics stack; its build
+and installation evidence must be recorded separately.
+
+The [source-build guide](rdp-build.md) explains the isolated bundle and required
+host configuration; do not install or start the default configuration blindly.
 
 ## Client, server, protocol and session
 
@@ -130,7 +160,8 @@ The inspected client/daemon was 1.104.2; the 2026-10-26 SSH bulletins
 TS-2026-014/015 are fixed in 1.104.4 or newer. Verify the current running version
 and policy, arrange console or alternate recovery, then update to an appropriate
 supported release before forwarding. Do not restart the sole remote path or
-weaken a reauthentication policy to regain access. No update was applied here.
+weaken a reauthentication policy to regain access. The controlled update and
+forwarding verification recorded above completed on 2026-10-28.
 
 After xrdp is configured and verified to listen only on Jetson loopback port
 3389, run this **example on Mac**, with real values supplied locally:
@@ -150,7 +181,29 @@ use the research Linux account when asked for the remote login. No RDP gateway
 is required for this SSH-tunnel example. Confirm the expected server certificate
 through the independently trusted host; do not blindly accept a changed identity.
 Do not put passwords in command arguments, the repository or shared screenshots.
-The tunnel and Windows App connection have not been tested on this Jetson.
+The tunnel, Linux authentication and visible GNOME desktop passed on this
+Jetson. A Mac profile named `B2 Jetson (SSH tunnel)` was created with credentials
+set to Ask when required; no password was saved. Client folder, clipboard,
+printer, smartcard, microphone, camera and audio redirection are disabled.
+An inherited Chrome crash notification was visible; no crash report was sent.
+Input/settings and reconnect acceptance still need their own evidence.
+
+## Using the installed server
+
+On Jetson, the manually installed service can be started after a reboot with:
+
+```sh
+sudo systemctl start b2-rdp.service
+systemctl is-active b2-rdp.service b2-rdp-sesman.service
+```
+
+It is currently running, but not enabled at boot. Once the remaining acceptance
+checks pass, boot enablement is a separate recorded step; it does not require
+GUI autologin and must never start robot motion. Start the SSH tunnel from Mac,
+then open the saved `B2 Jetson (SSH tunnel)` profile. A self-signed certificate
+requires checking the expected server identity; do not ignore changed
+certificates or save a permanent bypass. The independently verified TLS probe
+used the actual public certificate as a trust anchor.
 
 ## eduroam settings through RDP
 

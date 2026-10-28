@@ -45,7 +45,9 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 | [System overview and unattended boot](system-overview.md) | Which paths/settings changed? What is isolated? How do boot networking, credentials, sharing and return work? |
 | [Jetson bootstrap](jetson-bootstrap.md) | How are accounts, SSH/Tailscale, interpreters and dependency boundaries prepared? |
 | [Jetson runtime setup](jetson-runtime.md) | How were SSD/Docker storage, native CUDA, Python and runtime stages built and recovered? |
+| [Model artifacts and loading plan](model-artifacts.md) | Which exact model files, revisions, sizes and terms need approval? How can a separate CPU conversion avoid old-Torch pickle loading? |
 | [Runtime compatibility](runtime-compatibility.md) | Which candidate versions and model-free checks passed? Why is checkpoint loading still blocked? |
+| [RDP build and commissioning](rdp-build.md) | Why a separately pinned source build? What is exported, configured and tested before a host server is used? |
 | [Remote desktop from Mac](remote-desktop.md) | How do Windows App/RDP/xrdp sessions differ from VNC? What must work before remote GUI can replace routine HDMI? |
 
 Historical inspection dates are not automatic claims about the current device.

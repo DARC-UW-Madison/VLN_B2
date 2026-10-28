@@ -49,8 +49,13 @@ of previous data occurred. See [storage procedure](jetson-runtime.md#storage-pre
 | `/mnt/b2-research/VLN_B2/build-logs` | Image-build logs and model-free check results |
 | `/mnt/b2-research/VLN_B2/huggingface` | Empty model-cache directory; `~/.cache/huggingface` points here |
 
-Only three development-header packages were added to the host:
-`libbz2-dev`, `libncurses-dev`, and `libreadline-dev`; none was upgraded or removed.
+The initial Python setup added three development-header packages to the host:
+`libbz2-dev`, `libncurses-dev`, and `libreadline-dev`; none was upgraded or removed in that initial step. On 2026-10-28 Tailscale alone
+was upgraded to 1.104.4 after direct LAN SSH was verified. A separately compiled
+RDP prefix, non-login `xrdp` service identity, `b2-remote-users` allow group,
+`/etc/pam.d/xrdp-sesman` and dedicated `b2-rdp`/`b2-rdp-sesman` units were added.
+Host TLS keys are root-owned and not stored in the repository. No xrdp APT
+package, replacement Xorg, CUDA driver or new ROS installation was added.
 The project is installed editable in its own venv. NVIDIA's base image and a
 separate Python image were acquired/built in Docker; Torch/vision compilation
 occurs there. CUDA, TensorRT, Docker, ROS and ZED already existed on the host.
@@ -92,15 +97,20 @@ The desired sequence is power-on → Ubuntu → system Wi-Fi → Tailscale → S
 GUI automatic login is optional for network services, though useful for local
 operation. NetworkManager, tailscaled and SSH are already enabled and active.
 For Mac screen control, [remote desktop](remote-desktop.md) now prioritizes
-Windows App/RDP with a proposed host xrdp server. No server has been installed
-or enabled; existing Vino is stopped. Headless/login behavior requires validation.
+Windows App/RDP with a proposed host xrdp server. The server is installed under `/opt/b2-remote`
+and manually running; Windows App authentication/desktop display passed. Boot
+enablement and HDMI-disconnected cold boot remain pending. Existing Vino is stopped.
 Tailscale retains login state; it does not normally require `tailscale up` on
 every boot. Its node-key expiry must still be checked in the
 [Tailscale admin console](https://tailscale.com/docs/features/access-control/key-expiry).
 
-The active enterprise Wi-Fi profile currently uses a user secret agent
+The enterprise Wi-Fi profile inspected on 2026-10-27 uses a user secret agent
 (`password-flags=1`) and is restricted to a login. Its password is unavailable
-through NetworkManager's settings cache. A login-independent configuration needs
+through NetworkManager's settings cache. A later 2026-10-28 inspection found
+that the then-active Wi-Fi profile had no 802.1X settings. Do not transfer the
+earlier enterprise-profile conclusions to a different active connection. The
+helper refuses credential changes on a non-PEAP profile. Identify the intended
+eduroam profile again before any credential operation. A login-independent enterprise configuration needs
 one local password entry, in either a physical terminal or the operator's own
 interactive SSH terminal. Do not send the password to a chat or put it in a command.
 

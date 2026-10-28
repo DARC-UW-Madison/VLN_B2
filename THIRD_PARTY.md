@@ -61,6 +61,27 @@ build or install. No vendor code has been copied into the independent adapters.
 Installing dependencies later can introduce additional transitive requirements;
 this table is not a completed redistribution audit or permission to publish them.
 
+## Remote-desktop build candidate
+
+The optional management build is separate from the model runtime. The
+[recipe](deploy/remote-desktop.Dockerfile) pins xrdp 0.10.6.1 at
+`80c52879fead585d6347df5b3c587718adf8f5a5` under
+[Apache-2.0 and included third-party terms](https://raw.githubusercontent.com/neutrinolabs/xrdp/80c52879fead585d6347df5b3c587718adf8f5a5/COPYING),
+and xorgxrdp 0.10.5 at `c2d3cbafebe00be3221f985c06ef6b97f1c63790` under
+[its X11-style permissive terms](https://raw.githubusercontent.com/neutrinolabs/xorgxrdp/c2d3cbafebe00be3221f985c06ef6b97f1c63790/COPYING).
+Do not substitute our MIT notice or assert an unverified SPDX identifier for the
+latter. Git-pinned optional submodules retain their notices. The bundle preserves
+COPYING/LICENSE/NOTICE files; it is a local artifact, not a published image.
+[Check 0.15.2](https://github.com/libcheck/check/tree/11970a7e112dfe243a2e68773f014687df2900e8)
+is a test-only build dependency under its LGPL-2.1 terms; it is not linked into
+or bundled with the exported RDP runtime. The builder's other OS packages retain
+their own terms. This is not a full binary-redistribution clearance.
+
+Existing NoMachine 8.20.1-5 was discovered on the target; it was not installed,
+modified or bundled by this project. Its commercial/vendor conditions are
+separate from this source repository. No license or client-access entitlement is
+inferred from package presence. See [RDP build details](docs/rdp-build.md).
+
 ## Optional host management and Python tooling
 
 Tailscale is used for the verified host-management SSH path, not bundled with the
@@ -68,7 +89,8 @@ application. Its Linux client source uses [BSD-3-Clause](https://github.com/tail
 tailnet enrollment, hosted-service terms and lab access rules are separate.
 Use the [official installer](https://tailscale.com/docs/install/linux). SSH over
 Tailscale was verified on the target; the inspected client/daemon version is
-1.104.2. Review the update/access constraints in the remote-desktop guide.
+1.104.4 after the controlled 2026-10-28 update. Review access details in the
+remote-desktop guide.
 [pyenv](https://github.com/pyenv/pyenv) is optional per-user interpreter tooling
 under its [MIT license](https://github.com/pyenv/pyenv/blob/master/LICENSE), not a
 bundled dependency or GPU-runtime sandbox. Neither tool is installed by this

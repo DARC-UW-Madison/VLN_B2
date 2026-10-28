@@ -37,7 +37,9 @@
 | [システム全体像と無人起動](system-overview.ja.md) | 何のパス・設定を変えたか．何を分離したか．起動通信，認証情報，共有・返却はどうするか |
 | [Jetsonの初期設定](jetson-bootstrap.ja.md) | ユーザー，SSH・Tailscale，Python，依存の境界をどう準備するか |
 | [Jetsonの実行環境構築](jetson-runtime.ja.md) | SSD・Docker保存先，ネイティブCUDA，Python，実行環境をどうビルド・復旧したか |
+| [モデル資材と読込計画](model-artifacts.ja.md) | 承認するファイル・版・サイズ・条件は何か．別のCPU変換で古いTorchのpickle読込をどう避けるか |
 | [実行環境の互換性](runtime-compatibility.ja.md) | 候補の版とモデル不要の検査は何が通ったか．なぜチェックポイント読込が保留か |
+| [RDPのビルドと導入確認](rdp-build.ja.md) | なぜ別の固定版をビルドするか．ホストの利用前に何を出力・設定・検証するか |
 | [Macからの遠隔画面](remote-desktop.ja.md) | Windows App・RDP・xrdpのセッションはVNCと何が違うか．通常のHDMI利用を省く前に何を確認するか |
 
 過去の調査日付を，現在も同じ状態であるという主張へ自動的に読み替えない．SSH・GPUの過去の

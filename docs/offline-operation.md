@@ -9,6 +9,10 @@ external Jetson with local assets, sensor input and a wired B2 connection. Mac
 and internet are optional management resources. This is a target design: the
 live application, command sender, arming logic and watchdog are not implemented.
 No hotspot profile or offline robot operation has been tested or enabled.
+On 2026-10-28, NetworkManager and `iw list` both reported AP support on the
+existing radio; its listed interface combinations share a single channel.
+Direct LAN OpenSSH worked from Mac. These facts do not establish AP/client
+concurrency in the field, hotspot association, range or offline cold boot.
 
 A network-independent computation does not imply an unsupervised experiment.
 Trials still need a verified operator control/stop procedure and a defined

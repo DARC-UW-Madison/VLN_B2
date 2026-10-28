@@ -54,13 +54,31 @@
 独立したアダプタへのベンダーコードのコピーはない．後から導入する依存先には推移的な依存が
 加わる可能性があり，この表は再配布監査の完了や公開許可を意味しない．
 
+## 遠隔画面のビルド候補
+
+任意の管理用ビルドはモデルの実行環境と分ける．[レシピ](deploy/remote-desktop.Dockerfile)は
+xrdp 0.10.6.1の`80c52879fead585d6347df5b3c587718adf8f5a5`を
+[Apache-2.0と同梱部品の条件](https://raw.githubusercontent.com/neutrinolabs/xrdp/80c52879fead585d6347df5b3c587718adf8f5a5/COPYING)で，
+xorgxrdp 0.10.5の`c2d3cbafebe00be3221f985c06ef6b97f1c63790`を
+[同版のX11-styleの許諾条件](https://raw.githubusercontent.com/neutrinolabs/xorgxrdp/c2d3cbafebe00be3221f985c06ef6b97f1c63790/COPYING)で固定する．
+後者を自分たちのMIT表示へ置き換えたり，未確認のSPDX識別子を断定したりしない．
+Gitで固定した任意のsubmoduleも表示を維持する．成果物にはCOPYING・LICENSE・NOTICEを保存し，
+公開イメージではなくローカルの成果物として扱う．
+[Check 0.15.2](https://github.com/libcheck/check/tree/11970a7e112dfe243a2e68773f014687df2900e8)は
+LGPL-2.1条件のテスト専用ビルド依存で，書き出すRDP実行環境にはリンク・同梱しない．
+ビルド用OSパッケージもそれぞれの条件を保持する．バイナリ再配布の全体審査を終えたという意味ではない．
+
+既存のNoMachine 8.20.1-5を対象機で発見したが，本プロジェクトで導入・改変・同梱していない．
+メーカーの商用・利用条件は本ソースリポジトリとは別であり，パッケージの存在から
+ライセンスやクライアント接続の権利を推定しない．[RDPビルドの詳細](docs/rdp-build.ja.md)を参照する．
+
 ## 任意のホスト管理・Pythonツール
 
 Tailscaleは確認済みのホスト管理用SSH経路として利用し，アプリケーションには同梱しない．
 Linuxクライアントのソースは[BSD-3-Clause](https://github.com/tailscale/tailscale/blob/main/LICENSE)であり，
 tailnetへの登録，ホストされたサービスの条件，研究室のアクセス規則は別に扱う．
 [公式インストーラー](https://tailscale.com/docs/install/linux)を使う．対象機へのTailscale経由のSSHは
-確認済みで，調査したクライアント・デーモンの版は1.104.2である．更新・接続の条件は遠隔画面のガイドを参照する．[pyenv](https://github.com/pyenv/pyenv)は
+確認済みで，2026-10-28の管理された更新後，クライアント・デーモンは1.104.4である．接続の詳細は遠隔画面のガイドを参照する．[pyenv](https://github.com/pyenv/pyenv)は
 [MITライセンス](https://github.com/pyenv/pyenv/blob/master/LICENSE)の任意のユーザー用Python管理ツールであり，
 同梱する依存先やGPU実行環境の隔離ではない．いずれも本Pythonパッケージから導入しない．
 ホスト構築では，公式pyenvの`v2.8.14`，コミット`3fb25668b463ad38ac2db6092dbf476ef744c0ca`をGit管理外で使う．

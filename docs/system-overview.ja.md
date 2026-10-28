@@ -46,8 +46,12 @@ SSDには既存の割り当て済みデータが約1 TBあり，当初`needs_rec
 | `/mnt/b2-research/VLN_B2/build-logs` | イメージのビルドログとモデル不要の検査結果 |
 | `/mnt/b2-research/VLN_B2/huggingface` | 空のモデルキャッシュ．標準の`~/.cache/huggingface`から参照する |
 
-ホストへ追加した開発用パッケージは`libbz2-dev`，`libncurses-dev`，`libreadline-dev`の三つで，
-既存パッケージは更新・削除していない．プロジェクトは専用venvへ編集可能な形で導入した．
+最初のPython構築でホストへ追加した開発用パッケージは`libbz2-dev`，`libncurses-dev`，`libreadline-dev`の三つで，
+その時点で既存パッケージは更新・削除していない．2026-10-28には通常のLAN SSHを確認後，
+Tailscaleだけを1.104.4へ更新した．別にビルドしたRDPのprefix，非ログインのサービス用`xrdp`，
+許可グループ`b2-remote-users`，`/etc/pam.d/xrdp-sesman`，専用の`b2-rdp`・`b2-rdp-sesman` unitも追加した．
+ホストのTLS鍵はroot管理で，レポには保存しない．xrdpのAPTパッケージ，Xorgの置換，CUDAドライバ，
+新しいROSは追加していない．プロジェクトは専用venvへ編集可能な形で導入した．
 DockerではNVIDIAの基底イメージを取得してPython用イメージをビルドし，Torch／visionもその中で構築する．
 CUDA，TensorRT，Docker，ROS，ZEDは元からあった．モデルの重みは未取得である．
 
@@ -83,13 +87,16 @@ GPUイメージはモデル実行環境の候補用である．カメラや状�
 現地の操作に便利だが，ネットワークサービスの起動には本来不要である．NetworkManager，tailscaled，SSHは
 起動時に有効で，現在も動作している．
 Macからの画面操作は[リモートデスクトップ](remote-desktop.ja.md)を参照する．既存Vinoは未起動で，
-Windows App・RDPとホストのxrdp案を優先する．サーバーは未導入・未有効化で，画面なし・ログイン時の動作は
-現地で検証する．Tailscaleはログイン状態を保持するため，通常は起動ごとに
+Windows App・RDPとホストのxrdp案を優先する．サーバーは`/opt/b2-remote`へ導入し，手動起動している．Windows Appの認証・画面表示が通った．
+起動時の有効化とHDMIなしの電源投入試験は保留である．Tailscaleはログイン状態を保持するため，通常は起動ごとに
 `tailscale up`をやり直さない．認証キーの期限は，別途[Tailscaleの管理画面](https://tailscale.com/docs/features/access-control/key-expiry)で確認する．
 
-現在の企業向けWi-Fiプロファイルは，ユーザーのsecret agentでパスワードを扱う設定
+2026-10-27に調べた企業向けWi-Fiプロファイルは，ユーザーのsecret agentでパスワードを扱う設定
 （`password-flags=1`）で，利用できるログインも限定される．NetworkManagerの設定キャッシュから
-パスワードは取得できなかった．ログイン前から接続するには，物理端末または自分の対話型SSH端末で
+パスワードは取得できなかった．2026-10-28に調べた，その時点の有効なWi-Fiプロファイルには802.1X設定がなかった．
+以前の企業向けプロファイルの結論を別の接続へ適用しない．ヘルパーはPEAP以外の設定変更を拒否する．
+認証情報を操作する前に，対象のeduroamプロファイルを改めて特定する．
+ログイン前から企業向け接続を使うには，物理端末または自分の対話型SSH端末で
 一度だけ入力して保存する．チャットやコマンド引数へパスワードを書かない．
 
 ```sh

@@ -76,7 +76,10 @@ Do not describe its deserializer as safe merely because that flag exists.
 The initial candidate is limited to the model-free smoke below. Before external
 checkpoint loading, resolve reviewed fixes/backports or a separately reviewed
 conversion and loading path such as safetensors. This work has not implemented
-either. Retain strict keys/shapes and no unrestricted-pickle fallback.
+either. The metadata-reviewed [artifact/loading plan](model-artifacts.md)
+proposes isolated modern CPU-only conversion and a safetensors-only Jetson path,
+with exact acquisition candidates and unresolved terms. No model acquisition has
+been approved. Retain strict keys/shapes and no unrestricted-pickle fallback.
 
 ## Next smoke test and acceptance
 
