@@ -5,6 +5,14 @@
 ホスト側のツールとモデル用コンテナを分けて構築する．既存のUbuntu 20.04／L4T 35.4.1，
 CUDA，ROS，ZEDを維持する．この段階では機体への接続やモデルファイルを必要としない．
 
+2026-10-27に`vln-b2-runtime:jp5`のビルドと`pip check`が成功した．Python 3.11.18，
+Torch 2.2.2，torchvision 0.17.2，CUDA 11.4で，オフラインのTorch検査と全import検査が通った．
+FP32・BF16の行列積，畳み込み，LayerNorm，AttentionがGPU上で有限値を返し，
+Transformers・Lightning・timmと，版を固定したTIC-VLAのモジュールをimportできた．
+モデルの構築，チェックポイントの読込，機体への指令送信は行っていない．ビルド・検査の終了コードは
+ともに`0`で，結果とイメージの由来はSSDの`build-logs`とGit管理外の`local/`へ残す．
+モデル不要の実行を確認したもので，モデルの互換性，ナビゲーションの品質，実時間性能の実証ではない．
+
 ## ホストの作業領域とPython
 
 監査済みのソースアーカイブを，外付けJetsonの`~/Developer/Projects/Robotics/b2/VLN_B2`へ転送した．
@@ -75,7 +83,7 @@ timeout -k 5s 30s ./local/native-smoke/cuda-smoke
 
 2026-10-27に外付けJetsonで成功した．compute capabilityは8.7，driver／runtime APIは11040，
 最大絶対誤差は0だった．同じバイナリは，固定したNVIDIA基底コンテナ内でも，`--runtime=nvidia`と
-`--network=none`で成功した．BF16・PyTorchの実行とナビゲーションは引き続き未検証である．
+`--network=none`で成功した．別途，上記のTorch検査も通ったが，ナビゲーションは未検証である．
 
 ## 保存先の前提
 
@@ -144,6 +152,8 @@ Git管理外の再開用Dockerfileを生成する．正本の既定の`ARG`宣�
 検査コード，vision，残りの依存先が含まれる．再利用前に，正確なイメージID，Torchの版，CUDAの世代，
 ビルド設定を確認して記録する．似た名前の任意のイメージを信頼しない．正本のDockerfileは，
 ソースから全体を構築する手順として維持する．候補全体の動作は，GPU演算と全importで別途検証する．
+現在は完成したイメージで両検査が通っている．TensorPipe RPCはUnitreeの機体指令とは別で，
+この修正はTorchの未使用のRPC APIだけに作用する．
 
 版を固定したビルド専用のCMake・Ninjaのwheelは，プラットフォームのタグを記す位置が不正である．
 バイナリではコンパイルできたが，`pip check`はその情報を拒否する．コンパイル後に両ツールを外し，

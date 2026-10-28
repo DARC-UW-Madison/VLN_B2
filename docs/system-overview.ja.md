@@ -22,7 +22,8 @@
 [NVIDIAの仕様](https://developer.nvidia.com/embedded/jetson-developer-kits)と
 [AGX Orinの技術資料](https://www.nvidia.com/content/dam/en-zz/Solutions/gtcf21/jetson-orin/nvidia-jetson-agx-orin-technical-brief.pdf)を参照する．
 ディスク速度，継続時の消費電力，TIC-VLAの実行速度は未測定である．ネイティブCUDAの数値演算，
-一致する基底コンテナ内の演算，PythonコンテナのCUDA可視性は確認したが，実モデルの実行環境は別段階である．
+一致する基底コンテナ内の演算，PythonコンテナのCUDA可視性を確認した．完成した実行環境でも，
+FP32・BF16の8種類のGPU演算と本家ソースのimportが通ったが，モデルは構築していない．
 
 ## ストレージと変更箇所
 

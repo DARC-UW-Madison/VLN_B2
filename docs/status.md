@@ -34,12 +34,12 @@ the [MIT License](../LICENSE), with contributors retaining their respective righ
 | Component | Confirmed information | Still to inspect |
 | --- | --- | --- |
 | Robot | Unitree B2, without wheels | Firmware, working state/control interface, stop procedure |
-| External compute | AGX Orin 64 GB class; SSH, native CUDA, Python 3.11.18/venv and 93 tests verified | Model container and inference |
+| External compute | AGX Orin 64 GB class; SSH, native CUDA, Python 3.11.18/venv and 93 tests verified | Reviewed model loading and inference |
 | Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
 | Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
 | Camera | ZED 2i reported; existing SDK headers report 4.1.2 | Research-login SDK access, physical connection, bindings, RGB stream and timestamps |
 | LiDAR | Livox Mid-360 | Existing connection/driver and intended role in this project |
-| Containers | Docker on SSD; matching base CUDA arithmetic and Python 3.11 stage pass | Full Torch build and BF16/import checks |
+| Containers | Docker on SSD; runtime built, dependency check, FP32/BF16 and full imports pass | Checkpoint security and actual inference |
 | Collaboration | Public lab repository identified; push access verified; MIT for original work | First reviewed source publication |
 
 Component availability does not establish successful sensor or model operation.
@@ -92,33 +92,29 @@ personal credential saving nor a new GUI login target has been applied.
 
 ## Next deliverable
 
-The Python container stage and device-visibility check passed. Complete the
-source build and test the inference-only GPU/Python/PyTorch
-combination against the installed L4T. SSD storage is established; the
-[setup guide](jetson-runtime.md#storage-prerequisite) records its configuration
-and recovery plan. Do not apply the upstream training CUDA
-pins as a Jetson installer. Resolve Docker access and prove container GPU
-execution before model loading. The [baseline](target-baseline.md) defines the
-remaining checks and evidence boundaries. B2 wiring, service/domain, sensor
-frames/timing and stop behavior follow when the robot is connected. The
-[runtime compatibility review](runtime-compatibility.md) records a model-free
-build candidate and the unresolved checkpoint-loading issue; it is not a
-working-runtime claim.
+The model-free runtime milestone is complete. `vln-b2-runtime:jp5` built,
+`pip check` passed, and both offline Torch and full-import reports passed.
+Python 3.11.18 / Torch 2.2.2 / torchvision 0.17.2 / CUDA 11.4 executed eight
+FP32/BF16 GPU operations; Transformers, Lightning, timm and the pinned upstream
+TIC-VLA module imported without constructing a model. Build and verification
+exit codes are both `0`. No model weights were acquired or loaded.
 
-The remaining image build runs in the background on the Jetson. A one-shot local
-verification job waits for successful completion, then runs the Torch and full
-import checks without models. Logs and result JSON stay under
-`/mnt/b2-research/VLN_B2/build-logs`. `runtime-build.exit` records the build exit
-code; `runtime-verify.exit` records verification. Code `0` means that stage
-passed; a missing record does not establish success. Inspect `runtime-build.log`,
-`torch-smoke.json` and `full-smoke.json` when continuing. No automatic model
-download or robot integration follows these checks.
+The next deliverable is a reviewed artifact/loading plan: resolve the old-Torch
+checkpoint vulnerabilities, then obtain separate approval for exact model files,
+revisions, terms, sizes and official-cache location before any acquisition.
+Run recorded-observation inference only after that review. The
+[runtime compatibility review](runtime-compatibility.md) preserves these constraints.
+In parallel, complete the deferred onsite boot/credential checks and map B2's
+actual computers, cables and service/domain. Verify receive-only camera/state,
+frames/timestamps, control authority and stopping before motion integration.
 
-The first attempt completed Torch compilation but failed at torchvision's Torch
-import because disabled TensorPipe RPC was advertised by Python. A hash-checked
-local feature guard passed an isolated Torch import/CUDA-visibility check.
-Resume from the verified completed Torch image; preserve the initial logs and
-both attempts' provenance. See [build recovery](jetson-runtime.md#torch-import-guard-and-build-recovery).
+Reports stay under `/mnt/b2-research/VLN_B2/build-logs`:
+`runtime-build.exit`, `runtime-verify.exit`, `torch-smoke.json` and
+`full-smoke.json`. The completed one-shot verifier has exited; no model download
+or robot service follows automatically. Initial and retry logs, source-derived
+resume recipes and image provenance are preserved. The local RPC guard and
+build-only wheel cleanup are documented in [build recovery](jetson-runtime.md#torch-import-guard-and-build-recovery).
+The [setup guide](jetson-runtime.md#storage-prerequisite) records storage/recovery.
 
 Stereolabs provides an [official Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)
 with platform-specific image selection. NVIDIA documents the [Jetson container runtime](https://developer.nvidia.com/embedded/jetson-cloud-native/).

@@ -3,7 +3,7 @@
 [日本語](runtime-flow.ja.md) · [System overview](system-overview.md) · [Architecture](architecture.md)
 
 This guide separates what exists from the intended live deployment. The external
-Jetson is currently building a model-free runtime. No model weights are present,
+Jetson has a built runtime with passing model-free GPU/import checks. No model weights are present,
 no camera has been validated, B2 Ethernet is disconnected, and this project
 implements no motor command sender.
 
@@ -140,7 +140,7 @@ Here `--rm` removes the finished container, `--pull=never` uses an existing loca
 image, `--runtime=nvidia` exposes GPU support, and `--network=none` prevents
 external network communication. The image's default command checks Python and
 CUDA device visibility and prints JSON. This command does not start navigation.
-The full runtime's default command will similarly be a model-free Torch test,
+The full runtime's default command is similarly a model-free Torch test,
 not an automatically enabled robot application.
 
 Building downloads software and compiles it into image layers; running the

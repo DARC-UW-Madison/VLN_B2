@@ -6,6 +6,16 @@ This guide separates the host tools from the model container. The host remains
 Ubuntu 20.04 / L4T 35.4.1 with its existing CUDA, ROS and ZED installation.
 No robot connection or model file is needed for these steps.
 
+Verified on 2026-10-27: `vln-b2-runtime:jp5` built successfully and `pip check`
+passed. Offline Torch and full-import checks both passed with Python 3.11.18,
+Torch 2.2.2, torchvision 0.17.2 and CUDA 11.4. FP32/BF16 matrix multiplication,
+convolution, layer normalization and multihead attention produced finite GPU
+outputs. Transformers/Lightning/timm and the pinned TIC-VLA module imported.
+No model was constructed, no checkpoint loaded and no robot command sent.
+Build/check exit codes are both `0`; reports and image provenance remain on the
+SSD under `build-logs` and the project's ignored `local/`. This establishes
+model-free execution, not model compatibility, navigation quality or real-time speed.
+
 ## Host workspace and Python
 
 The reviewed source archive is on the external Jetson at
@@ -84,7 +94,7 @@ timeout -k 5s 30s ./local/native-smoke/cuda-smoke
 On 2026-10-27 this passed on the external Jetson: compute capability 8.7,
 driver/runtime API 11040, and maximum absolute error 0. The same binary also
 passed inside the pinned NVIDIA base container with `--runtime=nvidia` and
-`--network=none`. BF16/PyTorch operations and navigation remain unverified.
+`--network=none`. The separate Torch checks above also passed; navigation remains unverified.
 
 ## Storage prerequisite
 
@@ -172,6 +182,8 @@ Verify and record the exact image ID, Torch revision, CUDA generation and build
 settings before reuse. Do not trust an arbitrary similarly named image. The
 canonical Dockerfile remains the complete build-from-source recipe. Full GPU
 operations and import checks still decide whether the complete candidate works.
+Those checks now pass for the completed image. TensorPipe RPC is unrelated to
+Unitree's robot-request interface; this guard changes only Torch's unused RPC API.
 
 The pinned build-only CMake/Ninja wheels have misplaced platform-tag metadata.
 Their binaries completed compilation, but `pip check` rejects their metadata.

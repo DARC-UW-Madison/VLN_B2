@@ -23,7 +23,8 @@ See [NVIDIA's specifications](https://developer.nvidia.com/embedded/jetson-devel
 and [AGX Orin technical brief](https://www.nvidia.com/content/dam/en-zz/Solutions/gtcf21/jetson-orin/nvidia-jetson-agx-orin-technical-brief.pdf).
 No storage-speed, sustained power, or TIC-VLA frame-rate benchmark has been run.
 Native CUDA arithmetic, arithmetic in the matching base container, and the Python
-container's CUDA visibility passed; the full model runtime is a separate stage.
+container's CUDA visibility passed. The completed runtime also passed eight
+FP32/BF16 GPU-operation checks and upstream imports; no model was constructed.
 
 ## Storage and changes made
 

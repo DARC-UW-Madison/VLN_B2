@@ -2,13 +2,13 @@
 
 [English](runtime-compatibility.md) · [実機の基準情報](target-baseline.ja.md)
 
-調査日：**2026-10-27**．候補と検証手順の資料であり，動作確認済みの構成ではありません．実施したホスト側の作業と保存先の前提は[実行環境構築](jetson-runtime.ja.md)に記します．PythonコンテナとネイティブCUDAの検査は通りましたが，Torchを含むビルドとモデルは未検証です．
+調査日：**2026-10-27**．モデル不要の候補の構築とGPU・import検査は通りましたが，実際のモデル読込は未検証で，以下の制約が残ります．実施手順，ローカルのRPC判定の修正，ビルドの再開，結果，保存先の前提は[実行環境構築](jetson-runtime.ja.md)に記します．
 
 ## 推奨する候補
 
-Ubuntu 20.04，L4T 35.4.1，CUDA 11.4，ROS Foxy，ZED を維持し，**`nvcr.io/nvidia/l4t-jetpack:r35.4.1` を基底とした ARM64 コンテナ内で，Python 3.11.18 とソースビルドした PyTorch 2.2.2 を検証**します．ビルドと GPU 動作試験が必要な限定候補です．現時点の根拠から，ホスト OS や JetPack の更新が不可避とは言えません．
+Ubuntu 20.04，L4T 35.4.1，CUDA 11.4，ROS Foxy，ZED を維持し，**`nvcr.io/nvidia/l4t-jetpack:r35.4.1` を基底とした ARM64 コンテナ内で，Python 3.11.18 とソースビルドした PyTorch 2.2.2 を検証**します．ビルドとモデル不要のGPU・import検査が通った限定候補です．現時点の根拠から，ホスト OS や JetPack の更新が不可避とは言えません．
 
-[実機](target-baseline.ja.md)ではネイティブ CUDA ドライバの問い合わせと GPU の数値演算に成功しました．一致する基底コンテナ内の数値演算とPython段階でのCUDAデバイスの可視性も確認しましたが，PyTorchの実行は未検証です．Docker はホストのカーネルとドライバのインターフェースを使用します．新しい CUDA イメージを選ぶだけで互換性が成立するわけではありません．
+[実機](target-baseline.ja.md)ではネイティブ CUDA ドライバの問い合わせと GPU の数値演算に成功しました．一致する基底コンテナ内の数値演算とPython段階でのCUDA可視性に加え，最終イメージでFP32・BF16の8種類のTorch演算と，モデル不要の全importも通りました．Docker はホストのカーネルとドライバのインターフェースを使用します．新しい CUDA イメージを選ぶだけで互換性が成立するわけではありません．
 
 ## 確認した制約
 
@@ -36,7 +36,7 @@ PyTorch 2.2.2 にはアダプタが必要とする [`torch.load(weights_only=Tru
 
 ## 次の動作試験と合格条件
 
-まず既存のローカルイメージとランタイムを調べます．適切なものがなければ，保存先を準備してから取得・ビルドします．これらの作業は未実施です．ビルドとイメージの確認後は `--pull=never`，`--runtime=nvidia`，`--network=none` と Hugging Face のオフライン設定で実行し，ロボットのデバイスやソケットを接続しません．次の確認にはモデル不要です．
+まず既存のローカルイメージとランタイムを調べ，適切なものがなければ保存先を準備してから取得・ビルドします．調査した対象機では，この作業と以下のモデル不要の検査が通りました．別の対象機では，対応するイメージを構築・確認した後，`--pull=never`，`--runtime=nvidia`，`--network=none` と Hugging Face のオフライン設定で実行し，ロボットのデバイスやソケットを接続しません．
 
 - ARM64，Python 3.11，各ライブラリの指定バージョン，`torch.version.cuda == "11.4"`，CUDA 利用可否，compute capability 8.7 を確認します．
 - FP32/BF16 の行列積，畳み込み，layer normalization，multihead attention を GPU で実行して synchronize し，有限の出力を要求します．BF16 対応，最大割り当てメモリ，実行時間を記録します．

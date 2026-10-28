@@ -29,12 +29,12 @@ push権限を確認したが，pushは未実施である．独自コードと文
 | 要素 | 確認できた情報 | 実機で確認すること |
 | --- | --- | --- |
 | 機体 | 車輪のないUnitree B2 | ファームウェア，動作実績のある状態取得・制御方法，停止手順 |
-| 外付け計算機 | AGX Orinの64 GBクラス．SSH，ネイティブCUDA，Python 3.11.18・venv，93件のテストを確認 | モデル用コンテナ，推論 |
+| 外付け計算機 | AGX Orinの64 GBクラス．SSH，ネイティブCUDA，Python 3.11.18・venv，93件のテストを確認 | 確認した方法でのモデル読込，推論 |
 | 内蔵計算機 | 別のJetsonがあると操作者から報告 | 型式，サービス，センサーの接続先，ネットワークの到達性 |
 | 動作制御用計算機 | 別の計算機があると操作者が推定 | 実体，公開サービスの動作先，制御権，接続経路 |
 | カメラ | ZED 2iの報告あり．既存SDKヘッダは4.1.2 | 研究用ログインのSDKアクセス，物理接続，バインディング，RGB映像と時刻 |
 | LiDAR | Livox Mid-360 | 既存の接続・ドライバと，本プロジェクトでの用途 |
-| コンテナ | DockerをSSDへ移設．一致する基底のCUDA演算とPython 3.11段階が成功 | Torchのビルド，BF16演算，importの検査 |
+| コンテナ | DockerをSSDへ移設．実行環境の構築，依存検査，FP32・BF16演算，全importが成功 | 重み読込のセキュリティ，実際の推論 |
 | 共同作業 | 公開の研究室リポジトリとpush権限を確認．独自成果物はMIT | レビュー済みソースの初回公開 |
 
 機器が利用可能であることは，センサーやモデルの動作に成功したことを意味しない．
@@ -80,26 +80,24 @@ push権限を確認したが，pushは未実施である．独自コードと文
 
 ## 次の成果物
 
-コンテナのPython段階とデバイスの可視性は確認済みである．推論用のGPU／Python／PyTorchの
-ソースビルドを完了し，動作を調べる．SSDの保存先は構築済みで，
-[構築ガイド](jetson-runtime.ja.md#保存先の前提)に設定と復旧の手順を記した．
-上流の学習用CUDA指定をJetsonのインストーラーとして使わない．
-Dockerの権限とコンテナ内のGPU演算を確認してからモデルを読み込む．[確認済み構成](target-baseline.ja.md)に
-残る確認と証拠の範囲を示す．B2の配線，サービス・ドメイン，センサーの座標・時刻，停止動作は
-実機への接続後に確認する．[実行環境の互換性調査](runtime-compatibility.ja.md)には，モデル不要の
-ビルド候補と未解決のチェックポイント読込問題を記した．動作確認済み環境ではない．
+モデル不要の実行環境の段階を完了した．`vln-b2-runtime:jp5`のビルド，`pip check`，
+オフラインのTorch検査と全import検査が通った．Python 3.11.18／Torch 2.2.2／torchvision 0.17.2／
+CUDA 11.4で，FP32・BF16の8種類のGPU演算を実行し，Transformers，Lightning，timm，
+版を固定した本家TIC-VLAをimportできた．モデルは構築せず，ビルド・検査の終了コードはともに`0`である．
+重みの取得・読込は行っていない．
 
-残りのイメージのビルドはJetson上のバックグラウンドで動く．ローカルの一回限りの検証ジョブが
-ビルド成功を待ち，モデル不要のTorch検査と全import検査を実行する．ログと結果JSONは
-`/mnt/b2-research/VLN_B2/build-logs`へ保存する．`runtime-build.exit`がビルド，
-`runtime-verify.exit`が検証の終了コードで，`0`なら該当段階は成功である．記録がないことは
-成功の証拠ではない．再開時は`runtime-build.log`，`torch-smoke.json`，`full-smoke.json`を確認する．
-これらの後にモデル取得や機体との結合を自動実行することはない．
+次の成果物は，対象のモデルファイルと読込方法の確認である．旧Torchのチェックポイントの脆弱性を解決し，
+取得前に具体的なファイル，版，条件，容量，公式キャッシュの保存先について別途承認を得る．
+確認後に記録済み観測の推論へ進む．制約は[実行環境の互換性調査](runtime-compatibility.ja.md)に維持する．
+並行して，保留した現地の起動・認証情報の検査と，B2の実際の計算機，ケーブル，サービス・ドメインの
+確認を進める．移動制御の実装前に，受信だけでの画像・状態取得，座標・時刻，制御権，停止を検証する．
 
-初回はTorchのコンパイルが完成したが，無効なTensorPipe RPCをPythonが利用可能と判定し，
-torchvisionの準備時にTorchのimportが失敗した．ハッシュを照合したローカルの機能判定の修正で，
-隔離環境のTorch importとCUDA可視性の確認が通った．完成済みTorchのイメージを確認して再開し，
-初回ログと両方の試行の由来を維持する．[ビルドの再開](jetson-runtime.ja.md#torchのimport判定とビルドの再開)を参照する．
+結果は`/mnt/b2-research/VLN_B2/build-logs`の`runtime-build.exit`，`runtime-verify.exit`，
+`torch-smoke.json`，`full-smoke.json`へ残す．一回限りの検証ジョブは終了し，モデル取得や
+機体のサービスを自動で起動する処理は続かない．初回・再試行のログ，正本から生成した再開用レシピ，
+イメージの由来を残した．ローカルのRPC判定の修正とビルド専用wheelの除去は，
+[ビルドの再開](jetson-runtime.ja.md#torchのimport判定とビルドの再開)に記す．
+保存先と復旧は[構築ガイド](jetson-runtime.ja.md#保存先の前提)を参照する．
 
 Stereolabsには，対応するイメージを選ぶための[Jetson向け公式Docker手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)がある．
 NVIDIAは[Jetsonのコンテナruntime](https://developer.nvidia.com/embedded/jetson-cloud-native/)を説明している．

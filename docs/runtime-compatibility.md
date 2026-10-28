@@ -2,22 +2,23 @@
 
 [日本語](runtime-compatibility.ja.md) · [Target baseline](target-baseline.md)
 
-Research date: **2026-10-27**. This is a candidate and validation plan, not a
-working-runtime claim. See [runtime setup](jetson-runtime.md) for executed host
-steps and storage prerequisites. The Python container and native CUDA check
-have passed; the full Torch build and model remain unvalidated.
+Research date: **2026-10-27**. The model-free candidate has built and passed
+GPU/import checks; actual model loading remains unvalidated and constrained below.
+See [runtime setup](jetson-runtime.md) for executed steps, the local RPC guard,
+build recovery, results and storage prerequisites.
 
 ## Decision
 
 Keep Ubuntu 20.04, L4T 35.4.1, CUDA 11.4, ROS Foxy and ZED intact. Evaluate a
 **custom arm64 inference container based on `nvcr.io/nvidia/l4t-jetpack:r35.4.1`,
 with Python 3.11.18 and source-built PyTorch 2.2.2**. This is a bounded engineering
-candidate; a successful build and GPU smoke test are still required. The evidence
+candidate with a successful build and model-free GPU/import tests. The evidence
 does **not** establish that changing the host OS or JetPack is unavoidable.
 
 The [observed host](target-baseline.md) has a working native CUDA driver query
 and GPU arithmetic check. Arithmetic also passed in the matching base container,
-and the Python stage exposes a CUDA device; PyTorch execution remains untested.
+and the Python stage exposes a CUDA device. The final image also passed eight
+FP32/BF16 Torch operations and full imports without models.
 Docker shares the host kernel/driver interfaces; selecting a newer CUDA image
 does not establish compatibility.
 
@@ -80,8 +81,9 @@ either. Retain strict keys/shapes and no unrestricted-pickle fallback.
 ## Next smoke test and acceptance
 
 First inventory already-present images and local runtimes. If no suitable image
-exists, prepare storage before downloading or building it. These steps have
-not been performed. After building and checking the image, run it with `--pull=never`,
+exists, prepare storage before downloading or building it. These steps and the
+model-free checks below passed on the inspected target. For another target,
+build/check its matched image and run it with `--pull=never`,
 `--runtime=nvidia`, `--network=none`, no robot devices/sockets and Hugging Face
 offline settings. No model is needed for these acceptance checks:
 
