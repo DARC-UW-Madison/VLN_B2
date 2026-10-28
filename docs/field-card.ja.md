@@ -5,6 +5,16 @@
 プロジェクトをJetsonにコピーし，ルートフォルダで端末を開きます．SSHやGitHubのURLは
 不要です．以下のコマンドはモーターへ指令を送りません．
 
+準備済みの外付けJetsonにはソースがある．以下のプロジェクト用コマンドの前に，ホストのvenvを
+有効にする．システムPythonは3.8のままで，このvenvにもカメラ・Unitreeの依存先はまだない．
+現地の起動試験と個人の認証情報の確認には，[システムのガイド](system-overview.ja.md#個人の認証情報と共有返却)を使う．
+
+```sh
+cd ~/Developer/Projects/Robotics/b2/VLN_B2
+source .venv/bin/activate
+python3 --version
+```
+
 1. **導入済み環境を調べる** — Python 3.8以上，追加の依存なし．
 
    ```sh

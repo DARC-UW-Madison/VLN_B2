@@ -18,6 +18,7 @@ official release from the paper's authors or the robot manufacturer.
 | Document | What it explains |
 | --- | --- |
 | [System overview](docs/system-overview.md) | Actual specifications, storage, isolation, GUI, unattended access and computer roles |
+| [From files to robot motion](docs/runtime-flow.md) | Source sharing, upstream/weights, Docker execution and communication by layer |
 | [Measured Jetson baseline](docs/target-baseline.md) | Verified host, GPU-driver, storage and network facts; runtime constraints |
 | [Jetson runtime setup](docs/jetson-runtime.md) | Host interpreter/venv, native CUDA check, storage and staged container builds |
 | [Runtime compatibility](docs/runtime-compatibility.md) | Candidate inference stack, model-free checks, and unresolved checkpoint-loading constraints |

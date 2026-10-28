@@ -7,7 +7,7 @@
 Initial read-only inspection of the external Jetson is complete. Mac-to-Jetson
 SSH over Tailscale, target-side inventory and native CUDA arithmetic worked.
 The host is an AGX Orin 64 GB class system running Ubuntu 20.04 / L4T 35.4.1.
-CPython 3.11.18, a dedicated project venv and the CLI are installed; all 85
+CPython 3.11.18, a dedicated project venv and the CLI are installed; all 93
 tests and synthetic replay passed on the target. A separate 2 TB ext4 partition
 was inspected with `ro,noload`, then mounted writable with explicit operator
 permission. Journal recovery succeeded without observed ext4 errors. Docker
@@ -16,8 +16,9 @@ See [runtime setup](jetson-runtime.md) and the [initial baseline](target-baselin
 The [system overview](system-overview.md) records exact storage types, hardware
 specifications and account/container boundaries. GUI boot is retained and
 research-login AC suspend is disabled. Wi-Fi automatic retry and Tailscale boot
-services are enabled; system-stored Wi-Fi credentials, the intended GUI
-autologin and a controlled cold-boot test still require operator completion.
+services are enabled; system-stored Wi-Fi credentials and a controlled cold-boot
+test still require operator completion. GUI autologin is optional for local use,
+not required for boot networking; leave it protected for shared use.
 The operator deferred credential saving and autologin changes until an onsite
 visit. The current connection and existing GDM login target are retained.
 B2 is not connected through the wired port; no model inference, camera capture,
@@ -33,7 +34,7 @@ the [MIT License](../LICENSE), with contributors retaining their respective righ
 | Component | Confirmed information | Still to inspect |
 | --- | --- | --- |
 | Robot | Unitree B2, without wheels | Firmware, working state/control interface, stop procedure |
-| External compute | AGX Orin 64 GB class; SSH, native CUDA, Python 3.11.18/venv and 85 tests verified | Model container and inference |
+| External compute | AGX Orin 64 GB class; SSH, native CUDA, Python 3.11.18/venv and 93 tests verified | Model container and inference |
 | Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
 | Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
 | Camera | ZED 2i reported; existing SDK headers report 4.1.2 | Research-login SDK access, physical connection, bindings, RGB stream and timestamps |
@@ -58,7 +59,7 @@ choosing an image or proposing a host upgrade.
 | Robot stop behavior | Not verified | Reviewed tests of the actual firmware, command loss, and operator override |
 | B2 navigation evaluation | Not started | Predefined tasks, complete trial counts, results and limitations |
 
-Development-host and target verification (85 tests and the stated limitations) is documented in
+Development-host and target verification (93 tests and the stated limitations) is documented in
 [the development guide](development.md#preparation-verification). Synthetic
 replay and mocked tests exercise software behavior, not real drivers, model
 quality, or hardware performance. Example limits are not approved operating limits.
@@ -67,6 +68,12 @@ The boot-network helper adds eight non-network tests; all **93 tests** pass on
 both development host and target. Its live read-only inspection succeeded under
 the target's system Python. Credential entry and reconnect/boot validation are
 not part of these mocked tests.
+
+The [runtime flow guide](runtime-flow.md) explains source synchronization,
+separate upstream/weight inputs, actual container contents and each communication
+layer. The [credential lifecycle](system-overview.md#personal-credentials-sharing-and-return)
+records onsite boot checks and the required review before sharing/return. Neither
+personal credential saving nor a new GUI login target has been applied.
 
 ## Decisions in effect
 

@@ -102,18 +102,21 @@ interactive SSH terminal. Do not send the password to a chat or put it in a comm
 
 ```sh
 cd ~/Developer/Projects/Robotics/b2/VLN_B2
-sudo /usr/bin/python3 tools/configure_unattended_wifi.py --apply --autologin RESEARCH_USER
+sudo /usr/bin/python3 tools/configure_unattended_wifi.py --apply
 ```
 
-Replace `RESEARCH_USER` with the actual research login. The helper shows the
-configured enterprise account and asks for the password twice without echo. It preserves identity,
+The helper shows the configured enterprise account and asks for the password
+twice without echo. It preserves identity,
 CA, EAP method and server-check settings, saves the password in NetworkManager's
-root-protected system profile, enables system-wide automatic connection, and
-selects the requested regular GDM login. It backs up settings and does not restart
+root-protected system profile and enables system-wide automatic connection.
+It backs up settings and does not restart
 Wi-Fi, GDM, Tailscale or the host. Root administrators can read system-stored
 credentials; this is not storage isolated from the device administrators.
-The automatic-login change is deliberately coupled to successful credential saving.
-Read-only inspection is available without `--apply`.
+Read-only inspection is available without `--apply`. GUI automatic login is a
+separate, optional choice: append `--autologin RESEARCH_USER` only if explicitly
+desired, replacing the placeholder with the intended regular login. That change
+occurs only after credential saving succeeds. Prefer leaving the desktop login
+protected on a shared device; boot Wi-Fi/Tailscale/SSH does not need autologin.
 
 After saving, perform a controlled reconnect and cold-boot test with someone
 present and local console recovery available. Do not interrupt the active source
@@ -127,6 +130,69 @@ Actual J42 jumper state, power supply, polarity, voltage and capacity must be
 checked physically. B2 battery/output specifications are still unknown; do not
 infer compatibility from a connector or connect an unverified robot supply.
 Automatic login does not make motors or this project start automatically.
+
+## Personal credentials, sharing and return
+
+UW's [official eduroam instructions](https://kb.wisc.edu/ns/page.php?id=25020)
+use the individual's NetID email and NetID password. System saving puts that
+password in a root-protected NetworkManager profile; it is not encryption against
+administrators. The [keyfile documentation](https://networkmanager.dev/docs/api/latest/nm-settings-keyfile.html)
+explicitly allows plaintext secrets in files that must be protected from other
+users. A sudo user or a privileged container with access to those files can read
+them. A separate Linux login, venv, or ordinary container does not protect a
+personal university password from the host's administrators. Do not put the
+profile in this repository, an image, a general backup or a support log.
+
+Current Wi-Fi uses a user secret agent; we have not saved its password in the
+system profile. Its existing user-keyring contents were not inspected. The
+current working connection is not proof of login-independent boot access: an
+already logged-in desktop or an existing authenticated session may explain it.
+The observed CA setting is present, but the server-name match was unset; the
+setup helper preserves rather than certifies those settings. Compare the profile
+with the university's official Linux installer before storing personal credentials;
+do not invent a server name or disable certificate validation.
+
+At the onsite visit, with this source build finished and console recovery ready:
+
+1. Confirm the owner of the configured eduroam identity, the official CA/server
+   checks, and who has sudo access. Decide whether personal system-stored
+   credentials are acceptable for this period of exclusive use. Enter any secret
+   locally; never send it to a chat.
+2. If accepted, save boot Wi-Fi credentials using the helper. Decide GUI login
+   separately; its existing target belongs to another login and is unchanged.
+3. Reconnect and then test a planned cold boot without anyone logging into the
+   desktop. Verify Wi-Fi and Mac-to-Jetson Tailscale SSH. This proves the actual
+   sequence; a boot message or current connection does not.
+
+Before shared use, ask campus/lab IT for an approved shared-device connection or
+device authentication; do not assume a shared eduroam account is available or
+share a personal NetID password. Give researchers individual logins, reconsider
+sudo membership and replace temporary weak login passwords. Keep GUI autologin
+off for shared access. These policy/credential changes have not been applied.
+
+At handover or return, arrange console access and replacement networking first.
+The following is a review plan, **not an automated cleanup already performed**:
+
+- Disconnect and remove the personal Wi-Fi profile; review user keyrings,
+  NetworkManager/wpa_supplicant settings, root-protected profile backups including
+  `/etc/NetworkManager/vln-b2-backups`, and any system backups for credential copies.
+  Do not restore an old profile backup containing that identity.
+- Log out of the personal Tailscale enrollment and remove/reassign the node in
+  the [admin console](https://tailscale.com/docs/features/access-control/device-management/how-to/remove).
+  Merely stopping Tailscale or deleting a Linux account does not complete this.
+- Review SSH keys/authorized access, Git credentials, tokens, browser/keyring
+  sessions and autologin. Transfer research files under their applicable terms;
+  remove personal access with the owner/administrator's agreement.
+- Verify after reboot that the old university identity and personal tailnet no
+  longer reconnect. If credentials may have been copied or backup removal cannot
+  be established, rotate them through the university's official process and
+  revoke applicable tokens. SSD file deletion alone is not proof of sanitization.
+
+Do not disconnect or remove credentials remotely while they are the only recovery
+path. No account deletion, credential rotation or data erasure has been done here.
+
+For source synchronization, the upstream/model boundary and the layer-by-layer
+communication path, read [the runtime flow guide](runtime-flow.md).
 
 ## Four computer roles and the next steps
 

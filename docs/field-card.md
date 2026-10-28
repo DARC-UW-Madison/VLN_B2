@@ -5,6 +5,17 @@
 Bring a copy of this project to the Jetson and open a terminal in its root.
 No SSH or GitHub URL is needed. These commands send no motor commands.
 
+On the prepared external Jetson, the source is already present. Activate its
+host venv before the project commands below; system Python remains 3.8. This
+venv does not yet supply camera/Unitree dependencies. For the onsite boot and
+personal-credential checks, use [the system guide](system-overview.md#personal-credentials-sharing-and-return).
+
+```sh
+cd ~/Developer/Projects/Robotics/b2/VLN_B2
+source .venv/bin/activate
+python3 --version
+```
+
 1. **Inspect the existing installation** — Python 3.8+, no extra dependencies:
 
    ```sh
