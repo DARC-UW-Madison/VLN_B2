@@ -4,7 +4,7 @@
 
 ## Working agreement
 
-- Read the README, project status, and the relevant guide before changing files.
+- Read the README, documentation index, project status and relevant guide before changing files.
 - Keep each change focused. Explain the problem, the result, and its evidence.
 - Distinguish proposed behavior, implemented behavior, and measured results.
 - Before environment changes, explain purpose, mechanism, inputs/outputs and
@@ -55,6 +55,8 @@ English files use `.md`; Japanese counterparts use `.ja.md` in the same folder.
 Link the two versions. Japanese prose uses `，` and `．`. Code, identifiers,
 comments, command output, commit subjects, and pull requests use English.
 Update both document versions in the same change; neither may omit caveats.
+Register guides in `docs/README.md` and its translation. Keep the root README
+focused on the project rather than duplicating the manual's directory.
 
 Keep this file brief. Put explanations in `docs/`: purpose, prerequisites,
 terms, mechanism, steps, expected observations, failure cases, and limitations.

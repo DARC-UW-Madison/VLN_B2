@@ -1,61 +1,38 @@
 # B2 TIC-VLA
 
-[日本語](README.ja.md)
+[日本語](README.ja.md) · [Documentation](docs/README.md)
 
-Research workspace for evaluating TIC-VLA navigation on the Unitree B2.
-The goal is to connect language-conditioned navigation to the robot's existing
-walking controller and measure the effect of delayed model inference.
+Research workspace for evaluating TIC-VLA navigation on the **Unitree B2**.
+The goal is to connect language-conditioned path prediction to the robot's
+existing walking controller and measure the effect of delayed model inference.
+This is an independent integration project, not an official release by the paper's
+authors or the robot manufacturer.
 
-**Status:** preparation tools are implemented for target inspection, synthetic
-replay, camera capture, state subscription, observation recording, and an optional
-offline inference check. They send no motor commands. Real ZED/B2 operation and
-GPU inference have not been validated. External-host inventory, management SSH,
-and a CUDA driver/device query are verified in [the baseline](docs/target-baseline.md). This is an independent project, not an
-official release from the paper's authors or the robot manufacturer.
+## Scope and current state
 
-## Read first
+The available setup is B2, an external Jetson AGX Orin, ZED 2i and Livox Mid-360.
+The intended deployment keeps perception/inference and eventual high-level
+control on Jetson; Mac is for development and optional result display. A prepared
+local run should not require Mac, campus Wi-Fi or a cloud inference service.
+The onboard sensor/service roles and control path still require inspection.
 
-| Document | What it explains |
-| --- | --- |
-| [System overview](docs/system-overview.md) | Actual specifications, storage, isolation, GUI, unattended access and computer roles |
-| [From files to robot motion](docs/runtime-flow.md) | Source sharing, upstream/weights, Docker execution and communication by layer |
-| [Build fundamentals](docs/build-fundamentals.md) | Source, compiler/linker, native Python packages, CUDA, image construction and what needs rebuilding |
-| [Field Ethernet procedure](docs/field-network.md) | Cable/IP/route/DDS sequence, onboard inventory, sensor paths and mobile operation |
-| [Remote desktop](docs/remote-desktop.md) | Existing Vino state, SSH-tunneled screen sharing and headless/login acceptance |
-| [Measured Jetson baseline](docs/target-baseline.md) | Verified host, GPU-driver, storage and network facts; runtime constraints |
-| [Jetson runtime setup](docs/jetson-runtime.md) | Host interpreter/venv, native CUDA check, storage and staged container builds |
-| [Runtime compatibility](docs/runtime-compatibility.md) | Candidate inference stack, model-free checks, and unresolved checkpoint-loading constraints |
-| [Jetson bootstrap](docs/jetson-bootstrap.md) | New login, Tailscale SSH, dependency isolation, and later CLI boot |
-| [Computers and network](docs/network-topology.md) | Host roles, SDK/ROS 2 boundaries, and the first external-Jetson survey |
-| [First-visit card](docs/field-card.md) | Visit agenda, observation probes and the facts to record |
-| [Onsite preparation](docs/onsite.md) | Commands to inspect the target, capture observations, and check local inference |
-| [Understanding TIC-VLA](docs/ticvla-explained.md) | How reasoning, action prediction, latency, training, and robot control fit together |
-| [Deployment information](docs/deployment-intake.md) | What to collect from the robot and lab before choosing an implementation |
-| [Development guide](docs/development.md) | How to start, validate each stage, and record reproducible experiments |
-| [Architecture](docs/architecture.md) | The proposed data flow, timing, coordinate frames, and control boundaries |
-| [Project status](docs/status.md) | Completed work, unresolved questions, and the next deliverable |
-| [Contributing](CONTRIBUTING.md) | Git, documentation, review, and AI-assisted collaboration |
-| [Third-party materials](THIRD_PARTY.md) | Sources, provenance, and conditions to resolve before integration |
+The repository provides target inventory, synthetic replay, camera/state
+acquisition adapters, paired recording and optional synchronous offline inference.
+**These tools send no motor commands.** Host setup and model-free GPU/import
+checks passed; actual model loading, sensor/B2 integration, asynchronous live
+control and physical stopping are unverified. No weights are included/downloaded,
+and no autonomous application is installed. Start with recorded observations,
+then live observation; controlled movement follows only after interface and
+stop validation. Training a replacement walking policy is outside this scope.
 
-Each document has a Japanese counterpart. Update both languages together.
-
-## Current scope
-
-Start with recorded observations, then observe live predictions without sending
-movement commands. Controlled B2 trials follow only after the interface and stop
-behavior have been verified. Training a new walking policy is outside this scope.
-
-The available setup is B2, Jetson AGX Orin, ZED 2i and Livox Mid-360.
-Docker use and lab GitHub hosting are permitted. See [project status](docs/status.md)
-for confirmed facts and the next inspection. External-host software inventory is
-verified, and model-free GPU/import checks pass. Actual model/sensor integration,
-connections, frames and timing remain unverified. No asynchronous robot-control
-loop or motor command sender is implemented.
+Read the [documentation index](docs/README.md) for concepts, terminology,
+verified specifications, environment setup, field procedures, project status
+and the next deliverable. All guides have maintained Japanese counterparts.
 
 ## Try the preparation tools
 
-From the repository root, Python 3.10 or later can run the CLI and local tests
-without installing this package:
+From the repository root, Python 3.10 or later can run the dependency-free CLI
+help and local tests without installing the package:
 
 ```sh
 PYTHONPATH=src python3 -m b2_tic_vla --help
@@ -63,42 +40,26 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 git diff --check
 ```
 
-The standalone inventory tool needs only Python 3.8 or later and its standard
-library. It can be copied to a target independently of the package:
+`replay` evaluates synthetic input. `camera`, `state` and `record` require working
+vendor dependencies and verified hardware/network configuration. `infer` requires
+separately approved local upstream/model assets and a reviewed compatible loader;
+the older candidate runtime is currently restricted to model-free checks.
+Dependencies and assets are not downloaded automatically. Synthetic/mocked tests
+do not establish hardware performance; example limits are not B2 operating limits.
 
-```sh
-python3 tools/inspect_target.py --help
-```
+## Collaboration and license
 
-| CLI command | Purpose | Additional local requirements |
-| --- | --- | --- |
-| `replay` | Evaluate synthetic trajectories and rejection checks; no neural model | None |
-| `camera` | Save a ZED left color image | Connected camera, matching ZED SDK and Python binding |
-| `state` | Subscribe to Unitree sport state | Working SDK2/DDS installation and explicit network interface |
-| `record` | Save an image and corresponding received robot state | Both camera and state requirements |
-| `infer` | Check synchronous inference using existing local model files | Compatible upstream TIC-VLA package, model dependencies, weights, and GPU |
+The intended lab destination is
+[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2).
+Initial source publication is pending the user's instruction. GitHub hosting is
+not a runtime dependency. Development uses reviewed source changes, bilingual
+documentation and separate machine-local environments/artifacts.
 
-See [onsite preparation](docs/onsite.md) for arguments and result interpretation.
-Dependencies and model files are not downloaded automatically. The example
-configuration contains unvalidated test limits, not approved B2 operating limits.
-Local tests use synthetic inputs and mocked optional dependencies; they do not
-establish sensor, model, or robot performance.
-
-## License and publication
-
-Original code and documentation use the [MIT License](LICENSE), with the
-collective notice `Copyright (c) 2026 VLN_B2 contributors`. Contributors retain
-their respective rights; this notice does not assign ownership to a person,
-laboratory, or university.
-
-The lab repository is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2).
-No upstream source code, model weights, recordings, or laboratory data are
-included. Their terms remain separate; this license grants no rights to TIC-VLA
-or its weights. See [third-party materials](THIRD_PARTY.md).
-
-Future datasets, recordings, and trained or converted weights need an explicit
-release decision and artifact-specific terms; they do not automatically inherit
-this repository's MIT license. Review unpublished research before sharing it.
-
-Documentation was prepared with AI assistance and must be reviewed as research
-material; it does not constitute experimental evidence.
+Original code and documentation use the [MIT License](LICENSE), with
+`Copyright (c) 2026 VLN_B2 contributors`. Contributors retain their respective
+rights. This does not relicense TIC-VLA, model weights, dependencies or datasets.
+No upstream source, weights, recordings or private lab data are bundled.
+Future results/assets require separate release decisions and applicable terms.
+The documentation index includes the contribution rules, licensing explanation
+and third-party inventory. Documentation uses AI assistance and requires review;
+it is not experimental evidence.

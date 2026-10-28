@@ -91,8 +91,9 @@ once. On this 64 GB system, CLI-only boot is not currently required.
 The desired sequence is power-on → Ubuntu → system Wi-Fi → Tailscale → SSH.
 GUI automatic login is optional for network services, though useful for local
 operation. NetworkManager, tailscaled and SSH are already enabled and active.
-For Mac screen control, see [remote desktop](remote-desktop.md); installed Vino
-is not currently running, and headless/login behavior requires field validation.
+For Mac screen control, [remote desktop](remote-desktop.md) now prioritizes
+Windows App/RDP with a proposed host xrdp server. No server has been installed
+or enabled; existing Vino is stopped. Headless/login behavior requires validation.
 Tailscale retains login state; it does not normally require `tailscale up` on
 every boot. Its node-key expiry must still be checked in the
 [Tailscale admin console](https://tailscale.com/docs/features/access-control/key-expiry).
@@ -157,10 +158,10 @@ do not invent a server name or disable certificate validation.
 
 At the onsite visit, with this source build finished and console recovery ready:
 
-1. Confirm the owner of the configured eduroam identity, the official CA/server
-   checks, and who has sudo access. Decide whether personal system-stored
-   credentials are acceptable for this period of exclusive use. Enter any secret
-   locally; never send it to a chat.
+1. Use the operator's own approved eduroam identity during dedicated use; do not
+   reuse another researcher's password. Verify the actual profile, official
+   CA/server checks and sudo access before system saving. Enter secrets only
+   in the operator's terminal, never in a chat.
 2. If accepted, save boot Wi-Fi credentials using the helper. Decide GUI login
    separately; its existing target belongs to another login and is unchanged.
 3. Reconnect and then test a planned cold boot without anyone logging into the
@@ -174,7 +175,13 @@ sudo membership and replace temporary weak login passwords. Keep GUI autologin
 off for shared access. These policy/credential changes have not been applied.
 
 At handover or return, arrange console access and replacement networking first.
-The following is a review plan, **not an automated cleanup already performed**:
+The following is a review plan, **not an automated cleanup already performed**.
+When sharing/return is requested, preserve approved research files, installed
+runtimes and useful environments. Inventory personal access and credential
+copies, identify the exact removal/revocation targets and clarify ambiguous
+ownership or retention before acting. A full disk wipe is not the default.
+Browser logout and deleting an SSH key alone do not remove Wi-Fi secrets,
+root-only backups or server-side access registrations:
 
 - Disconnect and remove the personal Wi-Fi profile; review user keyrings,
   NetworkManager/wpa_supplicant settings, root-protected profile backups including

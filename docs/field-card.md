@@ -20,7 +20,8 @@ python3 --version
 
 Follow [the Ethernet/onboard procedure](field-network.md) in this order:
 
-1. Confirm local recovery and the existing robot stop/control procedure.
+1. Confirm local recovery and the existing B2 remote-controller positioning,
+   takeover and stop procedure; verify priority over future SDK commands.
 2. Save the external host's current interfaces/routes before plugging Ethernet.
 3. Identify the B2 port, documented subnet, unused client IP and DDS domain;
    establish the link while preserving management, then verify route and reachability.
@@ -28,8 +29,9 @@ Follow [the Ethernet/onboard procedure](field-network.md) in this order:
    actual services and control ownership using authorized lab access.
 5. Attach the external ZED 2i by USB; map built-in camera/sensor exports and
    Mid-360 wiring separately. Built-in USB access from this Jetson is unavailable.
-6. Complete boot/credential tests; validate Mac remote desktop with and without
-   HDMI, then local management and process lifetime without campus Wi-Fi.
+6. Complete boot/credential tests; validate Windows App/RDP with and without
+   HDMI. With no separate AP available, inspect/test a Jetson hotspot and direct
+   local SSH with recovery access; then test offline process lifetime without Mac.
 7. Record axes/timestamps, sensor origins, remaining dependencies and next action.
    Motion, operator-link-loss behavior and physical stopping require later validation.
 

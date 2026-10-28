@@ -115,7 +115,8 @@ Pythonの[通信初期化部](https://github.com/unitreerobotics/unitree_sdk2_py
 
 コンテナ化しても，ホストのGPUドライバを置き換えたり，任意のCUDA／PyTorch／ZEDの組合せを
 互換にしたりはできない．導入済み環境にイメージを合わせ，必要なGPU・カメラへのアクセスを
-設定する．同梱のDockerfileはベースの明示が必要なテンプレートである．
+設定する．`deploy/Dockerfile`はベースを明示する汎用CLI用で，`deploy/jetson-runtime.Dockerfile`は
+実行環境ガイドに記した，別にビルド済みのモデル不要GPU候補である．どちらも実機のライブ構成全体を完成させるものではない．
 [NVIDIAのJetPack手順](https://docs.nvidia.com/jetson/jetpack/install-setup/index.html)と
 [StereolabsのJetsonコンテナ手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)を参照する．
 
@@ -168,12 +169,13 @@ SSH端末の前面で起動したプロセスは，端末セッションに寿�
 サービスとしては未導入である．[systemdサービスの説明](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html)を参照する．
 異常後にソフトウェアが再起動しただけで，移動を自動で許可しない．
 
-移動中の監視には，MacとJetsonが同じ到達可能なLANへ入る，承認されたローカルの管理用Wi-Fiを優先する．
-例は研究室の持ち運べるAPで，認証を整えた通常のローカルSSHにはインターネットは不要である．
-B2は別のEthernet経路に保ち，大学・機体間のブリッジやサブネットルーターを作る必要はない．
-スマートフォンのホットスポットやJetsonのAP化には，端末間の隔離，無線の能力，電源・移動の検証が別途必要である．
-AP，新しいWi-Fi設定，サブネットルーターは構築していない．Tailscaleの相手の設定・調整が常に
-インターネットなしで成立するとは仮定せず，直接のローカルSSHも確認する．
+別のAPは利用できない前提にする．準備した実行中のMacは任意とし，監視が必要なら，
+無線・ドライバの対応と直接OpenSSH認証を確認してJetsonをAPにする案がある．両方ともインターネットなしでよい．
+一つの無線をAPへ変えると現在のeduroam・Tailscale経路を失うため，初回は現地の復旧手段を確保する．
+B2は別のEthernetサブネットへ保ち，大学・機体間の転送は設定しない．AP設定は未作成である．
+[オフライン運用](offline-operation.ja.md)に，AP・クライアントの同時利用やオフラインのTailscale調整を仮定せず，
+手動IPの例，復旧，合格条件を記した．B2の既存リモコンは位置調整・介入・停止の別経路の候補であり，
+実際の制御権の調停と物理的停止は確認が必要である．
 
 **管理・操作者への通信断**と，**機体制御・状態・センサーの通信断**は別の事象として定義する．
 中核のループにMacのSSH端末を開き続ける必要を持たせない．ただし操作者への接続が切れても

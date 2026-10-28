@@ -128,8 +128,9 @@ architecture; the command sender and live asynchronous integration remain unimpl
 
 Containerization does not replace the Jetson host's GPU drivers or make arbitrary
 CUDA/PyTorch/ZED versions compatible. Match the image to the installed platform
-and expose the required GPU/camera devices deliberately. The supplied Dockerfile
-is only an explicit-base template. See [NVIDIA JetPack setup](https://docs.nvidia.com/jetson/jetpack/install-setup/index.html)
+and expose the required GPU/camera devices deliberately. `deploy/Dockerfile` is a generic CLI wrapper requiring an explicit base;
+`deploy/jetson-runtime.Dockerfile` is the separately built model-free GPU candidate
+documented in the runtime guide. Neither establishes a complete live robot stack. See [NVIDIA JetPack setup](https://docs.nvidia.com/jetson/jetpack/install-setup/index.html)
 and [Stereolabs' Jetson container guidance](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson).
 
 For a lab device, use a host Linux account assigned to the researcher. If the
@@ -194,14 +195,17 @@ and explicit arm/stop state; it is not installed as a service. See
 [systemd service semantics](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html).
 Restarting software must not automatically authorize movement after a fault.
 
-For mobile monitoring, prefer an approved local management Wi-Fi network with
-Mac and Jetson on the same reachable LAN, such as a portable lab access point.
-It need not provide internet for ordinary local SSH after authentication is set
-up. Keep B2 on a separate Ethernet path; no campus/robot bridge or subnet router
-is required. A phone hotspot or Jetson-hosted AP needs its own client-isolation,
-radio-capability and power/roaming checks. No AP, new Wi-Fi profile or subnet
-router has been configured. Do not assume Tailscale peer setup/coordination will
-always work without internet; verify direct local SSH as a fallback.
+Assume no separate AP is available. Mac is optional during a prepared run;
+if local monitoring is needed, a Jetson-hosted Wi-Fi AP is a candidate after
+radio/driver capability and direct OpenSSH authentication are verified. Both
+machines may be offline. A single radio switching to AP mode can remove the
+current eduroam/Tailscale path; first test with console recovery. Keep B2 on its
+separate Ethernet subnet, without campus/robot forwarding. No AP profile has
+been configured. The [offline-operation guide](offline-operation.md) provides
+a manual-address template, rollback and acceptance criteria, without assuming
+AP/client concurrency or internet-free Tailscale coordination. The existing B2
+remote controller is a separate candidate for manual positioning/takeover/stop;
+its actual arbitration and physical stop behavior still require validation.
 
 Define two different events: loss of the **management/operator link** and loss
 of **robot control/state/sensor data**. The core loop should not require an open

@@ -60,7 +60,7 @@ Tailscaleは確認済みのホスト管理用SSH経路として利用し，ア�
 Linuxクライアントのソースは[BSD-3-Clause](https://github.com/tailscale/tailscale/blob/main/LICENSE)であり，
 tailnetへの登録，ホストされたサービスの条件，研究室のアクセス規則は別に扱う．
 [公式インストーラー](https://tailscale.com/docs/install/linux)を使う．対象機へのTailscale経由のSSHは
-確認済みで，クライアントの正確な版は未調査である．[pyenv](https://github.com/pyenv/pyenv)は
+確認済みで，調査したクライアント・デーモンの版は1.104.2である．更新・接続の条件は遠隔画面のガイドを参照する．[pyenv](https://github.com/pyenv/pyenv)は
 [MITライセンス](https://github.com/pyenv/pyenv/blob/master/LICENSE)の任意のユーザー用Python管理ツールであり，
 同梱する依存先やGPU実行環境の隔離ではない．いずれも本Pythonパッケージから導入しない．
 ホスト構築では，公式pyenvの`v2.8.14`，コミット`3fb25668b463ad38ac2db6092dbf476ef744c0ca`をGit管理外で使う．

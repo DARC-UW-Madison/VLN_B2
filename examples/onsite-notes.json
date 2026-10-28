@@ -17,7 +17,11 @@
     "operator_override_verified": null,
     "command_loss_behavior": null,
     "command_loss_evidence": null,
-    "exclusive_control_method": null
+    "exclusive_control_method": null,
+    "remote_controller_model_and_pairing": null,
+    "documented_remote_stop_procedure": null,
+    "remote_priority_over_sdk_verified": null,
+    "research_sender_stays_disarmed_after_override": null
   },
   "coordinates_and_time": {
     "velocity_frame": null,
@@ -65,7 +69,13 @@
     "process_survives_ssh_disconnect_verified": null,
     "management_link_loss_policy": null,
     "robot_link_loss_policy": null,
-    "physical_stop_evidence": null
+    "physical_stop_evidence": null,
+    "rdp_server_session_and_version": null,
+    "rdp_system_settings_authorization_verified": null,
+    "wifi_ap_driver_capability": null,
+    "offline_local_ssh_authentication_verified": null,
+    "hotspot_profile_and_rollback_verified": null,
+    "offline_boot_mode_verified": null
   },
   "next_step": null
 }

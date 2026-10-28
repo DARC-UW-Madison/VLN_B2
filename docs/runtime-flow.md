@@ -7,6 +7,10 @@ Jetson has a built runtime with passing model-free GPU/import checks. No model w
 no camera has been validated, B2 Ethernet is disconnected, and this project
 implements no motor command sender.
 
+For why Mac can remain lightweight, why Docker is optional, where ROS may run
+and how containers/sensors connect, read [deployment choices](deployment-design.md).
+For the full guide list, use [the documentation index](README.md).
+
 ## Which files are shared
 
 On the research login, `~/Developer` is the workspace used for this setup.

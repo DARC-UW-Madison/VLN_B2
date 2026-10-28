@@ -66,6 +66,13 @@ push権限を確認したが，pushは未実施である．独自コードと文
 レイヤごとの通信を記した．[認証情報の扱い](system-overview.ja.md#個人の認証情報と共有返却)には，
 現地の起動試験と共有・返却前の確認をまとめた．個人の認証情報の保存とGUIログイン先の変更は実施していない．
 
+[文書目次](README.ja.md)をプロジェクトREADMEから分けた．[配置方針](deployment-design.ja.md)，
+[用語](glossary.ja.md)，[オフライン運用](offline-operation.ja.md)，[ライセンス](licensing.ja.md)で
+仕組みと判断の境界を日英で説明する．別のAPは利用できず，JetsonのAP化を候補とし，中核処理のMacは
+任意とする．B2の既存リモコンの制御優先順位・停止は確認が必要である．遠隔画面はRDP・Windows Appを
+第一候補にするが，安定性の実測結果ではない．2026-10-28の新しいSSHは認証前にtimeoutし，原因は未確認である．
+この継続作業では実機の導入・設定・ソース転送を行っておらず，最新のローカル文書はJetson上で一致を確認できていない．
+
 ## 決めていること
 
 [ビルドの基礎](build-fundamentals.ja.md)，[Ethernet・内蔵調査](field-network.ja.md)，

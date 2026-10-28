@@ -204,10 +204,11 @@ their localization/clearance role separately from TIC-VLA's RGB input.
   authentication and restricted access; package presence is not success.
   Establish recovery access and address the documented Tailscale SSH update
   before forwarding tests; preserve the only working remote path meanwhile.
-- Identify a lab-approved local management network for mobile use, such as a
-  portable access point. Verify Mac and Jetson addressing and ordinary local SSH
-  without campus internet. Do not assume Tailscale enrollment/coordination always
-  works offline or that the Wi-Fi adapter can provide AP and client concurrently.
+- Assume no separate AP. Follow [offline operation](offline-operation.md) to
+  inspect a possible Jetson AP and direct local OpenSSH before a console-backed
+  switch; no internet or concurrent eduroam/AP service is assumed. Mac remains
+  optional for the core loop. Verify the B2 remote's manual takeover, stopping
+  and research-command inhibition separately; no button behavior is assumed.
 - Verify that closing SSH does not own the application lifetime. For now use only
   an offline replay/detached-process exercise; this is not a robot watchdog test.
 - Before future motion, validate separately: management-link loss, camera/state

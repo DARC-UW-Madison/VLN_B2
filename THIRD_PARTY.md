@@ -67,7 +67,8 @@ Tailscale is used for the verified host-management SSH path, not bundled with th
 application. Its Linux client source uses [BSD-3-Clause](https://github.com/tailscale/tailscale/blob/main/LICENSE);
 tailnet enrollment, hosted-service terms and lab access rules are separate.
 Use the [official installer](https://tailscale.com/docs/install/linux). SSH over
-Tailscale is verified on the target; the exact client version remains uninspected.
+Tailscale was verified on the target; the inspected client/daemon version is
+1.104.2. Review the update/access constraints in the remote-desktop guide.
 [pyenv](https://github.com/pyenv/pyenv) is optional per-user interpreter tooling
 under its [MIT license](https://github.com/pyenv/pyenv/blob/master/LICENSE), not a
 bundled dependency or GPU-runtime sandbox. Neither tool is installed by this

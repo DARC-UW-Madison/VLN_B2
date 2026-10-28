@@ -75,6 +75,17 @@ layer. The [credential lifecycle](system-overview.md#personal-credentials-sharin
 records onsite boot checks and the required review before sharing/return. Neither
 personal credential saving nor a new GUI login target has been applied.
 
+The [documentation index](README.md) now separates the manual from the project
+README. [Deployment choices](deployment-design.md), [terminology](glossary.md),
+[offline operation](offline-operation.md) and [licensing](licensing.md) explain
+the mechanisms and decision boundaries in both languages. No separate AP is
+available; a Jetson-hosted local AP is a candidate, Mac is optional for the core
+loop, and B2's existing remote requires priority/stop verification. RDP/Windows
+App is the preferred remote-GUI candidate, not a proven stability result.
+A fresh SSH attempt on 2026-10-28 timed out before authentication; its cause is
+unknown. No remote install/configuration/source transfer was performed in that
+continuation; the latest local documentation is not yet verified on Jetson.
+
 ## Decisions in effect
 
 Learning and field preparation now include [build fundamentals](build-fundamentals.md),
