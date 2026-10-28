@@ -13,6 +13,13 @@ was inspected with `ro,noload`, then mounted writable with explicit operator
 permission. Journal recovery succeeded without observed ext4 errors. Docker
 storage and an empty standard Hugging Face cache are now on a dedicated SSD area.
 See [runtime setup](jetson-runtime.md) and the [initial baseline](target-baseline.md).
+The [system overview](system-overview.md) records exact storage types, hardware
+specifications and account/container boundaries. GUI boot is retained and
+research-login AC suspend is disabled. Wi-Fi automatic retry and Tailscale boot
+services are enabled; system-stored Wi-Fi credentials, the intended GUI
+autologin and a controlled cold-boot test still require operator completion.
+The operator deferred credential saving and autologin changes until an onsite
+visit. The current connection and existing GDM login target are retained.
 B2 is not connected through the wired port; no model inference, camera capture,
 or robot control has been validated. All project CLI commands remain
 observation-only or offline. A reviewed source archive is on the Jetson; the
@@ -55,6 +62,11 @@ Development-host and target verification (85 tests and the stated limitations) i
 [the development guide](development.md#preparation-verification). Synthetic
 replay and mocked tests exercise software behavior, not real drivers, model
 quality, or hardware performance. Example limits are not approved operating limits.
+
+The boot-network helper adds eight non-network tests; all **93 tests** pass on
+both development host and target. Its live read-only inspection succeeded under
+the target's system Python. Credential entry and reconnect/boot validation are
+not part of these mocked tests.
 
 ## Decisions in effect
 

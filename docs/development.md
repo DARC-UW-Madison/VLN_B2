@@ -50,6 +50,14 @@ passed there. The native CUDA arithmetic check passed independently of Torch.
 Source/publication checks do not establish hardware readiness or
 permission to redistribute third-party assets.
 
+The unattended-network helper adds eight tests. They check retained trust and
+identity, reports without personal data, omitted defaults, mismatched inputs
+without writes, unsupported profiles and bounded GDM changes. All **93 tests** passed
+locally and in the Jetson venv; read-only NetworkManager inspection also ran
+under the target system Python 3.8. Saving an operator-entered Wi-Fi password,
+actual reconnect, and cold-boot recovery remain separate operator checks.
+See the [system overview](system-overview.md).
+
 ## 1. Understand the system
 
 Read the [architecture](architecture.md) and [project status](status.md).

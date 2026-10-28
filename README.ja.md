@@ -16,6 +16,7 @@ Unitree B2でTIC-VLAによるナビゲーションを評価するための研究
 
 | 文書 | 内容 |
 | --- | --- |
+| [システム全体像](docs/system-overview.ja.md) | 実機の性能，保存先，隔離範囲，GUI，無人アクセス，計算機の担当 |
 | [確認済みのJetson構成](docs/target-baseline.ja.md) | ホスト，GPUドライバ，容量，ネットワークの実測と実行環境の条件 |
 | [Jetsonの実行環境構築](docs/jetson-runtime.ja.md) | ホストのPython・venv，CUDA演算確認，保存先，段階的なコンテナ構築 |
 | [実行環境の互換性](docs/runtime-compatibility.ja.md) | 推論環境の候補，モデル不要の確認，未解決のチェックポイント読込制約 |
