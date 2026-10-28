@@ -7,6 +7,7 @@
 deploy/*
 !deploy/runtime-requirements.txt
 !deploy/runtime-smoke.py
+!deploy/disable-unused-torch-rpc.py
 !src/
 !src/**
 !examples/

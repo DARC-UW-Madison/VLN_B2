@@ -129,6 +129,24 @@ FP32／BF16のGPU演算を調べる．いずれもモデルを読み込まない
 確認した上流チェックアウトを読み取り専用で接続してimportするが，モデルは作らない．
 カメラ，ロボットのデバイス，モデルキャッシュ，Dockerソケットは，これらの試験へ接続しない．
 
+### Torchのimport判定とビルドの再開
+
+初回のビルドではTorch 2.2.2が完成したが，torchvisionの準備で失敗した．Pythonが
+`USE_TENSORPIPE=0`でもRPCを利用可能と判定し，存在しないバインディングを要求するためである．
+`deploy/disable-unused-torch-rpc.py`は，正確な版，ビルド設定，元ファイルのSHA-256を確認して，
+RPCを利用不可と判定させる．distributed・Glooは残す．元と変更後のハッシュ，理由を
+`/opt/runtime-metadata/torch-rpc-patch.json`へ記録し，元のwheelとライセンス・NOTICEを維持する．
+ローカルの機能判定の修正で，本家の修正でもチェックポイントの脆弱性修正でもない．
+修正した隔離コンテナではTorchのimportが成功し，CUDAとdistributedが利用可能，RPCは利用不可と確認した．
+
+完成済みのビルド層と，失敗した試行のログを残す．確認済みのTorchイメージを基に，正本から
+Git管理外の再開用Dockerfileを生成し，`Resume boundary`以降を使える．修正，現在の表示事項・
+検査コード，vision，残りの依存先が含まれる．再利用前に，正確なイメージID，Torchの版，CUDAの世代，
+ビルド設定を確認して記録する．似た名前の任意のイメージを信頼しない．正本のDockerfileは，
+ソースから全体を構築する手順として維持する．候補全体の動作は，GPU演算と全importで別途検証する．
+
+### 上流のimport検査
+
 上流のソースはプロジェクト外の`~/Developer/External/TIC-VLA`に置き，
 `9fa6f8b66b9e121d5df5df071297bba8e5353ebb`へ固定した．sparse checkoutではPythonパッケージ，
 ライセンス，パッケージ情報だけを選び，モデルのblobは選んでいない．Torchの検査が通った後，

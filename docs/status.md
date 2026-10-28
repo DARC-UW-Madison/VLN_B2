@@ -105,7 +105,7 @@ frames/timing and stop behavior follow when the robot is connected. The
 build candidate and the unresolved checkpoint-loading issue; it is not a
 working-runtime claim.
 
-The current source build runs in the background on the Jetson. A one-shot local
+The remaining image build runs in the background on the Jetson. A one-shot local
 verification job waits for successful completion, then runs the Torch and full
 import checks without models. Logs and result JSON stay under
 `/mnt/b2-research/VLN_B2/build-logs`. `runtime-build.exit` records the build exit
@@ -113,6 +113,12 @@ code; `runtime-verify.exit` records verification. Code `0` means that stage
 passed; a missing record does not establish success. Inspect `runtime-build.log`,
 `torch-smoke.json` and `full-smoke.json` when continuing. No automatic model
 download or robot integration follows these checks.
+
+The first attempt completed Torch compilation but failed at torchvision's Torch
+import because disabled TensorPipe RPC was advertised by Python. A hash-checked
+local feature guard passed an isolated Torch import/CUDA-visibility check.
+Resume from the verified completed Torch image; preserve the initial logs and
+both attempts' provenance. See [build recovery](jetson-runtime.md#torch-import-guard-and-build-recovery).
 
 Stereolabs provides an [official Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)
 with platform-specific image selection. NVIDIA documents the [Jetson container runtime](https://developer.nvidia.com/embedded/jetson-cloud-native/).

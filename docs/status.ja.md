@@ -89,12 +89,17 @@ Dockerの権限とコンテナ内のGPU演算を確認してからモデルを�
 実機への接続後に確認する．[実行環境の互換性調査](runtime-compatibility.ja.md)には，モデル不要の
 ビルド候補と未解決のチェックポイント読込問題を記した．動作確認済み環境ではない．
 
-現在のソースビルドはJetson上のバックグラウンドで動く．ローカルの一回限りの検証ジョブが
+残りのイメージのビルドはJetson上のバックグラウンドで動く．ローカルの一回限りの検証ジョブが
 ビルド成功を待ち，モデル不要のTorch検査と全import検査を実行する．ログと結果JSONは
 `/mnt/b2-research/VLN_B2/build-logs`へ保存する．`runtime-build.exit`がビルド，
 `runtime-verify.exit`が検証の終了コードで，`0`なら該当段階は成功である．記録がないことは
 成功の証拠ではない．再開時は`runtime-build.log`，`torch-smoke.json`，`full-smoke.json`を確認する．
 これらの後にモデル取得や機体との結合を自動実行することはない．
+
+初回はTorchのコンパイルが完成したが，無効なTensorPipe RPCをPythonが利用可能と判定し，
+torchvisionの準備時にTorchのimportが失敗した．ハッシュを照合したローカルの機能判定の修正で，
+隔離環境のTorch importとCUDA可視性の確認が通った．完成済みTorchのイメージを確認して再開し，
+初回ログと両方の試行の由来を維持する．[ビルドの再開](jetson-runtime.ja.md#torchのimport判定とビルドの再開)を参照する．
 
 Stereolabsには，対応するイメージを選ぶための[Jetson向け公式Docker手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)がある．
 NVIDIAは[Jetsonのコンテナruntime](https://developer.nvidia.com/embedded/jetson-cloud-native/)を説明している．

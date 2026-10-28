@@ -71,8 +71,14 @@ RUN mkdir -p /opt/build /opt/wheels && \
     python3.11 -m pip install --no-index --no-deps /opt/wheels/torch-2.2.2-*.whl && \
     printf '%s\n' "${TORCH_REVISION}" > /opt/runtime-metadata/torch-revision.txt && \
     rm -rf /opt/build/pytorch
+# Resume boundary: a verified completed Torch image may supply the layers above.
 ENV FORCE_CUDA=1 BUILD_VERSION=0.17.2 PYTORCH_VERSION=2.2.2 \
     TORCHVISION_USE_FFMPEG=0 TORCHVISION_USE_VIDEO_CODEC=0 TORCHVISION_USE_NVJPEG=0
+COPY deploy/disable-unused-torch-rpc.py /opt/runtime-tools/disable-unused-torch-rpc.py
+COPY LICENSE THIRD_PARTY.md /opt/runtime-metadata/
+COPY deploy/runtime-smoke.py /opt/runtime-smoke.py
+RUN python3.11 /opt/runtime-tools/disable-unused-torch-rpc.py && \
+    python3.11 -c 'import torch; import torch.distributed.rpc as rpc; assert torch.distributed.is_available(); assert not rpc.is_available()'
 RUN python3.11 -m pip install --no-cache-dir pillow==10.4.0 && \
     git init /opt/build/vision && cd /opt/build/vision && \
     git remote add origin https://github.com/pytorch/vision.git && \

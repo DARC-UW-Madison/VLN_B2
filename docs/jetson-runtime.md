@@ -151,6 +151,29 @@ models. The optional `--stage full` also imports a pinned upstream checkout
 mounted read-only, without constructing a model; review its terms first.
 Do not mount cameras, robot devices, model caches or Docker sockets for these checks.
 
+### Torch import guard and build recovery
+
+The first build completed Torch 2.2.2, but torchvision preparation failed:
+Python advertised RPC despite `USE_TENSORPIPE=0`, then imported missing bindings.
+`deploy/disable-unused-torch-rpc.py` checks the exact version, build setting and
+original file SHA-256 before making RPC report unavailable. Distributed/Gloo
+remains available. Original/modified hashes and the reason are recorded in
+`/opt/runtime-metadata/torch-rpc-patch.json`; the original wheel and its
+license/NOTICE remain. This is a local feature guard, not an upstream fix or a
+checkpoint-security repair. The patched isolated container successfully imported
+Torch and reported CUDA available, distributed available and RPC unavailable.
+
+Preserve successful build layers and failed-attempt logs. A source-derived,
+ignored resume Dockerfile can start from the verified completed Torch image and
+include everything after the canonical recipe's `Resume boundary` marker:
+the guard, current notices/check script, vision and remaining dependencies.
+Verify and record the exact image ID, Torch revision, CUDA generation and build
+settings before reuse. Do not trust an arbitrary similarly named image. The
+canonical Dockerfile remains the complete build-from-source recipe. Full GPU
+operations and import checks still decide whether the complete candidate works.
+
+### Upstream import check
+
 The source-only upstream checkout is outside the project at
 `~/Developer/External/TIC-VLA`, pinned to
 `9fa6f8b66b9e121d5df5df071297bba8e5353ebb`. Sparse checkout selects the Python

@@ -44,7 +44,7 @@
 | 資料 | 出典 | 用途と配布 |
 |---|---|---|
 | ZED SDK／Pythonバインディング | [公式画像取得手順](https://docs.stereolabs.com/docs/tutorials/image-capture)，[Jetson Docker手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson) | 任意の`pyzed.sl`呼び出し．SDK，ドライバ，イメージ，ベンダーモデルは非同梱．導入・共有前に選択したSDK・イメージの条件を確認する |
-| PyTorch | [公式文書](https://docs.pytorch.org/docs/stable/index.html) | ローカルの候補イメージ内で版を固定してソースビルドする．ホストのvenvにはなく，リポジトリのソースに非同梱．イメージの表示事項を維持し，互換性調査の制約により重みの読込は保留する |
+| PyTorch | [公式文書](https://docs.pytorch.org/docs/stable/index.html) | Torch 2.2.2の`39901f2`をBSD系の利用条件と付属の外部表示事項のもとでローカルにビルドした．ローカルイメージでは，ハッシュ照合付きの機能判定で未使用のPython RPCを無効化し，元のwheel・ライセンス・NOTICEを維持する．リポジトリのソースやホストのvenvには非同梱で，重みの読込は保留する |
 | Transformers／InternVL実行環境 | [Transformers文書](https://huggingface.co/docs/transformers/index)，[InternVL3-1B](https://huggingface.co/OpenGVLab/InternVL3-1B) | 上流モデルの任意のローダー．ローカルのみ参照するが，信頼したモデルのPythonコードは実行する．ソースと成果物の版を固定する |
 | Livoxドライバ | [公式ドライバ](https://github.com/Livox-SDK/livox_ros_driver2) | 参照のみで，実装上の依存先ではない．ソースは非同梱 |
 | ベースコンテナイメージ | [NVIDIAのJetson資料](https://developer.nvidia.com/embedded/jetson-cloud-native/)，[提供元のJetPack EULA](https://docs.nvidia.com/jetson/jetpack/eula/index.html) | L4Tに一致する基底をOrinでのローカル利用用に取得し，Python段階をビルドした．イメージと各構成物の条件は引き続き適用される．バイナリイメージは同梱・公開しない |

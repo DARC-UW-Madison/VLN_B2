@@ -52,6 +52,8 @@ def _torch_check() -> dict:
     _require(torch.cuda.is_available(), "Torch cannot initialize a CUDA device.")
     _require(torch.cuda.get_device_capability() == (8, 7), "Expected Orin compute capability 8.7.")
     _require(torch.distributed.is_available(), "Torch distributed API must be compiled for imports.")
+    rpc = importlib.import_module("torch.distributed.rpc")
+    _require(not rpc.is_available(), "The candidate deliberately excludes TensorPipe RPC.")
     _require("weights_only" in inspect.signature(torch.load).parameters,
              "The required restricted-loading argument is missing.")
     _require(torch.cuda.is_bf16_supported(), "The candidate requires BF16 support.")
@@ -83,7 +85,7 @@ def _torch_check() -> dict:
     return {"torch": torch.__version__, "torchvision": vision.__version__,
             "torch_git_revision": torch.version.git_version, "cuda": torch.version.cuda,
             "compute_capability": list(torch.cuda.get_device_capability()),
-            "bf16_supported": True, "distributed_compiled": True,
+            "bf16_supported": True, "distributed_compiled": True, "rpc_available": False,
             "operations": operations, "elapsed_seconds": time.perf_counter() - started,
             "peak_allocated_bytes": torch.cuda.max_memory_allocated(),
             "checkpoint_loading_allowed": False}
