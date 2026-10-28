@@ -53,4 +53,5 @@ runs/
 
 # Operating-system files
 .DS_Store
+._*
 Thumbs.db
