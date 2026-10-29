@@ -126,6 +126,35 @@ terminal session does not create the screen tunnel, and closing the dedicated
 tunnel does not stop xrdp or a robot application. This tunnel carries the screen
 connection only, not general robot DDS traffic or the model's control loop.
 
+## Why this configuration uses a tunnel
+
+RDP itself does not require SSH. A Windows RDP host commonly accepts connections
+on a network interface, with access controlled by its firewall and policy. A
+client can then use the reachable IP and account directly. The same architecture
+is possible with xrdp. [Tailscale's direct RDP guide](https://tailscale.com/docs/solutions/access-remote-desktops-using-windows-rdp)
+illustrates reaching an RDP host using its tailnet address; the guide targets
+Windows and does not validate Linux host configuration.
+
+Here the installed xrdp listener was deliberately restricted to loopback, so an
+SSH forward is required by that chosen configuration, not by Linux or RDP.
+This adds a connection to maintain. A tailnet-only RDP listener with matching
+startup order, TLS, authentication and access rules could remove that forward;
+changing the host listener/policy is separate from merely changing Windows App's
+address. No such direct-listener change has been applied. Tailscale already
+provides an encrypted private network; SSH forwarding is not a universal extra
+requirement for using RDP through it.
+
+Testing the pre-existing NoMachine first could have reduced setup work. We have
+not compared NoMachine and xrdp on this host, so the source-build effort does not
+prove RDP was necessary or faster. The current xrdp bundle has CPU painting and
+RemoteFX enabled, with H.264 encoding disabled; desktop interaction passed, but
+video throughput, latency and CPU cost were not benchmarked. NoMachine supports
+[compressed/video display encodings](https://kb.nomachine.com/DT07X00332), whose
+actual availability depends on version, session and hardware. Sending screen
+updates is not evidence that every such protocol is equally expensive. VNC is
+excluded from this project's current options per the operator's preference.
+The installed NoMachine and working RDP configuration are retained unchanged.
+
 ## Session and graphics constraints
 
 The [xrdp FAQ](https://github.com/neutrinolabs/xrdp/wiki/Tips-and-FAQ) describes
@@ -394,30 +423,13 @@ Windows App display and interaction again. GUI autologin was not changed;
 physical power-cycle recovery and extended desktop checks remain untested.
 Private records and backups remain on the host, outside Git.
 
-## Vino fallback for sharing the console
+## Historical Vino inspection
 
-Vino remains an alternative when the requirement is to view the existing GNOME
-desktop. Its installed version shares a **logged-in** desktop; NVIDIA's VNC
-guide documents that requirement. It does not turn an unlogged-in boot into a
-working remote session. Whether the framebuffer works with HDMI unplugged also
-requires a test. Do not assume the Vino and xrdp sessions have identical behavior.
-
-If a reviewed Vino setup later listens only on Jetson loopback port 5900, the
-alternative Mac commands are:
-
-```sh
-ssh -N -L 127.0.0.1:5901:127.0.0.1:5900 RESEARCH_USER@JETSON_MANAGEMENT_ADDRESS
-```
-
-Open the viewer in a second Mac terminal after the tunnel is established:
-
-```sh
-open vnc://127.0.0.1:5901
-```
-
-These are unrun alternatives, not a request to enable both servers. Review
-authentication and client compatibility rather than copying a legacy guide's
-password-in-command or encryption-disabled configuration.
+Vino was already installed and stopped. Earlier planning considered sharing an
+existing console desktop with it. VNC is excluded from the current plan per the
+operator's preference; no Vino configuration or forwarding command is prescribed.
+The successful headless tests concern xrdp, not Vino. Retain the inventory as
+historical evidence rather than presenting VNC as an active alternative.
 
 ## Acceptance and recovery tests
 

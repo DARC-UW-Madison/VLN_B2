@@ -38,6 +38,7 @@
 | [Jetsonの初期設定](jetson-bootstrap.ja.md) | ユーザー，SSH・Tailscale，Python，依存の境界をどう準備するか |
 | [Jetsonの実行環境構築](jetson-runtime.ja.md) | SSD・Docker保存先，ネイティブCUDA，Python，実行環境をどうビルド・復旧したか |
 | [モデル資材と読込計画](model-artifacts.ja.md) | 承認するファイル・版・サイズ・条件は何か．別のCPU変換で古いTorchのpickle読込をどう避けるか |
+| [ローカルのチェックポイント変換](checkpoint-conversion.ja.md) | 分離したCPU環境の構築，制限，検証とGPU推論との境界は何か？ |
 | [実行環境の互換性](runtime-compatibility.ja.md) | 候補の版とモデル不要の検査は何が通ったか．なぜチェックポイント読込が保留か |
 | [RDPのビルドと導入確認](rdp-build.ja.md) | なぜ別の固定版をビルドするか．ホストの利用前に何を出力・設定・検証するか |
 | [Macからの遠隔画面](remote-desktop.ja.md) | Windows App・RDP・xrdpのセッションはVNCと何が違うか．通常のHDMI利用を省く前に何を確認するか |
