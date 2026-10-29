@@ -15,7 +15,7 @@ network. No camera, SDK control client or robot command sender participates.
 | Strict GPU loading | 948,462,978 unique parameters; horizon 30; action layers 3; about 10.42 seconds | One load, excluding the preceding checksum; not inference timing |
 | Synthetic inference | One generated 448×448 RGB image and zero velocities; 30 finite XY points; about 13.64 seconds | No real image, accuracy, stopping or control-rate validation |
 | PyTorch allocation | Load peak 2,110,120,960 bytes; inference peak 2,624,592,384 bytes | GPU allocator only; excludes CPU RAM, driver allocations and total unified memory |
-| Ordinary tests | 130 passed on Mac and Jetson | Unit/synthetic tests do not validate sensors, firmware or movement |
+| Ordinary tests | 134 passed on Mac and Jetson | Unit/synthetic tests do not validate sensors, firmware or movement |
 
 The synthetic run retained the upstream sampling configuration: maximum 200
 new tokens, sampling enabled, temperature 0.7. No seed was fixed or recorded.
@@ -133,13 +133,71 @@ an autonomous service or robot watchdog. Runs used a 24 GiB container memory
 limit, two CPUs, 128 processes and 256 MiB temporary space. Those limits do not
 measure total device memory or prove real-time behavior.
 
+## Recorded camera image and stage timing
+
+After the first ZED capture, `tools/profile_model_runtime.py` processed that
+1280×720 image twice with **explicitly assumed stationary state**. B2 was not
+connected and no robot state was received. Both calls produced 30 finite XY
+points. This tests the real-camera file path and numerical compatibility, not
+navigation on the desk scene, a mounted view or live control.
+
+| Measured stage | First call | Second call |
+|---|---:|---:|
+| Semantic generation: image/language reasoning | 11.573 s | 9.566 s |
+| Semantic cache forward | 0.225 s | 0.217 s |
+| Current-image feature extraction | 0.089 s | 0.089 s |
+| Action decoder | 0.0058 s | 0.0057 s |
+| Whole synchronous call | 12.001 s | 9.931 s |
+
+Model loading took 9.254 seconds separately. GPU allocator peak was
+2,628,811,264 bytes in each call; this is not total unified-memory use.
+Stage wrappers synchronize the GPU at boundaries and exclude nested vision
+calls from extra totals. They add diagnostic overhead. Unmeasured preprocessing
+and bookkeeping remain outside the listed stage totals. Two trials are not a
+latency distribution, sustained throughput or a guaranteed control rate.
+
+The image/instruction were unchanged, upstream sampling stayed at maximum 200
+new tokens and temperature 0.7, and Python/NumPy/Torch seeds were reset to 0
+before each call. Deterministic algorithms were not forced and actual output
+token counts were not recorded. Do not attribute the difference solely to
+warm-up. The large semantic cost motivates separate reasoning/action execution;
+it does not establish that a roughly ten-second-old cache is valid for driving.
+
+The first attempt stopped before inference because the container mounted the
+probe as `profile.py`, shadowing Python's standard module during a dependency
+import. Attempt 02 used `profile_model_runtime.py` and passed. Keep that distinct
+filename. Private commands, image/report hashes, source/image revisions,
+assumed-state labels and limits are in `local/model-profiling/attempt-02`.
+The run used an offline, non-root, read-only GPU container with 24 GiB RAM,
+two CPUs, 128 processes, 256 MiB temporary space and a 180-second supervisor.
+Only the recorded image was mounted; no camera/USB, home or credentials were
+passed. The original pickle checkpoint was not mounted.
+
+To repeat, use the same constrained mounts/environment as the strict load check,
+mount the profiler with its distinct filename and the recorded image read-only,
+and choose a new report directory. Inside that container, the explicit call is:
+
+```sh
+python3.11 /workspace/profile_model_runtime.py \
+  --base-model /input/base-repo/snapshots/4415a3b810e636d11dfa86b0e9ba40bb00535aa8 \
+  --checkpoint /input/model.safetensors \
+  --expected-sha256 2d2cab167ef723cf6644729128016ccbb0ab5b131a3aa561c7418a3318ea51e4 \
+  --upstream-root /opt/upstream --image /input/frame.jpg \
+  --report /reports/profile.json --assumed-stationary --repeats 2
+```
+
+This requires an explicit assumed-state flag. Report overwrite, non-offline
+execution and a checkpoint checksum mismatch fail before model loading. Hook
+restoration/nested accounting and input guards are unit-tested. All 134 tests
+pass on Mac and Jetson. These tests do not validate real B2 observations.
+
 ## Next acceptance
 
-Without hardware, measure semantic and action stages separately and distinguish
-first-call from repeated-call timing. No new model download is needed for that
-work. The next physical input test is a standalone external ZED 2i connected
-to this Jetson over USB: acquire and inspect RGB without connecting to B2.
-If the camera is only available onsite, perform that check there.
+The first RGB capture and two recorded-image stage measurements passed. Next,
+separate semantic reasoning from action execution with coherent cache metadata,
+then test cache age, inference stalls and fresh-frame handling without commands.
+No new model download is needed. Validate sustained camera capture, source-clock
+alignment and the intended mounted view; a desk image does not establish them.
 
 At B2, first verify the existing manual/stop procedure and inspect Ethernet
 networking and computer roles. Receive state without motor commands. Camera and

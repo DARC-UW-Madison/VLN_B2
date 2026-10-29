@@ -12,11 +12,18 @@ prediction horizon does not make this a real-time controller. That synthetic run
 and no motor command was sent. The subsequent first ZED RGB capture passed;
 see [camera preparation](camera-runtime.md).
 
+Two subsequent calls on a recorded 1280×720 ZED image passed with explicitly
+assumed stationary state: 12.00 and 9.93 seconds overall. Semantic generation
+accounted for 11.57 and 9.57 seconds; the action decoder took about 0.006 seconds.
+A separate short stream check passed 90/90 SDK grabs at about 30 grabs/s. These
+are bounded compatibility checks, not sustained live control or navigation
+quality. [Runtime measurements](model-runtime.md) retain the limits and failures.
+
 The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-All **130 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+All **134 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
 B2 is still disconnected from the wired interface. Actual B2 state reception,
@@ -49,7 +56,7 @@ Hardware availability is not sensor or navigation validation. The
 | Model asset acquisition | Verified | 17 approved files, pinned revisions, 3,827,163,803 bytes and file digests |
 | CPU conversion | Verified for the actual checkpoint | 1,324 names retained; 3,773,492,276-byte output and readback manifest |
 | GPU model loading | Passed | Exact keys/shapes, parameter/device checks, no original pickle input |
-| Synthetic-image inference | One call passed | 30 finite points; not camera quality, navigation accuracy or a rate guarantee |
+| Offline numerical inference | One generated image and two recorded-camera calls passed | 30 finite points per call; real-image state was assumed, not received from B2 |
 | Live camera/state observation | One camera capture passed; B2 state unverified | Sustained RGB, state, clocks, frames and paired recording need checks |
 | Asynchronous runtime and motion sender | Not implemented | Consistent cache metadata, fresh observation path, watchdog and control authority |
 | Physical stopping and B2 evaluation | Not validated | Review and execute staged field tests before movement |
@@ -92,9 +99,9 @@ Hardware availability is not sensor or navigation validation. The
 1. Follow the [field card](field-card.md) and [Ethernet runbook](field-network.md)
    to map the actual B2 network, computers, sensors and receive-only SDK path.
    Preserve management Wi-Fi and keep the robot LAN separate from campus.
-2. Validate ZED RGB and B2 state without commands. Establish frame axes, units,
+2. Initial ZED RGB and short-stream checks passed. Validate B2 state without commands. Establish frame axes, units,
    source/receipt timing, odometry and calibration before interpreting live plans.
-3. Profile the synchronous model stages, then implement and validate asynchronous
+3. Use the measured stage costs to implement and validate asynchronous
    reasoning/cache/action execution. The observed 13.64-second call cannot simply
    feed a three-second plan into a walking loop. Bound cache age and verify
    behavior under inference stalls and stale/missing observations.

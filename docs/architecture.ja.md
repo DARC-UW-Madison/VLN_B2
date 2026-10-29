@@ -117,6 +117,7 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | `tools/acquire_model_assets.py` | 既定は計画表示のみ．明示的に承認したHub資材の版・容量・digestを照合して取得 |
 | `tools/verify_checkpoint_conversion.py`，`tools/verify_tensor_loading.py` | 生成fixtureによるCPU変換と旧環境のtensor専用読戻し |
 | `tools/verify_model_load.py` | 厳密なオフラインGPU読込．生成画像の推論には明示的なflagが必要 |
+| `tools/profile_model_runtime.py` | 保存画像・仮定した状態を明示した段階別計測．機体の入出力なし |
 | `deploy/checkpoint-converter.Dockerfile`，`deploy/converter-requirements.lock` | GPU環境を維持した，hash固定の独立したCPUソフトウェア環境 |
 | `src/b2_tic_vla/control.py` | 鮮度，座標系，制限値を確認する候補速度の計算 |
 | `src/b2_tic_vla/cli.py` | 個別確認，記録，再生，推論の各コマンド |

@@ -26,6 +26,13 @@ SDK 4.1.2，`DEPTH_MODE.NONE`，`optional_settings_path`を確認し，`pip chec
 生画像，serial番号，正確なdevice割当はGit対象外の非公開記録へ置く．CLIの`camera`と`record`に
 `--settings-dir`を追加し，別の書き込み可能なマウントへ校正を分離できるようにした．
 
+
+別の短い連続取得試験では，**SDKのgrabが90/90回成功**し，失敗は0回だった．最初と最後の受信は
+2.968秒の間隔で，約29.99 grabs/s，元の時刻は単調増加だった．各フレームを画像へ符号化・保存する
+ループではないため，JPEG保存性能や長時間の信頼性の試験ではない．時計の対応，取付後の校正，
+ライブ推論は未検証である．後の確認では任意のHID nodeがなくなっていたが，映像・USB側は存在し，
+そのnodeだけで連続取得が成功した．SDK使用・再接続後は，古い名前を維持せず実際のdeviceを再確認する．
+
 ## ファイル・依存・隔離
 
 SDKはカメラを扱うネイティブのソフトウェアで，`pyzed`はそれをPythonから呼ぶ部品である．
@@ -49,6 +56,30 @@ SDK，wheel，撮影画像，メーカーのモデルは本レポで配布しな
 配置した．通常の研究用UIDで，非公開の配置先だけへ書き込む．GPUイメージ，ホストPython，プロジェクトvenvは
 変更していない．Cythonはbindingが宣言する依存を満たす．NumPyはbindingの要求どおり2.0未満に維持する．
 来歴，wheel，importのログはJetsonのGit対象外`local/camera-runtime/attempt-01`に残す．
+
+## 非公開のPython配置先を再構築する
+
+一致するJetsonに確認済みイメージがある場合，新しい配置先へ次の手順で固定した二つのソフトウェアwheelだけを
+Stereolabs・PyPIから取得できる．import・撮影と違い，この明示的な導入だけはnetworkを使うが，
+SDK，カメラ，ホーム，モデルは公開しない．新しい保存先を選び，導入報告を維持する．既存先なら`mkdir`が失敗する．
+
+```sh
+mkdir -p local/camera-runtime
+mkdir -m 700 local/camera-runtime/rebuild-01
+sudo docker run --rm --pull never --runtime runc --network bridge --read-only \
+  --user "$(id -u):$(id -g)" --cap-drop ALL --security-opt no-new-privileges \
+  --memory 1g --cpus 2 --pids-limit 64 --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+  --mount "type=bind,src=$(pwd)/local/camera-runtime/rebuild-01,dst=/camera" \
+  --mount "type=bind,src=$(pwd)/deploy/zed-camera-requirements.lock,dst=/spec/requirements.lock,readonly" \
+  -e HOME=/tmp -e PYTHONDONTWRITEBYTECODE=1 --entrypoint python3.11 \
+  vln-b2-runtime:jp5 -m pip install --only-binary=:all: --require-hashes \
+  --no-deps --no-compile --target /camera/python \
+  --report /camera/install-report.json -r /spec/requirements.lock
+```
+
+以下のimportコマンドでは`attempt-01/python`の代わりに新しい配置先を使い，同じコンテナ環境で
+`python3.11 -m pip check`も実行する．lockはイメージ内のNumPy・Torchを置き換えない．
+SDK，Python ABI，L4Tが違う場合は，既存環境を上書きせず別に互換性を確認する．
 
 ## import確認の再現
 

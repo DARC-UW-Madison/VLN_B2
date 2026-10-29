@@ -5,7 +5,8 @@
 This guide separates what exists from the intended live deployment. The external
 Jetson has passing model-free checks, strict actual-model GPU loading and one
 synthetic-image inference. Approved weights are privately cached/converted on
-SSD. No real camera has been validated, B2 Ethernet is disconnected, and this project
+SSD. One real ZED RGB capture passed; sustained sensing/timing remain
+unvalidated, B2 Ethernet is disconnected, and this project
 implements no motor command sender.
 
 For why Mac can remain lightweight, why Docker is optional, where ROS may run

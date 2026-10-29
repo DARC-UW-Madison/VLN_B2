@@ -129,6 +129,7 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | `tools/acquire_model_assets.py` | Default plan only; explicit approved pinned Hub acquisition with size/digest checks |
 | `tools/verify_checkpoint_conversion.py`, `tools/verify_tensor_loading.py` | Generated fixtures for CPU conversion and old-runtime tensor-only readback |
 | `tools/verify_model_load.py` | Strict offline GPU loading; synthetic-image inference only with an explicit flag |
+| `tools/profile_model_runtime.py` | Explicit recorded-image/assumed-state stage timing, without robot I/O |
 | `deploy/checkpoint-converter.Dockerfile`, `deploy/converter-requirements.lock` | Separate hash-pinned CPU software environment; preserves the GPU stack |
 | `src/b2_tic_vla/control.py` | Pure candidate tracking with freshness, frame, and limit checks |
 | `src/b2_tic_vla/cli.py` | Separate probe, recording, replay, and inference commands |

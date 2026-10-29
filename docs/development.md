@@ -4,7 +4,8 @@
 
 This guide defines the route to a reproducible B2 experiment. Preparation tools
 are implemented. External-host inventory, strict GPU model loading and one synthetic-image
-inference are verified; real sensor operation and robot motion remain unvalidated. Use [onsite preparation](onsite.md) for the current commands; the
+inference are verified; one ZED RGB capture also passed. Sustained sensing, B2 state and robot motion
+remain unvalidated. Use [onsite preparation](onsite.md) for the current commands; the
 stages below describe what evidence is needed before advancing.
 
 ## Run local checks first

@@ -20,8 +20,8 @@ The repository provides target inventory, synthetic replay, camera/state
 acquisition adapters, paired recording and optional synchronous offline inference.
 **These tools send no motor commands.** Host setup and model-free GPU/import
 checks passed. Approved weights were acquired and CPU-converted separately;
-strict GPU loading and one synthetic-image inference passed. Real sensor/B2
-integration, asynchronous control and physical stopping remain unverified.
+strict GPU loading and one synthetic-image inference passed. One real ZED RGB capture also passed. B2 integration, asynchronous control and
+physical stopping remain unverified.
 No weights or third-party model code are included in this repository,
 and no autonomous application is installed. Start with recorded observations,
 then live observation; controlled movement follows only after interface and

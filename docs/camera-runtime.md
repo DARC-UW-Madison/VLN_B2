@@ -33,6 +33,16 @@ Raw images, serial numbers and exact device mappings stay in ignored private
 records, not in this repository. The CLI now accepts `--settings-dir` for both
 `camera` and `record`, so SDK calibration can use the separate writable mount.
 
+
+A separate short stream check then completed **90/90 SDK grabs**, zero failed
+grabs, over 2.968 seconds between first/last receipts (about 29.99 grabs/s).
+Source timestamps increased strictly. This loop did not encode/write every
+frame, so it is not JPEG throughput or a long-duration reliability test. Clock
+alignment, mounted-view calibration and live inference remain unvalidated.
+An optional HID node was no longer present at the later preflight; the successful
+stream mapped the still-present camera video/USB endpoints without it. Reinspect
+actual devices after SDK use/reconnection rather than retaining old node names.
+
 ## Files, dependencies and isolation
 
 The SDK is the native camera software. `pyzed` is the Python binding that calls
@@ -59,6 +69,33 @@ only its private prefix. The GPU image, host Python and project venv were not
 modified. Cython satisfies the binding's declared dependency; NumPy stays below
 2.0 as required by this binding. Provenance, wheel files and import logs remain
 under ignored `local/camera-runtime/attempt-01` on Jetson.
+
+## Recreate the private Python prefix
+
+For a clean prefix on a matching Jetson with the inspected image already
+present, the following downloads only the two pinned software wheels from
+Stereolabs/PyPI. Unlike import/capture, this explicit installation step needs
+network access; it exposes no SDK, camera, home or model files. Choose a new
+output directory and retain the install report. `mkdir` fails if it exists.
+
+```sh
+mkdir -p local/camera-runtime
+mkdir -m 700 local/camera-runtime/rebuild-01
+sudo docker run --rm --pull never --runtime runc --network bridge --read-only \
+  --user "$(id -u):$(id -g)" --cap-drop ALL --security-opt no-new-privileges \
+  --memory 1g --cpus 2 --pids-limit 64 --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+  --mount "type=bind,src=$(pwd)/local/camera-runtime/rebuild-01,dst=/camera" \
+  --mount "type=bind,src=$(pwd)/deploy/zed-camera-requirements.lock,dst=/spec/requirements.lock,readonly" \
+  -e HOME=/tmp -e PYTHONDONTWRITEBYTECODE=1 --entrypoint python3.11 \
+  vln-b2-runtime:jp5 -m pip install --only-binary=:all: --require-hashes \
+  --no-deps --no-compile --target /camera/python \
+  --report /camera/install-report.json -r /spec/requirements.lock
+```
+
+Use this new prefix instead of `attempt-01/python` in the import command below,
+and run `python3.11 -m pip check` in the same container environment. The lock
+intentionally does not replace the image's NumPy/Torch. A different SDK, Python
+ABI or L4T needs a separate compatibility check, not an in-place upgrade.
 
 ## Reproduce the import check
 
