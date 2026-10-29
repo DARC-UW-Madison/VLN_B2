@@ -75,6 +75,14 @@ The real generated-tensor probe is `tools/verify_tensor_loading.py`; it does not
 construct a model, use a GPU or read external weights. It is distinct from a
 model-conversion test, strict full-model loading and recorded-image inference.
 
+The CPU-conversion module adds eight tests for pinned provenance, source
+checksums, regular files, input/output budgets, non-overwrite behavior, complete
+alias names, supported CPU tensors and omission of unrelated training metadata.
+All **121 tests** passed locally and on Jetson. The separate CPU container also
+passed real generated-checkpoint conversion and old-runtime tensor readback;
+see [the conversion guide](checkpoint-conversion.md). Actual model loading is
+still unvalidated.
+
 ## 1. Understand the system
 
 Read the [architecture](architecture.md) and [project status](status.md).

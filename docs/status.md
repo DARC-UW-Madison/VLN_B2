@@ -156,14 +156,20 @@ exit codes are both `0`. No model weights were acquired or loaded.
 
 The artifact/loading plan is prepared. The independent adapter now accepts
 safetensors, forces tensor-only base loading and blocks checkpoint decoding on
-older Torch; all **113 tests passed locally and on Jetson**. The existing
+older Torch; the subsequent converter tests bring the suite to **121 passing
+tests locally and on Jetson**. The existing
 Torch 2.2.2 image also passed real generated-tensor I/O on CPU: four keys,
 4,504 bytes, FP32/BF16 values/shapes/dtypes, both alias names, malformed-input
 rejection and the old-Torch checkpoint gate. The container had no network/GPU,
 a read-only root, no capabilities, UID 1000 and bounded resources. No external
-weights, model construction or inference were involved. Next implement and test
-the reviewed CPU conversion, resolve
-artifact-specific terms, then obtain separate approval for exact model files,
+weights, model construction or inference were involved. The separate pinned CPU
+image now builds with Torch 2.15.0+cpu/safetensors 0.8.0/NumPy 2.4.6. Generated
+checkpoint conversion and readback on the older 2.2.2 image passed for six keys,
+including aliases, transposed/scalar/empty tensors, NaNs and signed zeros.
+Unsupported serialized globals were rejected without unsafe fallback. See the
+[conversion guide](checkpoint-conversion.md) for the image/recipe, resource limits,
+initial failed BuildKit attempt and private provenance. Resolve artifact-specific
+terms and obtain separate approval for exact model files,
 revisions, sizes and official-cache location before acquisition.
 Run recorded-observation inference only after that review. The
 [runtime compatibility review](runtime-compatibility.md) preserves these constraints.

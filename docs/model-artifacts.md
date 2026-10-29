@@ -4,10 +4,12 @@
 
 Metadata review date: **2026-10-28**. This is an acquisition and loading plan,
 not approval to download, evidence of a loaded model, or permission to distribute
-an artifact. Only official repository/API metadata, small packaging metadata and
-HTTP headers were inspected. No checkpoint, model asset or wheel listed below
-was acquired. The tensor-only reader and model-loader restrictions described
-below are implemented; the CPU converter and full-model loading remain untested.
+an artifact. No checkpoint or model asset listed below has been acquired.
+The tensor-only reader, restricted model loader and independent CPU converter
+are implemented. The pinned CPU software wheel was installed in a separate
+container and generated-fixture conversion/readback passed; actual model loading
+remains untested. Metadata review and executed fixture results are distinguished
+below and in the [conversion guide](checkpoint-conversion.md).
 
 The existing Jetson GPU runtime passed model-free checks. Its Torch 2.2.2 must
 not deserialize the external TIC-VLA checkpoint while the documented loading
@@ -33,8 +35,8 @@ base weights and the navigation checkpoint; they are not one installation file.
 | Reviewed upstream Python | Defines TIC-VLA and its model calls | Source-only checkout exists separately for prior import checks |
 | InternVL base snapshot | Defines/initializes the pretrained vision/language model and text/image processing | Metadata inspected; assets not acquired |
 | TIC-VLA checkpoint | Supplies the trained navigation/model state | Metadata inspected; checkpoint not acquired or decoded |
-| CPU converter environment | Decodes the source checkpoint using a separately reviewed runtime, then emits tensor data | Candidate metadata only; not built or tested |
-| Derived tensor artifact and manifest | Input to the proposed Jetson loader, with conversion provenance | Not created |
+| CPU converter environment | Decodes the source checkpoint using a separately reviewed runtime, then emits tensor data | Built with pinned CPU software; generated conversion and old-runtime readback passed |
+| Derived tensor artifact and manifest | Input to the proposed Jetson loader, with conversion provenance | Generated fixture only; no converted model |
 
 The current independent adapter constructs the upstream model and then loads a
 strict full-model state dictionary. The apparently similar base/checkpoint sizes
@@ -138,7 +140,7 @@ data for the existing GPU runtime. This does not make old Torch generally
 secure, remove trust in model Python or prove every other runtime component safe.
 It narrows this particular deserialization path.
 
-### CPU package candidate: metadata only
+### Pinned CPU package and fixture validation
 
 The [official PyTorch CPU index](https://download.pytorch.org/whl/cpu/torch/)
 listed this candidate during the review:
@@ -149,13 +151,13 @@ Expected bytes: 170730380
 SHA256: 97dc6b0a7cbad2109e615da3eac03df626c61e821e9486438b0248ba896178c6
 ```
 
-The candidate's HEAD response supplied its length, and its small distribution
-metadata specifies Python 3.11+ with ordinary Python dependencies and no CUDA
-dependency. The inspected Python-stage image uses Python 3.11 on Ubuntu Focal;
-its expected glibc generation is above the wheel's 2.28 platform baseline. Those
-facts make a separate converter plausible, not validated. Do not describe this
-candidate as permanently current, installed or compatible. Select and review a
-supported release again at implementation, pin its dependencies, and test it.
+The initial HEAD/metadata review established the size and CPU/Python platform.
+On 2026-10-29 the exact wheel was installed with 11 hash-pinned dependencies in
+`vln-b2-converter:cpu-v1`, reusing the inspected Focal/Python-stage image.
+`pip check`, CPU-only checks, generated checkpoint conversion and readback by
+Torch 2.2.2 passed. This validates the recorded fixture path, not the real model
+or a permanently current software selection. See the conversion guide for the
+recipe, full image ID, failed first attempt and limits.
 
 Do not substitute the ordinary PyPI ARM64 Torch package: its inspected 2.15.0
 metadata declares Linux CUDA 13.2 dependencies. A matching ARM64/Python filename
@@ -163,9 +165,9 @@ alone is not proof of CPU-only packaging. Explicit CPU source/version selection
 prevents accidentally changing the GPU stack during this conversion work.
 The exact [CPU wheel reference](https://download-r2.pytorch.org/whl/cpu/torch-2.15.0%2Bcpu-cp311-cp311-manylinux_2_28_aarch64.whl)
 and its [small package metadata](https://download-r2.pytorch.org/whl/cpu/torch-2.15.0%2Bcpu-cp311-cp311-manylinux_2_28_aarch64.whl.metadata)
-are acquisition references, not instructions to fetch them now.
+identify the installed software pin; the model assets remain unacquired.
 
-## 5. Prepared loading sequence, not executed
+## 5. Loading sequence and validation boundaries
 
 1. Review permissions, acquire approval for exact assets and separately review
    the converter recipe/dependency plan. Preserve current images and host
@@ -222,8 +224,9 @@ or protection against arbitrary trusted custom Python; review pinned code and
 run actual inference without network access. Mocked contract tests bring the
 local suite to **113 passing tests**. `tools/verify_tensor_loading.py` provides
 a separate generated-tensor check for the real runtime; no external assets or
-model construction are involved. The CPU converter, provenance verification and
-full conversion/inference path still require implementation and validation.
+model construction are involved. The independent CPU converter now also passed
+generated checkpoint conversion and cross-runtime readback. Actual source
+payloads, architecture compatibility and full-model inference remain unvalidated.
 
 ### Generated-tensor verification completed on Jetson
 
@@ -269,9 +272,9 @@ and needs review against our full-state strict loader.
 
 The hosted Convert Space downloads, converts and opens a pull request to upload
 the result. Do not submit restricted TIC-VLA artifacts to that workflow or use
-its public-sharing behavior without applicable permission. An independent local
-converter with reviewed provenance is a proposal, not an already tested official
-TIC-VLA conversion. A converted weight retains applicable upstream conditions.
+its public-sharing behavior without applicable permission. The independent local
+converter passed generated-fixture checks; it is not a validated official TIC-VLA
+checkpoint conversion. A converted weight retains applicable upstream conditions.
 
 ## 7. Storage and reproducibility
 

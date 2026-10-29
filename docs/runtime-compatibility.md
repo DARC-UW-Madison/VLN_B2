@@ -78,8 +78,9 @@ checkpoint loading, resolve reviewed fixes/backports or a separately reviewed
 conversion and loading path such as safetensors. The adapter now rejects
 checkpoint decoding on Torch 2.2.2, supports a tensor-only safetensors path and
 forces safetensors for base-model AutoModel loading. Its mocked contracts and
-a real generated-tensor CPU probe passed on Jetson; the converter and full-model
-compatibility remain unverified. The metadata-reviewed [artifact/loading plan](model-artifacts.md)
+a real generated-tensor CPU probe passed on Jetson. A separate Torch 2.15.0+cpu
+converter subsequently passed generated checkpoint conversion and old-runtime
+readback; full-model compatibility remains unverified. The metadata-reviewed [artifact/loading plan](model-artifacts.md)
 proposes isolated modern CPU-only conversion and a safetensors-only Jetson path,
 with exact acquisition candidates and unresolved terms. No model acquisition has
 been approved. Retain strict keys/shapes and no unrestricted-pickle fallback.

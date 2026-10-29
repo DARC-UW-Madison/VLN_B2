@@ -87,6 +87,33 @@ are mounted; the second run mounts the fixture read-only. No home, robot devices
 credentials, model cache or Docker socket is exposed. Two GiB is a fixture-test
 limit, not an estimate for the real checkpoint or model inference.
 
+## Recorded fixture result
+
+On 2026-10-29, attempt 02 built successfully with all hashes verified, `pip check`
+and CPU-only imports passing. Attempt 01 stopped before installation because
+buildx was absent; it remains recorded. Image `vln-b2-converter:cpu-v1` is:
+
+```text
+sha256:fbb182b51c0e6aee011dc43c4b7f1405493f9b17113531ea2d30a330525dc98c
+```
+
+Its logical size is 11,073,891,434 bytes, including the shared existing Python
+base; this is not the amount downloaded or additional disk use. It contains
+Torch 2.15.0+cpu, safetensors 0.8.0 and NumPy 2.4.6. The CPU fixture probe and
+old-Torch readback both exited 0. Six original names, BF16 aliases, scalar/empty/
+transposed tensors, NaN and signed-zero bytes were retained. Unsupported globals
+were rejected without unrestricted retry. The self-generated source was 2,799
+bytes and the tensor output 512 bytes; discarded training metadata makes this
+size comparison unsuitable for estimating actual model output. No real model
+was acquired, constructed or inferred. All **121 tests** passed on Mac and Jetson.
+
+The 90-second probes used no network/GPU, ordinary UID, read-only root and source,
+no capabilities, no-new-privileges, 2 GiB RAM, two CPUs, 128 processes and 64 MiB
+temporary space. Fixture reports, image/source hashes and resource provenance
+are private under ignored `local/cpu-converter-build/verification-01`; build
+attempts are retained alongside it. Public source contains neither fixtures nor
+raw machine records. The real checkpoint remains a separate test.
+
 ## Actual conversion contract
 
 After separate approval, mount exactly the approved checkpoint read-only and a

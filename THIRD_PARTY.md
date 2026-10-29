@@ -6,7 +6,7 @@ These are references and optional runtime dependencies. Third-party code, models
 and packages are not bundled. Explicit host/container setup installs external
 software separately. Independent adapters call existing public APIs;
 their mocked tests do not load the actual third-party runtimes. Review updated:
-2026-10-27. Default-branch links may change; pin exact revisions before real-model
+2026-10-29. Default-branch links may change; pin exact revisions before real-model
 or hardware experiments.
 
 | Material | Source | Current handling |
@@ -113,5 +113,5 @@ typing-extensions (PSF-2.0), SymPy/mpmath/NetworkX/Jinja/MarkupSafe/fsspec
 BSD-3-Clause/0BSD/MIT/Zlib/CC0-1.0 expression). Preserve bundled binary/component
 notices; those summaries do not relicense the wheels. The recipe isolates these
 packages in a new container venv, with no model data or upstream TIC-VLA source.
-The recipe is prepared; installation and conversion validation are separate
-checks. No converter image or third-party wheel is released by this repository.
+The pinned container build, `pip check`, generated checkpoint conversion and
+old-runtime readback passed; no actual model checkpoint has been acquired. No converter image or third-party wheel is released by this repository.
