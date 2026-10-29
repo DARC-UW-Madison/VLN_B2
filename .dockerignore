@@ -7,11 +7,15 @@
 deploy/*
 !deploy/runtime-requirements.txt
 !deploy/converter-requirements.lock
+!deploy/unitree-requirements.lock
 !deploy/runtime-smoke.py
 !deploy/disable-unused-torch-rpc.py
 !src/
 !src/**
 !examples/
 !examples/**
+!tools/
+tools/*
+!tools/verify_unitree_sdk.py
 src/**/__pycache__/
 src/**/*.pyc
