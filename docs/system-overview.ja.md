@@ -87,8 +87,8 @@ GPUイメージはモデル実行環境の候補用である．カメラや状�
 現地の操作に便利だが，ネットワークサービスの起動には本来不要である．NetworkManager，tailscaled，SSHは
 起動時に有効で，現在も動作している．
 Macからの画面操作は[リモートデスクトップ](remote-desktop.ja.md)を参照する．既存Vinoは未起動で，
-Windows App・RDPとホストのxrdp案を優先する．サーバーは`/opt/b2-remote`へ導入し，手動起動している．Windows Appの認証・画面表示が通った．
-起動時の有効化とHDMIなしの電源投入試験は保留である．Tailscaleはログイン状態を保持するため，通常は起動ごとに
+Windows App・RDPとホストのxrdpを使う．サーバーは`/opt/b2-remote`へ導入して動作中で，Windows Appの認証・画面表示が通り，操作者も基本操作を確認した．
+RDP本体を起動時に有効化し，sesmanは必要な依存先として起動する．HDMIなしの電源投入試験は保留である．Tailscaleはログイン状態を保持するため，通常は起動ごとに
 `tailscale up`をやり直さない．認証キーの期限は，別途[Tailscaleの管理画面](https://tailscale.com/docs/features/access-control/key-expiry)で確認する．
 
 2026-10-27に調べた企業向けWi-Fiプロファイルは，ユーザーのsecret agentでパスワードを扱う設定

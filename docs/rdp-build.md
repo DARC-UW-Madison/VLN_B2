@@ -184,8 +184,10 @@ In addition to the configuration table above, applied values include:
 
 Host linking passed for 13 executables. Unit verification and `xrdp-chkpriv`
 passed; verification also printed warnings about pre-existing unrelated units,
-which were not modified. Both RDP units were started manually, without boot
-enablement. The actual listener was **127.0.0.1:3389 only**, the listener process
+which were not modified. Both RDP units were initially started manually. After the operator confirmed
+basic desktop interaction, `b2-rdp.service` was enabled at boot; sesman remains
+a required dependency rather than an independently enabled unit. Enablement,
+active states and the loopback listener were checked without restarting. The actual listener was **127.0.0.1:3389 only**, the listener process
 ran as xrdp:xrdp, and sesman ran as root. Through a temporary SSH tunnel, RDP
 selected TLS and a client trusting the separately obtained public certificate
 verified TLS 1.3 (`TLS_AES_256_GCM_SHA384`). That test tunnel was stopped.
@@ -196,8 +198,9 @@ GNOME inhibitors, Windows App authenticated and displayed the GNOME desktop.
 Credentials were not saved. The eight model-free FP32/BF16 GPU operations passed
 again after installation. No robot was connected or commanded.
 
-Desktop input/settings permission, disconnect/reconnect and cold boot still
-require acceptance evidence. An inherited Chrome crash dialog was visible; no
+Basic desktop interaction was confirmed by the operator. Settings permission,
+extended input checks, disconnect/reconnect and cold boot still require
+acceptance evidence. An inherited Chrome crash dialog was visible; no
 problem report was sent and its cause was not established. Do not claim a complete
 GUI/boot acceptance from a visible background alone. Raw build/install/probe
 records remain under ignored `local/remote-desktop-build`, `local/rdp-export-01`

@@ -97,9 +97,10 @@ The desired sequence is power-on → Ubuntu → system Wi-Fi → Tailscale → S
 GUI automatic login is optional for network services, though useful for local
 operation. NetworkManager, tailscaled and SSH are already enabled and active.
 For Mac screen control, [remote desktop](remote-desktop.md) now prioritizes
-Windows App/RDP with a proposed host xrdp server. The server is installed under `/opt/b2-remote`
-and manually running; Windows App authentication/desktop display passed. Boot
-enablement and HDMI-disconnected cold boot remain pending. Existing Vino is stopped.
+Windows App/RDP with the installed host xrdp server. The server is installed under `/opt/b2-remote`
+and running; Windows App authentication/desktop display and operator-reported
+basic interaction passed. RDP boot startup is enabled, with sesman as a required
+dependency; HDMI-disconnected cold boot remains pending. Existing Vino is stopped.
 Tailscale retains login state; it does not normally require `tailscale up` on
 every boot. Its node-key expiry must still be checked in the
 [Tailscale admin console](https://tailscale.com/docs/features/access-control/key-expiry).

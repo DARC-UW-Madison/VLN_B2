@@ -89,13 +89,16 @@ the running daemon and a new SSH/TCP-forward test passed. The preceding
 revision must be checked again after any subsequent documentation update.
 
 The pinned RDP source bundle built after resolving test-library/feature
-requirements; all 213 upstream test cases passed with no skips. The approximately
-20 MB bundle was installed in `/opt/b2-remote`, with dedicated service identity,
-allow group, PAM entry and units. Both units are manually active and disabled
-for boot. Loopback-only listening, service privileges, verified TLS 1.3, Xorg/X11
-query, Windows App authentication/desktop display and the post-install eight
-FP32/BF16 GPU checks passed. Input/settings, reconnect and cold boot remain
-pending. Existing NoMachine/GDM remain in place. See [RDP build and commissioning](rdp-build.md).
+requirements; all 213 upstream test cases passed with no skips. The
+approximately 20 MB bundle was installed in `/opt/b2-remote`, with dedicated
+service identity, allow group, PAM entry and units. Both units are active.
+Following operator confirmation of basic interaction, `b2-rdp.service` was
+enabled at boot; sesman starts as its required dependency. Loopback-only
+listening, service privileges, verified TLS 1.3, Xorg/X11 query, Windows App
+authentication/desktop display and the post-install eight FP32/BF16 GPU checks
+passed. Basic interaction is operator-confirmed; settings permission, extended
+input checks, reconnect and cold boot remain pending. Existing NoMachine/GDM
+remain in place. See [RDP build and commissioning](rdp-build.md).
 
 The [model-artifact plan](model-artifacts.md) identifies pinned candidates totaling
 3,827,163,803 bytes and a separate CPU conversion proposal. It is metadata-only;

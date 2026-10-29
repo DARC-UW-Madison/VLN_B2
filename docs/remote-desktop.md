@@ -4,12 +4,13 @@
 
 Use SSH for ordinary terminal work. Prepare RDP as the preferred option for the
 occasional graphical settings task, with Microsoft's Windows App on Mac and an
-xrdp server on Jetson. The pinned server is now installed and manually running; authentication and
-desktop display from Windows App passed on 2026-10-28. Input, settings permission,
-reconnect and cold-boot acceptance remain separate checks.
-RDP has not been measured against VNC on this Jetson, so the preference is not a
-claim that it is more stable. Remote desktop is a management tool; inference and
-future robot control must run locally without requiring a desktop connection.
+xrdp server on Jetson. The pinned server is installed, running and enabled at
+boot. Authentication and desktop display passed on 2026-10-28; the operator
+subsequently confirmed basic interaction. Settings permission, extended input
+checks, reconnect and cold-boot acceptance remain separate checks. RDP has not
+been measured against VNC on this Jetson, so the preference is not a claim that
+it is more stable. Remote desktop is a management tool; inference and future
+robot control must run locally without requiring a desktop connection.
 
 ## What is currently known
 
@@ -186,20 +187,25 @@ Jetson. A Mac profile named `B2 Jetson (SSH tunnel)` was created with credential
 set to Ask when required; no password was saved. Client folder, clipboard,
 printer, smartcard, microphone, camera and audio redirection are disabled.
 An inherited Chrome crash notification was visible; no crash report was sent.
-Input/settings and reconnect acceptance still need their own evidence.
+The operator confirmed basic desktop interaction. Settings permission, extended
+input checks and reconnect acceptance still need their own evidence.
 
 ## Using the installed server
 
-On Jetson, the manually installed service can be started after a reboot with:
+The service is enabled at boot. On Jetson, its current state can be checked and
+it can be started manually if needed:
 
 ```sh
 sudo systemctl start b2-rdp.service
 systemctl is-active b2-rdp.service b2-rdp-sesman.service
 ```
 
-It is currently running, but not enabled at boot. Once the remaining acceptance
-checks pass, boot enablement is a separate recorded step; it does not require
-GUI autologin and must never start robot motion. Start the SSH tunnel from Mac,
+After the operator confirmed basic interaction, `b2-rdp.service` was enabled
+with `systemctl enable`; its required `b2-rdp-sesman.service` starts through that
+dependency, without a separate boot enablement. The enablement and active state
+were verified without restarting either service or the host. This configures
+startup but does not prove cold-boot access. It requires neither GUI autologin
+nor robot motion. Start the SSH tunnel from Mac,
 then open the saved `B2 Jetson (SSH tunnel)` profile. A self-signed certificate
 requires checking the expected server identity; do not ignore changed
 certificates or save a permanent bypass. The independently verified TLS probe
