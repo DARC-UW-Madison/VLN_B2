@@ -125,6 +125,11 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | `src/b2_tic_vla/hardware.py` | Lazy ZED capture and Unitree state subscriptions only |
 | `src/b2_tic_vla/recording.py` | Validated portable observation manifests; no overwrite |
 | `src/b2_tic_vla/inference.py` | Strict local-file loading and synchronous upstream package calls |
+| `src/b2_tic_vla/checkpoint_conversion.py` | Bounded modern-CPU decoding, complete tensor-name preservation and bitwise safetensors readback |
+| `tools/acquire_model_assets.py` | Default plan only; explicit approved pinned Hub acquisition with size/digest checks |
+| `tools/verify_checkpoint_conversion.py`, `tools/verify_tensor_loading.py` | Generated fixtures for CPU conversion and old-runtime tensor-only readback |
+| `tools/verify_model_load.py` | Strict offline GPU loading; synthetic-image inference only with an explicit flag |
+| `deploy/checkpoint-converter.Dockerfile`, `deploy/converter-requirements.lock` | Separate hash-pinned CPU software environment; preserves the GPU stack |
 | `src/b2_tic_vla/control.py` | Pure candidate tracking with freshness, frame, and limit checks |
 | `src/b2_tic_vla/cli.py` | Separate probe, recording, replay, and inference commands |
 | `examples/` | Synthetic data, unvalidated limits, and blank onsite notes |
@@ -137,7 +142,8 @@ last two values represent relative displacement, which is zero for this
 synchronous smoke test. It expects shape `[1, horizon, 2]` and preserves the
 returned relative XY positions without cumulative summation. Output times use
 an assumed 0.1-second waypoint interval from the inspected implementation; exact
-revision/checkpoint compatibility and physical timing remain to be validated.
+revision/checkpoint compatibility passed strict loading and one synthetic
+inference; physical timing remains unvalidated. See [offline model checks](model-runtime.md).
 The CLI currently supplies one image as both the current and semantic reference
 observation. It does not reproduce a multi-image asynchronous observation history.
 

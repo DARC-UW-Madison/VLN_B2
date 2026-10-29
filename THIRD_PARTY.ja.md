@@ -12,8 +12,8 @@
 | --- | --- | --- |
 | TIC-VLA論文 | [arXivの第2版](https://arxiv.org/abs/2602.02459v2) | 手法の出典として引用する．論文の結果をB2での検証と扱わない |
 | TIC-VLAのソフトウェア | [リポジトリ](https://github.com/ucla-mobility/TIC-VLA)と[確認した版のライセンス](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e121d5df5df071297bba8e5353ebb/LICENSE.md) | `9fa6f8b`のAcademic Software Licenseを確認した．import検査用のソースだけをプロジェクト外へ取得した．本プロジェクトへのコードのコピーはない |
-| TIC-VLAのチェックポイント | [公式リポジトリが案内する配布先](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/main/TIC-VLA-model.ckpt) | 未取得．利用前に対象物の条件を確認する |
-| InternVL3-1B | [モデルの配布先](https://huggingface.co/OpenGVLab/InternVL3-1B) | ベースモデルの候補．組み込みに必要な利用条件と版の確認は未実施 |
+| TIC-VLAのチェックポイント | [公式リポジトリが案内する配布先](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/671de608f39ccae41b66cbb24ab923c0275f8fb4/TIC-VLA-model.ckpt) | 承認した固定版を取得し，非公開でCPU変換済み．本家の条件を維持する |
+| InternVL3-1B | [モデルの配布先](https://huggingface.co/OpenGVLab/InternVL3-1B) | 固定した承認済みsnapshotを取得し，隔離した読込用にコードを確認．model card・構成要素の条件と表示を維持する |
 | Unitree SDK2 Python | [B2クライアント](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py)，[BSD-3-Clauseライセンス](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | APIと`814556d`のライセンスを確認した．実行に使う版，依存先，ファームウェアとの互換性は未確認 |
 
 確認したTIC-VLAのソフトウェアライセンスは，学術・非営利研究者による所定の教育・学術研究用途を認め，
@@ -97,4 +97,4 @@ typing-extensionsはPSF-2.0，SymPy・mpmath・NetworkX・Jinja・MarkupSafe・f
 safetensorsはApache-2.0，NumPyは公開されたBSD-3-Clause・0BSD・MIT・Zlib・CC0-1.0の表現による．
 同梱バイナリ・構成要素の表示を維持し，この要約でwheelを再ライセンスしない．新しいコンテナのvenvへ
 隔離する手順であり，モデルデータや本家TIC-VLAのソースを含めない．固定したコンテナの構築，
-`pip check`，生成チェックポイントの変換と旧環境での読戻しが通ったが，実モデルは未取得である．このリポジトリから変換用イメージや外部wheelを公開するものではない．
+`pip check`，生成チェックポイントの変換と旧環境での読戻しが通ったが，その後，承認した実チェックポイントも非公開で変換・読込し，このリポジトリからは配布しない．このリポジトリから変換用イメージや外部wheelを公開するものではない．

@@ -205,8 +205,8 @@ sudo docker run --rm --pull=never --runtime=nvidia --network=none \
   --stage full --upstream-root /opt/upstream
 ```
 
-**Checkpoint loading remains blocked in this old-Torch candidate.** Resolve the
-published loading vulnerabilities or validate a separate conversion/loading
-path before using external weights. Model acquisition separately requires exact
-files, revisions, terms, sizes and official-cache location; no weights have been
-downloaded. See the [compatibility constraints](runtime-compatibility.md).
+**Original checkpoint decoding remains blocked on this old GPU Torch.** The
+subsequent approved 17-file acquisition and separate modern CPU conversion now
+support strict GPU safetensors loading and one synthetic-image inference. This
+is a distinct stage from the model-free build checks above; actual camera/B2
+integration and asynchronous control remain unverified. See the [compatibility constraints](runtime-compatibility.md).

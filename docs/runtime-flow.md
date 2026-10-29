@@ -3,8 +3,9 @@
 [日本語](runtime-flow.ja.md) · [System overview](system-overview.md) · [Architecture](architecture.md)
 
 This guide separates what exists from the intended live deployment. The external
-Jetson has a built runtime with passing model-free GPU/import checks. No model weights are present,
-no camera has been validated, B2 Ethernet is disconnected, and this project
+Jetson has passing model-free checks, strict actual-model GPU loading and one
+synthetic-image inference. Approved weights are privately cached/converted on
+SSD. No real camera has been validated, B2 Ethernet is disconnected, and this project
 implements no motor command sender.
 
 For why Mac can remain lightweight, why Docker is optional, where ROS may run
@@ -51,8 +52,9 @@ Running a model requires several different things:
    The pinned upstream checkout is outside this project at
    `~/Developer/External/TIC-VLA`.
 2. **Weights** contain learned tensor values. TIC-VLA's checkpoint and the
-   InternVL base-model assets are not downloaded. Their exact artifacts, terms,
-   revision and loading method still need review.
+   InternVL base snapshot are now approved, pinned and stored in the standard
+   SSD Hub cache. A separate CPU converter produced the private tensor-only
+   navigation artifact. Weights are not source files and are not in Git.
 3. **Runtime libraries** execute those operations: Python, PyTorch, Transformers,
    CUDA and related packages. Building these libraries does not fetch weights.
 4. **Our adapter** supplies images, an instruction and robot state, calls the
@@ -81,9 +83,10 @@ The existing `infer` command is an **offline synchronous adapter**. It takes one
 recorded observation, uses zero semantic-cache delay, and writes a result without
 sending it to B2. The proposed live asynchronous semantic cache, timing/pose
 alignment, watchdog and command sender remain separate implementation work.
-The candidate older Torch build is restricted to model-free checks because its
-checkpoint deserializer has unresolved security issues. Do not load a checkpoint
-just because `weights_only=True` is available. See [runtime compatibility](runtime-compatibility.md).
+The older GPU Torch must not deserialize the original checkpoint. The approved
+source was decoded in the reviewed CPU environment and converted to safetensors;
+this tensor-only input passed strict GPU loading and a synthetic inference.
+`weights_only=True` alone does not resolve old-Torch serialization issues. See [runtime compatibility](runtime-compatibility.md).
 
 ### Licensing boundary
 

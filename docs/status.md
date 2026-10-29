@@ -4,209 +4,107 @@
 
 ## Current stage
 
-Initial read-only inspection of the external Jetson is complete. Mac-to-Jetson
-SSH over Tailscale, target-side inventory and native CUDA arithmetic worked.
-The host is an AGX Orin 64 GB class system running Ubuntu 20.04 / L4T 35.4.1.
-CPython 3.11.18, a dedicated project venv and the CLI are installed; all 93
-tests and synthetic replay passed on the target. A separate 2 TB ext4 partition
-was inspected with `ro,noload`, then mounted writable with explicit operator
-permission. Journal recovery succeeded without observed ext4 errors. Docker
-storage and an empty standard Hugging Face cache are now on a dedicated SSD area.
-See [runtime setup](jetson-runtime.md) and the [initial baseline](target-baseline.md).
-The [system overview](system-overview.md) records exact storage types, hardware
-specifications and account/container boundaries. GUI boot is retained and
-research-login AC suspend is disabled. Wi-Fi automatic retry and Tailscale boot
-services are enabled. A controlled software reboot with HDMI disconnected
-restored the current non-enterprise Wi-Fi, Tailscale, SSH, RDP and Docker; the
-SSD mounted correctly. The operator confirmed post-reboot RDP display and input.
-The owner then saved eduroam credentials through the terminal after GUI polkit
-denied editing. System-wide automatic connection, secret flags 0 and retained
-trust settings were verified without disclosing the secret. A timed-rollback
-switch to eduroam and a second headless software reboot passed; fresh Tailscale
-SSH returned at about 24 seconds of target uptime, and the operator confirmed
-RDP display/input again. A physical power cycle remains untested.
-GUI autologin is optional for local use, not required for boot networking; leave
-it protected for shared use. The existing GDM login target is retained.
-B2 is not connected through the wired port; no model inference, camera capture,
-or robot control has been validated. All project CLI commands remain
-observation-only or offline. A reviewed source archive is on the Jetson; the
-source has not been published. The public lab destination
-is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); access
-allows pushing, but no push has been made. Original code and documentation use
-the [MIT License](../LICENSE), with contributors retaining their respective rights.
+Updated **2026-10-29**. TIC-VLA now loads on the external Jetson GPU and completes
+one synthetic-image inference offline. Strict loading accepted 1,324 tensor keys,
+948,462,978 unique parameters, horizon 30 and three action layers. The one
+synthetic call returned 30 finite XY points in **13.64 seconds**. Its three-second
+prediction horizon does not make this a real-time controller. No actual camera,
+B2 state or navigation task was evaluated, and no motor command was sent.
+
+The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
+The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
+A separate Torch 2.15.0+cpu container converted the approved checkpoint to
+safetensors; the older GPU runtime never decoded the original pickle checkpoint.
+All **130 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
+
+B2 is still disconnected from the wired interface. Actual camera/state capture,
+asynchronous cache/control integration, command sending, physical stopping and
+navigation evaluation remain unvalidated or unimplemented. The lab destination
+is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); no push has
+been made. The [MIT License](../LICENSE) covers only original code/docs, not
+upstream code, weights or converted derivatives.
 
 ## Target setup
 
-| Component | Confirmed information | Still to inspect |
-| --- | --- | --- |
-| Robot | Unitree B2, without wheels | Firmware, working state/control interface, stop procedure |
-| External compute | AGX Orin 64 GB class; SSH, native CUDA, Python 3.11.18/venv and 93 tests verified | Reviewed model loading and inference |
-| Onboard compute | Separate Jetson reported by the operator | Model, services, sensor ownership and network reachability |
-| Motion-control computer | Separate computer suspected by the operator | Actual device, published service host, control ownership and connection path |
-| Camera | ZED 2i reported; existing SDK headers report 4.1.2 | Research-login SDK access, physical connection, bindings, RGB stream and timestamps |
-| LiDAR | Livox Mid-360 | Existing connection/driver and intended role in this project |
-| Containers | Docker on SSD; runtime built, dependency check, FP32/BF16 and full imports pass | Checkpoint security and actual inference |
-| Collaboration | Public lab repository identified; push access verified; MIT for original work | First reviewed source publication |
+| Component | Confirmed | Remaining work |
+|---|---|---|
+| Robot | Unitree B2 without wheels, reported by the operator | Firmware, actual computers/services, authority and stopping |
+| External Jetson | AGX Orin 64 GB class, native CUDA and container GPU operations; real model load and synthetic inference | Real observations, delay profiling and asynchronous execution |
+| Onboard Jetson | Separate unit reported | Type, services, sensor connections and network reachability |
+| Motion controller | Separate computer suspected | Actual device, public control interface and ownership |
+| Camera | ZED 2i reported; pre-existing ZED headers 4.1.2 | Physical USB/network path, account access, binding, RGB and timing |
+| LiDAR | Livox Mid-360 reported | Existing driver/network and defined use outside RGB model input |
+| Management | eduroam/Tailscale/SSH/RDP software-reboot recovery passed with HDMI disconnected | Physical power cycle, mobile network recovery and node-key policy |
 
-Component availability does not establish successful sensor or model operation.
-Use the existing Jetson installation as the starting point; inspect it before
-choosing an image or proposing a host upgrade.
+Hardware availability is not sensor or navigation validation. The
+[baseline](target-baseline.md) preserves the initial inventory; the
+[system overview](system-overview.md) explains current storage and isolation.
 
 | Deliverable | State | Evidence or completion condition |
-| --- | --- | --- |
-| Shared documentation and development rules | Prepared | README, Contributing, architecture, development guide, and third-party review |
-| Hardware and software specification | External-host inventory verified; robot/sensors pending | [Measured baseline](target-baseline.md) |
-| Standalone target inventory | Executed on target Python 3.8.10 | `tools/inspect_target.py`; no installation or configuration changes |
-| Synthetic replay and candidate tracking | Implemented | `replay`, example trajectories, freshness checks, and velocity limits; no motor output |
-| Upstream permissions and dependency revisions | Open | Research use and sharing conditions resolved; exact revisions recorded |
-| Offline inference | Synchronous local-file adapter implemented; real-model run pending | Strict checkpoint validation and recorded-observation input; no async cache |
-| Live observation without commands | Acquisition adapters implemented; target validation pending | ZED image capture, Unitree state subscription, and observation manifests; clocks and frames unverified |
-| Asynchronous inference and motion integration | Not implemented | Consistent cache metadata, live watchdog, validated tracking, and B2 command path |
-| Robot stop behavior | Not verified | Reviewed tests of the actual firmware, command loss, and operator override |
-| B2 navigation evaluation | Not started | Predefined tasks, complete trial counts, results and limitations |
-
-Development-host and target verification (93 tests and the stated limitations) is documented in
-[the development guide](development.md#preparation-verification). Synthetic
-replay and mocked tests exercise software behavior, not real drivers, model
-quality, or hardware performance. Example limits are not approved operating limits.
-
-The boot-network helper adds eight non-network tests; all **93 tests** pass on
-both development host and target. Its live read-only inspection succeeded under
-the target's system Python. Credential entry and reconnect/boot validation are
-not part of these mocked tests.
-
-The [runtime flow guide](runtime-flow.md) explains source synchronization,
-separate upstream/weight inputs, actual container contents and each communication
-layer. The [credential lifecycle](system-overview.md#personal-credentials-sharing-and-return)
-records boot checks and the required review before sharing/return. Personal
-eduroam credentials are now saved in the root-protected host profile; no secret
-is in the repository. The existing GUI login target has not been changed.
-
-The [documentation index](README.md) now separates the manual from the project
-README. [Deployment choices](deployment-design.md), [terminology](glossary.md),
-[offline operation](offline-operation.md) and [licensing](licensing.md) explain
-the mechanisms and decision boundaries in both languages. No separate AP is
-available; a Jetson-hosted local AP is a candidate, Mac is optional for the core
-loop, and B2's existing remote requires priority/stop verification. RDP/Windows
-App is the preferred remote-GUI candidate, not a proven stability result.
-On 2026-10-28 management access was restored with operator authentication.
-Direct LAN OpenSSH was verified before upgrading only Tailscale to 1.104.4;
-the running daemon and a new SSH/TCP-forward test passed. The preceding
-82-file source revision was hash-verified on Jetson. The current final source
-revision must be checked again after any subsequent documentation update.
-
-The pinned RDP source bundle built after resolving test-library/feature
-requirements; all 213 upstream test cases passed with no skips. The
-approximately 20 MB bundle was installed in `/opt/b2-remote`, with dedicated
-service identity, allow group, PAM entry and units. Both units are active.
-Following operator confirmation of basic interaction, `b2-rdp.service` was
-enabled at boot; sesman starts as its required dependency. Loopback-only
-listening, service privileges, verified TLS 1.3, Xorg/X11 query, Windows App
-authentication/desktop display and the post-install eight FP32/BF16 GPU checks
-passed. Basic interaction is operator-confirmed; settings permission, extended
-input checks and a physical power cycle remain pending. A later headless
-software reboot and operator-confirmed RDP reconnection passed. A dedicated
-background SSH tunnel helper now keeps the Mac forward independent of a chat
-or terminal. Its 12 tests and four saved-profile tests bring the local suite
-to **109 passing tests**.
-Existing NoMachine/GDM
-remain in place. See [RDP build and commissioning](rdp-build.md).
-
-The [model-artifact plan](model-artifacts.md) identifies pinned candidates totaling
-3,827,163,803 bytes and a separate CPU conversion proposal. It is metadata-only;
-terms, acquisition approval, converter implementation and real inference remain
-open. No model files were acquired.
+|---|---|---|
+| Bilingual manual and working rules | Maintained | Documentation index, contributing rules, architecture and experiment procedures |
+| Replay and bounded path-following logic | Implemented offline | Synthetic replay, stale-input gates and velocity bounds; no sender |
+| Model asset acquisition | Verified | 17 approved files, pinned revisions, 3,827,163,803 bytes and file digests |
+| CPU conversion | Verified for the actual checkpoint | 1,324 names retained; 3,773,492,276-byte output and readback manifest |
+| GPU model loading | Passed | Exact keys/shapes, parameter/device checks, no original pickle input |
+| Synthetic-image inference | One call passed | 30 finite points; not camera quality, navigation accuracy or a rate guarantee |
+| Live camera/state observation | Adapters implemented, hardware unverified | RGB, state, timestamps, frames and recording need field checks |
+| Asynchronous runtime and motion sender | Not implemented | Consistent cache metadata, fresh observation path, watchdog and control authority |
+| Physical stopping and B2 evaluation | Not validated | Review and execute staged field tests before movement |
 
 ## Decisions in effect
 
-Learning and field preparation now include [build fundamentals](build-fundamentals.md),
-[the Ethernet/onboard runbook](field-network.md) and [remote desktop](remote-desktop.md).
-The visit agenda covers route/DDS verification, onboard service inventory,
-external-USB versus built-in network sensor paths, boot/headless access and
-operation without campus Wi-Fi. The notes template includes evidence fields.
-Vino remains stopped; existing NoMachine was discovered and preserved.
-Tailscale client/daemon 1.104.4 and the controlled RDP milestones are recorded
-above. AP support was reported by NetworkManager and iw, but no hotspot or
-Wi-Fi credential/GDM autologin change was applied. The active Wi-Fi profile is
-not the earlier inspected enterprise profile; verify the intended connection
-before using the credential helper. The future local robot service and link-loss
-policy remain unimplemented.
-
-- The external compute is verified as AGX Orin, 64 GB class. B2, ZED 2i and Mid-360 integration remains pending. Inventory onboard computers separately; do not infer their roles or wiring.
-- Use the existing B2 walking controller; investigate a high-level navigation adapter.
-- Mac-to-external-Jetson SSH over Tailscale is verified. Keep per-project dependency isolation; preserve the existing OS, ROS, ZED, other accounts and data. Robot Ethernet remains unconnected.
-- Keep proposed behavior separate from verified implementation and experiment results.
-- Maintain English and Japanese documentation, with English code and configuration.
-- Keep public-facing files free of personal labels, assistant instruction files,
-  chat transcripts, machine addresses, and private research data.
-- Keep upstream software and weights outside this repository. Do not assume that
-  code, weights, and datasets share one license.
-- Keep the current tools free of motor output. Verify observations and the
-  synchronous model adapter before implementing asynchronous motion integration.
-- Publish original work under MIT to the specified lab repository after reviewing files and history. Keep restricted upstream materials outside Git.
+- Preserve the host OS, JetPack, ROS and existing lab data. Docker and the standard
+  Hub cache use the dedicated writable SSD area. Existing data was not formatted.
+- Keep raw Hugging Face assets in the standard SSD-backed cache. Keep the derived
+  safetensors and manifest in the private SSD models area, referenced by the
+  ignored project `models` symlink. Weights, custom model Python and raw logs are
+  not in Git or on Mac. [Runtime flow](runtime-flow.md) explains the separation.
+- Raw checkpoint decoding on old Torch stays blocked. The reviewed CPU converter
+  uses restricted loading, budgets, checksum verification, complete alias names
+  and bitwise readback. Conversion does not remove source terms.
+- Actual GPU tests used network isolation, ordinary UID, dropped capabilities,
+  read-only source/weights and temporary module caches. Only the GPU device's
+  video group was added inside the container; host groups/permissions were not
+  changed. No robot/USB/profiling mounts or profiling groups were explicitly
+  requested; the NVIDIA runtime supplies its vendor GPU interfaces. Home and
+  credentials were not mounted.
+- The headless eduroam reboot and subsequent RDP interaction passed. Wi-Fi secret
+  saving does not require GUI autologin; the existing GDM target is unchanged.
+  GUI editing was denied by polkit and saving succeeded via the owner's terminal.
+  The return review includes the pre-existing lab login where UWNet portal
+  authentication occurred, not only the new research login. No cleanup was run.
+- Keep VNC outside the current plan. Existing NoMachine is unchanged; no
+  performance comparison proves xrdp is faster. RDP uses a loopback listener plus
+  a separate Mac SSH tunnel by configuration, not protocol necessity. A direct
+  tailnet-only RDP design could remove that tunnel. See [remote desktop](remote-desktop.md).
 
 ## Next deliverable
 
-The model-free runtime milestone is complete. `vln-b2-runtime:jp5` built,
-`pip check` passed, and both offline Torch and full-import reports passed.
-Python 3.11.18 / Torch 2.2.2 / torchvision 0.17.2 / CUDA 11.4 executed eight
-FP32/BF16 GPU operations; Transformers, Lightning, timm and the pinned upstream
-TIC-VLA module imported without constructing a model. Build and verification
-exit codes are both `0`. No model weights were acquired or loaded.
+1. Follow the [field card](field-card.md) and [Ethernet runbook](field-network.md)
+   to map the actual B2 network, computers, sensors and receive-only SDK path.
+   Preserve management Wi-Fi and keep the robot LAN separate from campus.
+2. Validate ZED RGB and B2 state without commands. Establish frame axes, units,
+   source/receipt timing, odometry and calibration before interpreting live plans.
+3. Profile the synchronous model stages, then implement and validate asynchronous
+   reasoning/cache/action execution. The observed 13.64-second call cannot simply
+   feed a three-second plan into a walking loop. Bound cache age and verify
+   behavior under inference stalls and stale/missing observations.
+4. Confirm control authority, remote-controller priority and actual stopping.
+   Only then prepare guarded, low-speed motion trials and predefined evaluation.
 
-The artifact/loading plan is prepared. The independent adapter now accepts
-safetensors, forces tensor-only base loading and blocks checkpoint decoding on
-older Torch; the subsequent converter tests bring the suite to **121 passing
-tests locally and on Jetson**. The existing
-Torch 2.2.2 image also passed real generated-tensor I/O on CPU: four keys,
-4,504 bytes, FP32/BF16 values/shapes/dtypes, both alias names, malformed-input
-rejection and the old-Torch checkpoint gate. The container had no network/GPU,
-a read-only root, no capabilities, UID 1000 and bounded resources. No external
-weights, model construction or inference were involved. The separate pinned CPU
-image now builds with Torch 2.15.0+cpu/safetensors 0.8.0/NumPy 2.4.6. Generated
-checkpoint conversion and readback on the older 2.2.2 image passed for six keys,
-including aliases, transposed/scalar/empty tensors, NaNs and signed zeros.
-Unsupported serialized globals were rejected without unsafe fallback. See the
-[conversion guide](checkpoint-conversion.md) for the image/recipe, resource limits,
-initial failed BuildKit attempt and private provenance. Resolve artifact-specific
-terms and verify acquired payloads before actual model loading. The operator
-approved the exact 17 files, revisions, 3.83 GB and standard SSD-backed cache on
-2026-10-29. The default-dry acquisition helper adds four boundary tests; all
-129 local tests pass after adding the explicit load verifier. All 17 files
-were then acquired with Hub client 0.24.7 and verified against approved sizes,
-weight SHA256 and pinned small-file Git blobs. No implicit token was used.
-Actual CPU conversion passed: 1,324 tensor keys, 3,773,492,276 output bytes,
-horizon 30 and three action layers, with architecture metadata agreement.
-The output is private SSD data referenced through the ignored project models
-symlink; the original Hub payload is unchanged. No model was constructed by
-acquisition/conversion. The next step is explicit offline GPU construction.
-A matched 2 GiB GPU probe requires the device's video group inside the
-unprivileged container; host account/device permissions remain unchanged.
-Run recorded-observation inference only after that review. The
-[runtime compatibility review](runtime-compatibility.md) preserves these constraints.
-In parallel, verify physical power-cycle recovery onsite and map B2's
-actual computers, cables and service/domain. Verify receive-only camera/state,
-frames/timestamps, control authority and stopping before motion integration.
-
-Reports stay under `/mnt/b2-research/VLN_B2/build-logs`:
-`runtime-build.exit`, `runtime-verify.exit`, `torch-smoke.json` and
-`full-smoke.json`. The completed one-shot verifier has exited; no model download
-or robot service follows automatically. Initial and retry logs, source-derived
-resume recipes and image provenance are preserved. The local RPC guard and
-build-only wheel cleanup are documented in [build recovery](jetson-runtime.md#torch-import-guard-and-build-recovery).
-The [setup guide](jetson-runtime.md#storage-prerequisite) records storage/recovery.
-
-Stereolabs provides an [official Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson)
-with platform-specific image selection. NVIDIA documents the [Jetson container runtime](https://developer.nvidia.com/embedded/jetson-cloud-native/).
-Start with ZED RGB input, model inference, path tracking and the B2 SDK. Decide
-ROS 2 and Mid-360 integration from existing services and a defined need; the
-[Livox ROS driver](https://github.com/Livox-SDK/livox_ros_driver2) is one available
-integration path, not an adopted dependency. The host venv contains this project; no model weight has been acquired.
+The first synthetic run used upstream sampling (200-token maximum, sampling
+with temperature 0.7); no seed was fixed or recorded. Timing is a single trial
+under CPU/resource limits, not a benchmark average. The reported PyTorch GPU
+allocator peak excludes CPU RAM, driver allocations and total unified memory.
+No real-time, navigation-quality or physical-safety claim follows from this smoke.
 
 ## Continuing the work
 
-A new task starts by reading this page, the relevant guide, and the current Git
-diff. Use a branch for a bounded deliverable. On completion, update this page
-and its Japanese counterpart with evidence, unresolved questions, and the next
-action. Keep detailed experiment methods and results in reviewed reports rather
-than expanding this page into a session log.
+Read this page, the relevant guide and Git diff first. Use a bounded branch and
+keep English/Japanese conclusions aligned. Source is locally committed and
+hash-synchronized to the Jetson archive; GitHub publication remains deferred.
+Detailed setup/build/asset/load/inference records stay in ignored `local/` on
+Jetson, including failed attempts. Preserve source revisions, image IDs, hashes,
+inputs, limits and limitations; do not turn this page into a chat transcript.

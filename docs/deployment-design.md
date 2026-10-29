@@ -4,9 +4,9 @@
 
 This guide explains the proposed division of work and the choices behind the
 prepared environment. A design is not a measurement: only the external Jetson's
-host inventory, management SSH and model-free GPU/import checks are verified.
-Actual model loading, sensor acquisition, B2 connectivity and motion remain
-unverified. No motion sender or autonomous service is installed.
+host inventory, management access, model-free checks, strict actual GPU model
+loading and one synthetic inference are verified. Real sensor acquisition, B2
+connectivity, asynchronous control and motion remain unverified. No motion sender or autonomous service is installed.
 
 ## 1. Where computation happens
 

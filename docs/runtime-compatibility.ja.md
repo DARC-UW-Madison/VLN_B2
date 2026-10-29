@@ -2,7 +2,7 @@
 
 [English](runtime-compatibility.md) · [実機の基準情報](target-baseline.ja.md)
 
-調査日：**2026-10-27**．モデル不要の候補の構築とGPU・import検査は通りましたが，実際のモデル読込は未検証で，以下の制約が残ります．実施手順，ローカルのRPC判定の修正，ビルドの再開，結果，保存先の前提は[実行環境構築](jetson-runtime.ja.md)に記します．
+調査日：**2026-10-27**．モデル不要の検査に加え，2026-10-29に承認資材のCPU変換，実モデルの厳密なGPU読込，生成画像の1回の推論が通りました．古いGPU Torchでの元のpickle復元は引き続き拒否します．実施手順，ローカルのRPC判定の修正，ビルドの再開，結果，保存先の前提は[実行環境構築](jetson-runtime.ja.md)に記します．
 
 ## 推奨する候補
 
@@ -35,7 +35,11 @@ Ubuntu 20.04，L4T 35.4.1，CUDA 11.4，ROS Foxy，ZED を維持し，**`nvcr.io
 PyTorch 2.2.2 にはアダプタが必要とする [`torch.load(weights_only=True)`](https://github.com/pytorch/pytorch/blob/v2.2.2/torch/serialization.py) がありますが，公式の [2025 年の weights-only 脆弱性](https://github.com/pytorch/pytorch/security/advisories/GHSA-53q9-r3pm-6pq6)と [2026 年の weights-only 脆弱性](https://github.com/pytorch/pytorch/security/advisories/GHSA-63cw-57p8-fm3p)の対象です．フラグの存在だけで安全なデシリアライズとは扱えません．初回候補は以下のモデル不要試験に限定します．外部チェックポイントを読む前に，レビューした修正のバックポート，または safetensors などへの変換・専用読込経路を別途検証する必要があります．アダプターはTorch 2.2.2でのチェックポイント復元を拒否し，tensor専用のsafetensors経路と，
 基盤モデルのAutoModelでsafetensorsを強制する処理を実装しました．モックによる契約の検査と，
 Jetsonで実際に生成したtensorのCPU入出力は通りました．さらに，別のTorch 2.15.0+cpu環境による
-生成チェックポイントの変換と旧環境での読戻しも通りましたが，実モデルの互換性は未検証です．[モデル資材と読込計画](model-artifacts.ja.md)に，メタデータを確認した取得候補と未解決の条件，分離した新しいCPU環境での変換，Jetsonでsafetensorsだけを読む案を記しました．17ファイルの取得は2026-10-29に承認されましたが，17ファイルの照合と実際のCPU変換が通り，実モデルのGPU互換性は未確認です．厳密なキー・形状検査と，制限のない pickle へのフォールバックをしない方針も維持します．
+生成チェックポイントの変換と旧環境での読戻しも通りました．17ファイルの取得は2026-10-29に承認され，
+ファイルの照合，実際のCPU変換，厳密なGPU読込，生成画像の1回の推論も成功しました．
+[モデル資材の記録](model-artifacts.ja.md)に固定した版と適用条件，
+[オフラインモデル確認](model-runtime.ja.md)に実際の環境と限界を記します．実センサー，走行品質，
+非同期制御は未検証です．厳密なキー・形状検査と，制限のないpickleへ戻さない方針を維持します．
 
 ## 次の動作試験と合格条件
 

@@ -113,6 +113,11 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | `src/b2_tic_vla/hardware.py` | 必要時だけ読み込むZED画像取得とUnitree状態購読 |
 | `src/b2_tic_vla/recording.py` | 検証付きの移植可能な観測記録．上書きなし |
 | `src/b2_tic_vla/inference.py` | ローカルファイルの厳密な照合と上流パッケージの同期呼び出し |
+| `src/b2_tic_vla/checkpoint_conversion.py` | 新しいCPU環境で制限付き復元，全tensor名の維持，safetensorsのbit単位の読戻し照合 |
+| `tools/acquire_model_assets.py` | 既定は計画表示のみ．明示的に承認したHub資材の版・容量・digestを照合して取得 |
+| `tools/verify_checkpoint_conversion.py`，`tools/verify_tensor_loading.py` | 生成fixtureによるCPU変換と旧環境のtensor専用読戻し |
+| `tools/verify_model_load.py` | 厳密なオフラインGPU読込．生成画像の推論には明示的なflagが必要 |
+| `deploy/checkpoint-converter.Dockerfile`，`deploy/converter-requirements.lock` | GPU環境を維持した，hash固定の独立したCPUソフトウェア環境 |
 | `src/b2_tic_vla/control.py` | 鮮度，座標系，制限値を確認する候補速度の計算 |
 | `src/b2_tic_vla/cli.py` | 個別確認，記録，再生，推論の各コマンド |
 | `examples/` | 合成データ，未検証の制限値，空の現地記録欄 |
@@ -123,7 +128,8 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 `ticvla.models.ticvla.TICVLA.predict`を呼ぶ．状態は`[vx, vy, yaw_rate, 0, 0]`，遅延はゼロ
 とする．最後の二つは相対変位であり，この同期確認ではゼロになる．期待する出力形状は
 `[1, horizon, 2]`で，返された相対XY位置に累積和を取らない．点列の時刻は確認した実装に
-基づき0.1秒間隔とするが，正確なリビジョン・重みの互換性と実際の時間対応は要検証である．
+基づき0.1秒間隔とする．固定した版・重みの厳密な読込と生成画像の1回の推論は通ったが，
+実際の時間対応は未検証である．[オフラインモデル確認](model-runtime.ja.md)を参照する．
 現在のCLIは，一枚の画像を現在観測と意味情報の参照観測の両方に使う．複数画像を持つ
 非同期観測履歴は再現していない．
 

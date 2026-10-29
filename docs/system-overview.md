@@ -59,7 +59,9 @@ package, replacement Xorg, CUDA driver or new ROS installation was added.
 The project is installed editable in its own venv. NVIDIA's base image and a
 separate Python image were acquired/built in Docker; Torch/vision compilation
 occurs there. CUDA, TensorRT, Docker, ROS and ZED already existed on the host.
-No model weights have been acquired.
+Approved raw assets now live in the SSD-backed standard Hub cache; the private
+derived safetensors/manifest use the SSD models area through the ignored project
+models symlink. These are not host-venv packages or repository source.
 
 System-wide changes are explicit: the SSD mount entry in `/etc/fstab`, Docker's
 data root, and its mount guard under `docker.service.d`. Backups and the old

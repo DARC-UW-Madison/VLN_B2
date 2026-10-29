@@ -13,8 +13,8 @@ or hardware experiments.
 | --- | --- | --- |
 | TIC-VLA paper | [arXiv, version 2](https://arxiv.org/abs/2602.02459v2) | Cite as the method's source; its results are not B2 validation |
 | TIC-VLA software | [Repository](https://github.com/ucla-mobility/TIC-VLA) and [license at reviewed revision](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e121d5df5df071297bba8e5353ebb/LICENSE.md) | Academic Software License reviewed at `9fa6f8b`; source-only checkout outside the project for import checks; no source copied into this project |
-| TIC-VLA checkpoint | [Official repository's linked checkpoint](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/main/TIC-VLA-model.ckpt) | Not downloaded; verify applicable artifact terms before use |
-| InternVL3-1B | [Model repository](https://huggingface.co/OpenGVLab/InternVL3-1B) | Candidate base model; terms and revision not yet reviewed for integration |
+| TIC-VLA checkpoint | [Official repository's linked checkpoint](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/671de608f39ccae41b66cbb24ab923c0275f8fb4/TIC-VLA-model.ckpt) | Approved pinned payload acquired and CPU-converted privately; source terms remain applicable |
+| InternVL3-1B | [Model repository](https://huggingface.co/OpenGVLab/InternVL3-1B) | Pinned approved snapshot acquired and code-reviewed for isolated loading; model-card/component terms and notices retained |
 | Unitree SDK2 Python | [B2 client](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py), [BSD-3-Clause license](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | API inspected; license reviewed at `814556d`; runtime revision, dependencies, and firmware compatibility remain unverified |
 
 The inspected TIC-VLA software license permits specified educational or academic
@@ -114,4 +114,5 @@ BSD-3-Clause/0BSD/MIT/Zlib/CC0-1.0 expression). Preserve bundled binary/componen
 notices; those summaries do not relicense the wheels. The recipe isolates these
 packages in a new container venv, with no model data or upstream TIC-VLA source.
 The pinned container build, `pip check`, generated checkpoint conversion and
-old-runtime readback passed; no actual model checkpoint has been acquired. No converter image or third-party wheel is released by this repository.
+old-runtime readback passed. The approved actual checkpoint was subsequently
+converted and loaded privately; this repository distributes neither payload. No converter image or third-party wheel is released by this repository.

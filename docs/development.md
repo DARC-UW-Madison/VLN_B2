@@ -3,8 +3,8 @@
 [日本語](development.ja.md) · [Home](../README.md)
 
 This guide defines the route to a reproducible B2 experiment. Preparation tools
-are implemented. External-host inventory is verified; sensor operation, GPU
-inference, and robot motion remain unvalidated. Use [onsite preparation](onsite.md) for the current commands; the
+are implemented. External-host inventory, strict GPU model loading and one synthetic-image
+inference are verified; real sensor operation and robot motion remain unvalidated. Use [onsite preparation](onsite.md) for the current commands; the
 stages below describe what evidence is needed before advancing.
 
 ## Run local checks first
@@ -41,8 +41,9 @@ include license/provenance notices. No container build was performed.
 
 Real external-Jetson SSH inspection ran the inspector under Python 3.8.10 and
 verified a CUDA driver/device query and privileged Docker metadata. See the
-[baseline](target-baseline.md). Container GPU computation, actual model loading,
-ZED capture and B2 operation remain unverified. The
+[baseline](target-baseline.md). Those initial checks did not validate container
+GPU computation, model loading, ZED capture or B2 operation; subsequent milestones
+are recorded below. The
 [runtime review](runtime-compatibility.md) records the unresolved checkpoint-loading
 constraint. Subsequent [runtime setup](jetson-runtime.md) installed Python
 3.11.18 and a project venv on the Jetson; all 85 tests and synthetic replay also
@@ -80,8 +81,8 @@ checksums, regular files, input/output budgets, non-overwrite behavior, complete
 alias names, supported CPU tensors and omission of unrelated training metadata.
 All **121 tests** passed locally and on Jetson. The separate CPU container also
 passed real generated-checkpoint conversion and old-runtime tensor readback;
-see [the conversion guide](checkpoint-conversion.md). Actual model loading is
-still unvalidated.
+see [the conversion guide](checkpoint-conversion.md). Strict actual-model GPU loading and one synthetic inference subsequently
+passed; real observations and asynchronous control remain unvalidated.
 
 ## 1. Understand the system
 

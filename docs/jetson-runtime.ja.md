@@ -173,6 +173,6 @@ sudo docker run --rm --pull=never --runtime=nvidia --network=none \
   --stage full --upstream-root /opt/upstream
 ```
 
-**旧Torchの候補では，チェックポイントの読み込みは保留する．** 公表済みの脆弱性を修正するか，
-別の変換・読込経路を検証してから外部の重みを使う．モデル取得では，対象ファイル，版，条件，
-容量，公式キャッシュの保存先を別途確認する．重みは未取得である．[互換性の制約](runtime-compatibility.ja.md)を参照する．
+**古いGPU Torchで元のチェックポイントを復元することは引き続き拒否する．** その後，承認した17ファイルの
+取得と別の新しいCPU環境での変換により，GPUでの厳密なsafetensors読込と生成画像の1回の推論が通った．
+上のモデル不要の構築検査とは別の段階で，実画像・B2結合，非同期制御は未検証である．[互換性の制約](runtime-compatibility.ja.md)を参照する．

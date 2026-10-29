@@ -53,7 +53,8 @@ Tailscaleだけを1.104.4へ更新した．別にビルドしたRDPのprefix，�
 ホストのTLS鍵はroot管理で，レポには保存しない．xrdpのAPTパッケージ，Xorgの置換，CUDAドライバ，
 新しいROSは追加していない．プロジェクトは専用venvへ編集可能な形で導入した．
 DockerではNVIDIAの基底イメージを取得してPython用イメージをビルドし，Torch／visionもその中で構築する．
-CUDA，TensorRT，Docker，ROS，ZEDは元からあった．モデルの重みは未取得である．
+CUDA，TensorRT，Docker，ROS，ZEDは元からあった．承認した元の資材はSSDの標準Hubキャッシュへ置き，変換したsafetensors・manifestは
+SSDのmodels領域へ置いてプロジェクトのGit対象外symlinkから参照する．ホストvenvのパッケージやレポのソースではない．
 
 システム全体の変更は，`/etc/fstab`のSSD設定，Docker保存先，`docker.service.d`のマウント検査である．
 設定のバックアップと旧Docker保存先は残している．Wi-Fiは自動接続を無制限に再試行する設定へ変更し，

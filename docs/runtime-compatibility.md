@@ -3,7 +3,9 @@
 [日本語](runtime-compatibility.ja.md) · [Target baseline](target-baseline.md)
 
 Research date: **2026-10-27**. The model-free candidate has built and passed
-GPU/import checks; actual model loading remains unvalidated and constrained below.
+GPU/import checks. On 2026-10-29, approved assets and CPU conversion enabled
+strict GPU loading and one synthetic inference; original pickle decoding on
+this older GPU Torch remains blocked.
 See [runtime setup](jetson-runtime.md) for executed steps, the local RPC guard,
 build recovery, results and storage prerequisites.
 
@@ -80,11 +82,13 @@ checkpoint decoding on Torch 2.2.2, supports a tensor-only safetensors path and
 forces safetensors for base-model AutoModel loading. Its mocked contracts and
 a real generated-tensor CPU probe passed on Jetson. A separate Torch 2.15.0+cpu
 converter subsequently passed generated checkpoint conversion and old-runtime
-readback; full-model compatibility remains unverified. The metadata-reviewed [artifact/loading plan](model-artifacts.md)
-proposes isolated modern CPU-only conversion and a safetensors-only Jetson path,
-with exact acquisition candidates and unresolved terms. The exact 17-file model acquisition was approved on 2026-10-29;
-the 17 payloads and actual CPU conversion now passed verification, while
-real GPU-model compatibility remains pending. Retain strict keys/shapes and no unrestricted-pickle fallback.
+readback. The exact 17-file acquisition was approved on 2026-10-29; payload
+verification, actual CPU conversion, strict GPU loading and one synthetic-image
+inference subsequently passed. [Artifact records](model-artifacts.md) retain
+pins and applicable terms; [offline model checks](model-runtime.md) record the
+actual runtime and limits. Real sensors, navigation quality and asynchronous
+control remain unvalidated. Retain strict keys/shapes and no unrestricted-pickle
+fallback.
 
 ## Next smoke test and acceptance
 

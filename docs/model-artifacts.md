@@ -1,24 +1,20 @@
-# Model artifacts and the proposed loading path
+# Model artifacts and verified loading path
 
 [日本語](model-artifacts.ja.md) · [Documentation](README.md) · [Runtime compatibility](runtime-compatibility.md) · [Licensing](licensing.md)
 
-Metadata review date: **2026-10-28**. This is an acquisition and loading plan,
-not approval to download, evidence of a loaded model, or permission to distribute
-an artifact. The operator approved the exact plan on 2026-10-29; all 17 files
-have now been acquired and verified. Actual CPU conversion passed for 1,324
-keys, producing 3,773,492,276 bytes with original architecture metadata agreement.
-Model construction and inference remain separate checks.
-The tensor-only reader, restricted model loader and independent CPU converter
-are implemented. The pinned CPU software wheel was installed in a separate
-container and generated-fixture conversion/readback passed; actual model loading
-remains untested. Metadata review and executed fixture results are distinguished
-below and in the [conversion guide](checkpoint-conversion.md).
+Metadata review: **2026-10-28**; executed acquisition/conversion/runtime checks:
+**2026-10-29**. The operator approved the exact 17 files below for private
+academic research. All payload sizes/digests passed; the actual checkpoint was
+converted on modern CPU Torch, then strictly loaded on the older Jetson GPU
+runtime. One synthetic-image inference returned 30 finite XY points. This is
+not redistribution permission, real-camera validation or a real-time controller.
 
-The existing Jetson GPU runtime passed model-free checks. Its Torch 2.2.2 must
-not deserialize the external TIC-VLA checkpoint while the documented loading
-issues remain unresolved. The proposal is a separate reviewed CPU conversion
-step, followed by safetensors-only loading on the existing GPU runtime. It can
-avoid rebuilding the GPU computation library; compatibility still needs testing.
+The original pickle checkpoint is never decoded on Torch 2.2.2. The GPU path
+uses the verified derived safetensors plus the reviewed local base snapshot.
+Independent tooling is implemented; runtime evidence, failed checks and limits
+are in [offline model checks](model-runtime.md), with conversion details in
+[the conversion guide](checkpoint-conversion.md). Source/component terms remain
+applicable to raw and derived artifacts; model payloads are outside Git.
 
 ## 1. Inputs are different artifacts
 
@@ -185,7 +181,7 @@ alone is not proof of CPU-only packaging. Explicit CPU source/version selection
 prevents accidentally changing the GPU stack during this conversion work.
 The exact [CPU wheel reference](https://download-r2.pytorch.org/whl/cpu/torch-2.15.0%2Bcpu-cp311-cp311-manylinux_2_28_aarch64.whl)
 and its [small package metadata](https://download-r2.pytorch.org/whl/cpu/torch-2.15.0%2Bcpu-cp311-cp311-manylinux_2_28_aarch64.whl.metadata)
-identify the installed software pin; the model assets remain unacquired.
+identify the installed software pin; approved model assets were acquired separately.
 
 ## 5. Loading sequence and validation boundaries
 
@@ -246,7 +242,9 @@ local suite to **113 passing tests**. `tools/verify_tensor_loading.py` provides
 a separate generated-tensor check for the real runtime; no external assets or
 model construction are involved. The independent CPU converter now also passed
 generated checkpoint conversion and cross-runtime readback. Actual source
-payloads, architecture compatibility and full-model inference remain unvalidated.
+payloads and strict model architecture/loading now passed, followed by one
+synthetic inference; real-input accuracy and asynchronous operation remain
+unvalidated.
 
 ### Generated-tensor verification completed on Jetson
 
@@ -293,8 +291,8 @@ and needs review against our full-state strict loader.
 The hosted Convert Space downloads, converts and opens a pull request to upload
 the result. Do not submit restricted TIC-VLA artifacts to that workflow or use
 its public-sharing behavior without applicable permission. The independent local
-converter passed generated-fixture checks; it is not a validated official TIC-VLA
-checkpoint conversion. A converted weight retains applicable upstream conditions.
+converter passed fixture and approved actual-checkpoint checks; it is not an
+upstream-provided or author-certified converter. A converted weight retains applicable upstream conditions.
 
 ## 7. Storage and reproducibility
 
@@ -312,7 +310,7 @@ explicit dedicated-storage plan before writing rather than scattering copies.
 Public documentation can retain revisions, expected hashes and the method;
 weights, converted outputs and raw private permissions remain outside Git.
 
-No source/cache/derived artifact has been transferred or distributed by this
-plan. Review allowed recipients before lab handover or image sharing. Follow
+No cached source/weight or derived artifact has been published or redistributed
+to another person by this work. Review allowed recipients before lab handover or image sharing. Follow
 [the development guide](development.md) for experiment records and
 [the status page](status.md) for what has actually passed.
