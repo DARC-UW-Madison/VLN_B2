@@ -35,6 +35,7 @@ def main(argv=None):
                   "robot_connected": False, "motion_sent": False}
         started = time.monotonic()
         try:
+            report["stage"] = "checkpoint_checksum"
             if os.environ.get("HF_HUB_OFFLINE") != "1":
                 raise ValueError("Run this verifier with offline Hub resolution and network isolation.")
             actual = digest(args.checkpoint)
@@ -43,13 +44,18 @@ def main(argv=None):
             from b2_tic_vla.inference import TicVlaPredictor
             import torch
 
+            report["stage"] = "cuda_initialization"
+            torch.cuda.init()
+            torch.cuda.set_device(args.device)
             torch.cuda.reset_peak_memory_stats(args.device)
+            report["stage"] = "strict_model_loading"
             load_started = time.monotonic()
             predictor = TicVlaPredictor(args.base_model, args.checkpoint, args.device,
                                         args.upstream_root).load()
             torch.cuda.synchronize(args.device)
             report.update(
-                passed=True, model_constructed=True, load_seconds=time.monotonic() - load_started,
+                passed=True, stage="complete", model_constructed=True,
+                load_seconds=time.monotonic() - load_started,
                 checkpoint_sha256=actual, torch_version=str(torch.__version__),
                 parameter_count=sum(value.numel() for value in predictor._model.parameters()),
                 torch_allocated_bytes=torch.cuda.memory_allocated(args.device),
