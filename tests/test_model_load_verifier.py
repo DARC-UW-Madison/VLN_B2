@@ -5,8 +5,9 @@ import io
 import json
 from pathlib import Path
 import tempfile
+from types import ModuleType, SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 SPEC = importlib.util.spec_from_file_location(
     "verify_model_load", Path(__file__).resolve().parents[1] / "tools/verify_model_load.py"
@@ -63,6 +64,31 @@ class ModelLoadVerifierTests(unittest.TestCase):
             self.assertEqual(verifier.main(self.arguments()), 1)
         digest.assert_not_called()
         self.assertFalse(json.loads(self.report.read_text())["model_constructed"])
+
+    def test_successful_default_load_does_not_run_inference_or_create_image(self):
+        predictor = SimpleNamespace(
+            _model=SimpleNamespace(parameters=lambda: [SimpleNamespace(numel=lambda: 1)]),
+            describe=lambda: {"loaded": True},
+            predict=Mock(side_effect=AssertionError("Inference must be explicitly requested")),
+        )
+        predictor.load = lambda: predictor
+        torch = ModuleType("torch")
+        torch.__version__ = "test"
+        torch.cuda = SimpleNamespace(init=lambda: None, set_device=lambda device: None,
+            reset_peak_memory_stats=lambda device: None, synchronize=lambda device: None,
+            memory_allocated=lambda device: 1, max_memory_allocated=lambda device: 1)
+        module = ModuleType("b2_tic_vla.inference")
+        module.TicVlaPredictor = lambda *args: predictor
+        with patch.dict(verifier.os.environ, {"HF_HUB_OFFLINE": "1"}), \
+             patch.dict("sys.modules", {"torch": torch, "b2_tic_vla.inference": module}), \
+             patch.object(verifier, "digest", return_value="0" * 64), \
+             patch("sys.stdout", io.StringIO()):
+            self.assertEqual(verifier.main(self.arguments()), 0)
+        report = json.loads(self.report.read_text())
+        self.assertTrue(report["passed"])
+        self.assertFalse(report["inference_run"])
+        self.assertFalse((self.root / "generated-frame.png").exists())
+        predictor.predict.assert_not_called()
 
 
 if __name__ == "__main__":
