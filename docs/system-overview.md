@@ -252,6 +252,14 @@ share a personal NetID password. Give researchers individual logins, reconsider
 sudo membership and replace temporary weak login passwords. Keep GUI autologin
 off for shared access. These policy/credential changes have not been applied.
 
+The accepted return review covers both the research login and the pre-existing
+lab login: UWNet portal authentication happened in the latter before the research
+login was created. Browser cookies/passwords, web sessions and keyrings may
+therefore belong to that earlier home directory. A new login does not relocate
+or clear them. Review that account with its owner/administrator, remove only
+identified personal access when return/sharing is requested, and preserve lab
+files and unrelated users' secrets. No browser/keyring cleanup has been done.
+
 At handover or return, arrange console access and replacement networking first.
 The following is a review plan, **not an automated cleanup already performed**.
 When sharing/return is requested, preserve approved research files, installed

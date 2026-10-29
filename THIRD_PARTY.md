@@ -100,3 +100,18 @@ Python package. Host setup uses official pyenv `v2.8.14` at
 is installed per user under the [PSF License Agreement and included notices](https://github.com/python/cpython/blob/v3.11.18/LICENSE).
 No interpreter binary is redistributed. See [runtime setup](docs/jetson-runtime.md).
 Review updated for these references: 2026-10-27.
+
+## CPU conversion candidate
+
+`deploy/converter-requirements.lock` pins 12 Python 3.11/aarch64 CPU-converter
+packages and their official wheel SHA256 values. Torch 2.15.0+cpu is selected
+from the [official CPU index](https://download.pytorch.org/whl/cpu/torch/), not
+the CUDA-enabled PyPI artifact. The remaining exact files were reviewed through
+[official PyPI metadata](https://pypi.org/): filelock/setuptools (MIT),
+typing-extensions (PSF-2.0), SymPy/mpmath/NetworkX/Jinja/MarkupSafe/fsspec
+(BSD-family), safetensors (Apache-2.0), and NumPy (its published
+BSD-3-Clause/0BSD/MIT/Zlib/CC0-1.0 expression). Preserve bundled binary/component
+notices; those summaries do not relicense the wheels. The recipe isolates these
+packages in a new container venv, with no model data or upstream TIC-VLA source.
+The recipe is prepared; installation and conversion validation are separate
+checks. No converter image or third-party wheel is released by this repository.

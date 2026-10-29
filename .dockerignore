@@ -6,6 +6,7 @@
 !deploy/
 deploy/*
 !deploy/runtime-requirements.txt
+!deploy/converter-requirements.lock
 !deploy/runtime-smoke.py
 !deploy/disable-unused-torch-rpc.py
 !src/

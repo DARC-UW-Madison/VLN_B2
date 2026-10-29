@@ -86,3 +86,15 @@ tailnetへの登録，ホストされたサービスの条件，研究室のア�
 [PSF License Agreementと同梱の表示事項](https://github.com/python/cpython/blob/v3.11.18/LICENSE)に従って
 ユーザー用に導入した．インタープリタのバイナリは再配布しない．[実行環境構築](docs/jetson-runtime.ja.md)を参照する．
 これらの参照の更新確認日：2026-10-27．
+
+## CPU変換用の候補
+
+`deploy/converter-requirements.lock`で，Python 3.11・aarch64用のCPU変換環境の12パッケージと，
+公式wheelのSHA256を固定した．Torch 2.15.0+cpuは，CUDA版のPyPI成果物ではなく，
+[公式CPU index](https://download.pytorch.org/whl/cpu/torch/)から選んだ．残りの正確なファイルは
+[公式PyPIメタデータ](https://pypi.org/)で確認した．filelock・setuptoolsはMIT，
+typing-extensionsはPSF-2.0，SymPy・mpmath・NetworkX・Jinja・MarkupSafe・fsspecはBSD系，
+safetensorsはApache-2.0，NumPyは公開されたBSD-3-Clause・0BSD・MIT・Zlib・CC0-1.0の表現による．
+同梱バイナリ・構成要素の表示を維持し，この要約でwheelを再ライセンスしない．新しいコンテナのvenvへ
+隔離する手順であり，モデルデータや本家TIC-VLAのソースを含めない．手順を用意した段階で，導入と
+変換の検証は別の確認である．このリポジトリから変換用イメージや外部wheelを公開するものではない．
