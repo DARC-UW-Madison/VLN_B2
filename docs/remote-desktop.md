@@ -128,6 +128,26 @@ connection only, not general robot DDS traffic or the model's control loop.
 
 ## Why this configuration uses a tunnel
 
+The operator wants to avoid Mac system/network changes. Do not change macOS
+routes, enable its SSH server, or install a persistent forwarding service for
+this project. The existing tunnel is an SSH client process that forwards one
+local port; it is not a requirement to reconfigure the Mac network.
+
+For NoMachine's direct NX mode, the intended path is:
+
+```text
+Mac NoMachine client -> Tailscale private network -> Jetson NoMachine server :4000
+```
+
+The Mac needs the client application and a saved connection containing the
+Jetson's reachable Tailscale IP, NX protocol, port 4000 and Jetson Linux account.
+No separate SSH tunnel is part of that path. Port 4000 is the default, not a
+claim that reachability/access has passed on this host. Inspect Jetson listener,
+tailnet access and headless desktop behavior before relying on it; no Mac
+system change is implied. Existing Tailscale supplies the private network.
+See the vendor's [direct connection guide](https://www.nomachine.com/support/documents/getting-started-with-nomachine).
+Direct-IP mode is distinct from the vendor's separate NoMachine Network service.
+
 RDP itself does not require SSH. A Windows RDP host commonly accepts connections
 on a network interface, with access controlled by its firewall and policy. A
 client can then use the reachable IP and account directly. The same architecture

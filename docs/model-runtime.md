@@ -25,6 +25,14 @@ quality. A three-second predicted path taking 13.64 seconds in this synchronous
 call cannot simply be connected to a walking loop. Asynchronous reasoning,
 coherent cache metadata, fresh observations, watchdogs and stopping remain work.
 
+The 13.64-second measurement wraps the synchronous image-to-plan call; it is
+not a separately measured action-policy period. TIC-VLA separates delayed
+semantic reasoning from action generation using current observations and delay
+metadata. We have not yet measured those stages separately on this Jetson.
+First-call initialization, repeated-call latency and output-token count also
+need separate recording before judging steady-state performance. Asynchrony
+does not by itself establish that an arbitrarily old semantic result is usable.
+
 The GPU image was the existing `vln-b2-runtime:jp5`:
 
 ```text
@@ -126,6 +134,18 @@ limit, two CPUs, 128 processes and 256 MiB temporary space. Those limits do not
 measure total device memory or prove real-time behavior.
 
 ## Next acceptance
+
+Without hardware, measure semantic and action stages separately and distinguish
+first-call from repeated-call timing. No new model download is needed for that
+work. The next physical input test is a standalone external ZED 2i connected
+to this Jetson over USB: acquire and inspect RGB without connecting to B2.
+If the camera is only available onsite, perform that check there.
+
+At B2, first verify the existing manual/stop procedure and inspect Ethernet
+networking and computer roles. Receive state without motor commands. Camera and
+robot-link checks are independent; passing one does not establish the other.
+Only after both pass should recorded real images and state be combined for
+offline model input, followed by observation-only asynchronous integration.
 
 Use real RGB and received robot state without commands, validate clocks/frames/
 units/calibration, and profile individual model stages. Implement and test the

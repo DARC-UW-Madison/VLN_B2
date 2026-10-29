@@ -110,6 +110,23 @@ RDPサーバーのTLSも有効なままである．別の待受・アクセス�
 
 ## 今回トンネルが必要な理由
 
+操作者はMacのシステム・network設定の変更を避けたいと希望している．本プロジェクトのために
+macOSの経路変更，SSHサーバーの有効化，常駐する転送サービスの導入を行わない．既存のトンネルは
+ローカルの一つのポートを転送するSSH clientのプロセスであり，Macのnetworkを再設定する要件ではない．
+
+NoMachineのNX直接接続で想定する経路は次のとおりである．
+
+```text
+Mac NoMachine client -> Tailscale private network -> Jetson NoMachine server :4000
+```
+
+Mac側はclientアプリを用意し，Jetsonの到達可能なTailscale IP，NX方式，4000番，JetsonのLinuxアカウントを
+接続情報として登録する．この経路に別のSSHトンネルは含まれない．4000番は既定値であり，このホストでの
+到達性・アクセスの検証済みという意味ではない．Jetson側の待受，tailnetの許可，画面なしでの表示を
+確認してから利用する．Macのシステム変更を意味しない．既存のTailscaleをプライベートな通信路として使う．
+製品の[直接接続の手順](https://www.nomachine.com/support/documents/getting-started-with-nomachine)を参照する．
+IPでの直接接続と，製品独自の別サービスNoMachine Networkは区別する．
+
 RDP自体にSSHは不要である．WindowsのRDPホストでは，ネットワークのインターフェースで接続を受け，
 firewallとポリシーでアクセスを制御する構成が一般的である．到達できるIPとアカウントをクライアントへ
 指定すれば接続でき，xrdpでも同じ構成は可能である．
