@@ -62,7 +62,7 @@ def _camera(args: argparse.Namespace) -> dict:
         raise ValueError("ZED capture output must use a .jpg or .jpeg extension")
     sidecar = _unused_output(str(target) + ".json")
     target.parent.mkdir(parents=True, exist_ok=True)
-    camera = ZedCamera()
+    camera = ZedCamera(settings_directory=args.settings_dir)
     try:
         camera.open()
         frame = camera.capture(str(target))
@@ -106,7 +106,7 @@ def _record(args: argparse.Namespace) -> dict:
 
     target = _unused_output(args.output_dir)
     reader = _reader(args)
-    camera = ZedCamera()
+    camera = ZedCamera(settings_directory=args.settings_dir)
     target.mkdir(parents=True)
     try:
         reader.open()
@@ -177,6 +177,7 @@ def build_parser() -> argparse.ArgumentParser:
     replay.set_defaults(run=_replay)
     camera = commands.add_parser("camera", help="Capture one ZED left image; no motor output")
     camera.add_argument("--output", required=True)
+    camera.add_argument("--settings-dir", help="Existing private writable SDK calibration directory")
     camera.set_defaults(run=_camera)
     state = commands.add_parser("state", help="Subscribe to B2 state; no motor output")
     _add_state_options(state)
@@ -186,6 +187,7 @@ def build_parser() -> argparse.ArgumentParser:
     record = commands.add_parser("record", help="Save one image/state observation; no motor output")
     _add_state_options(record)
     record.add_argument("--output-dir", required=True)
+    record.add_argument("--settings-dir", help="Existing private writable SDK calibration directory")
     record.add_argument("--velocity-frame", choices=["unknown", "body", "base_link"], default="unknown",
                         help="Set body/base_link only after verifying the SDK velocity convention")
     record.add_argument("--position-frame", default="unknown")

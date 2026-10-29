@@ -72,6 +72,23 @@ class ZedCameraTests(unittest.TestCase):
         adapter.close()
         self.camera.close.assert_called_once()
 
+    def test_private_settings_directory_is_used_without_changing_sdk_default(self):
+        default = hardware.ZedCamera()
+        default.open()
+        self.assertFalse(hasattr(self.camera.open.call_args.args[0], "optional_settings_path"))
+        default.close()
+        adapter = hardware.ZedCamera(settings_directory=self.folder.name)
+        adapter.open()
+        self.assertEqual(self.camera.open.call_args.args[0].optional_settings_path,
+                         str(Path(self.folder.name).resolve()))
+        adapter.close()
+
+    def test_camera_settings_reject_non_directory_before_vendor_import(self):
+        self.path.write_text("not a directory")
+        with self.assertRaisesRegex(ValueError, "existing directory"):
+            hardware.ZedCamera(settings_directory=str(self.path))
+        self.sl.Camera.assert_not_called()
+
     def test_capture_without_source_timestamp_retains_receipt_only(self):
         self.camera.get_timestamp.return_value.get_nanoseconds.return_value = 0
         adapter = hardware.ZedCamera()

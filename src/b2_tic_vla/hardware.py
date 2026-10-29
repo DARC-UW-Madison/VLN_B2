@@ -35,13 +35,20 @@ class ZedCamera:
     not enable tracking, depth inference, recording, or sensor fusion.
     """
 
-    def __init__(self, *, max_grab_attempts: int = 30, timeout_s: float = 5.0):
+    def __init__(self, *, max_grab_attempts: int = 30, timeout_s: float = 5.0,
+                 settings_directory: str | None = None):
         if not isinstance(max_grab_attempts, int) or max_grab_attempts < 1:
             raise ValueError("max_grab_attempts must be a positive integer")
         if not math.isfinite(timeout_s) or timeout_s <= 0:
             raise ValueError("timeout_s must be positive and finite")
         self.max_grab_attempts = max_grab_attempts
         self.timeout_s = timeout_s
+        self.settings_directory = None
+        if settings_directory is not None:
+            settings = Path(settings_directory).expanduser().resolve(strict=True)
+            if not settings.is_dir():
+                raise ValueError("Camera settings must be an existing directory")
+            self.settings_directory = str(settings)
         self._sl: Any = None
         self._camera: Any = None
         self._image: Any = None
@@ -62,6 +69,8 @@ class ZedCamera:
             parameters.depth_mode = sl.DEPTH_MODE.NONE
             parameters.open_timeout_sec = self.timeout_s
             parameters.async_grab_camera_recovery = True
+            if self.settings_directory is not None:
+                parameters.optional_settings_path = self.settings_directory
             result = camera.open(parameters)
             if result != sl.ERROR_CODE.SUCCESS:
                 raise RuntimeError(f"ZED camera open failed: {result}")
