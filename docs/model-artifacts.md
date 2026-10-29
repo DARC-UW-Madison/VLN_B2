@@ -4,7 +4,10 @@
 
 Metadata review date: **2026-10-28**. This is an acquisition and loading plan,
 not approval to download, evidence of a loaded model, or permission to distribute
-an artifact. No checkpoint or model asset listed below has been acquired.
+an artifact. The operator approved the exact plan on 2026-10-29; all 17 files
+have now been acquired and verified. Actual CPU conversion passed for 1,324
+keys, producing 3,773,492,276 bytes with original architecture metadata agreement.
+Model construction and inference remain separate checks.
 The tensor-only reader, restricted model loader and independent CPU converter
 are implemented. The pinned CPU software wheel was installed in a separate
 container and generated-fixture conversion/readback passed; actual model loading
@@ -33,10 +36,10 @@ base weights and the navigation checkpoint; they are not one installation file.
 | Input | Function | Current state |
 |---|---|---|
 | Reviewed upstream Python | Defines TIC-VLA and its model calls | Source-only checkout exists separately for prior import checks |
-| InternVL base snapshot | Defines/initializes the pretrained vision/language model and text/image processing | Metadata inspected; assets not acquired |
-| TIC-VLA checkpoint | Supplies the trained navigation/model state | Metadata inspected; checkpoint not acquired or decoded |
+| InternVL base snapshot | Defines/initializes the pretrained vision/language model and text/image processing | Pinned approved assets acquired and digest-verified |
+| TIC-VLA checkpoint | Supplies the trained navigation/model state | Approved checkpoint acquired, hash-verified and CPU-converted |
 | CPU converter environment | Decodes the source checkpoint using a separately reviewed runtime, then emits tensor data | Built with pinned CPU software; generated conversion and old-runtime readback passed |
-| Derived tensor artifact and manifest | Input to the proposed Jetson loader, with conversion provenance | Generated fixture only; no converted model |
+| Derived tensor artifact and manifest | Input to the proposed Jetson loader, with conversion provenance | Actual converted artifact and verified manifest exist privately on SSD |
 
 The current independent adapter constructs the upstream model and then loads a
 strict full-model state dictionary. The apparently similar base/checkpoint sizes
@@ -105,6 +108,23 @@ The two acquisition candidates total **3,827,163,803 bytes**, approximately
 conversion output, temporary files, recordings and logs. Derived size and peak
 conversion/inference memory are unknown until measured. Check current free
 space and define resource limits before acquiring or converting anything.
+
+### Approved acquisition
+
+On 2026-10-29 the operator explicitly approved the two pinned repositories,
+17 files and 3,827,163,803 bytes above for private academic research in the
+standard SSD-backed Hub cache. This is not approval for redistribution, robot
+motion or unrestricted loading. Preserve the applicable source/component terms.
+Acquisition verification, custom-code review and actual inference remain separate.
+
+`tools/acquire_model_assets.py` prints the plan by default without importing the
+Hub client or contacting the network. Explicit `--download` mode requires cache
+and private report paths, uses the official client with token access disabled,
+and verifies pinned repository revisions, approved sizes, weight SHA256 and
+small-file Git blobs. It fetches only the allowlist and never executes model code.
+Four non-network tests bring the suite to 125 local tests. Do not mount a home,
+credential file or GPU into the downloader; mount only the standard Hub cache,
+reviewed script and dedicated private report directory.
 
 ## 3. Terms and approval remain separate gates
 

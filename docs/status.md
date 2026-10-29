@@ -169,8 +169,19 @@ including aliases, transposed/scalar/empty tensors, NaNs and signed zeros.
 Unsupported serialized globals were rejected without unsafe fallback. See the
 [conversion guide](checkpoint-conversion.md) for the image/recipe, resource limits,
 initial failed BuildKit attempt and private provenance. Resolve artifact-specific
-terms and obtain separate approval for exact model files,
-revisions, sizes and official-cache location before acquisition.
+terms and verify acquired payloads before actual model loading. The operator
+approved the exact 17 files, revisions, 3.83 GB and standard SSD-backed cache on
+2026-10-29. The default-dry acquisition helper adds four boundary tests; all
+129 local tests pass after adding the explicit load verifier. All 17 files
+were then acquired with Hub client 0.24.7 and verified against approved sizes,
+weight SHA256 and pinned small-file Git blobs. No implicit token was used.
+Actual CPU conversion passed: 1,324 tensor keys, 3,773,492,276 output bytes,
+horizon 30 and three action layers, with architecture metadata agreement.
+The output is private SSD data referenced through the ignored project models
+symlink; the original Hub payload is unchanged. No model was constructed by
+acquisition/conversion. The next step is explicit offline GPU construction.
+A matched 2 GiB GPU probe requires the device's video group inside the
+unprivileged container; host account/device permissions remain unchanged.
 Run recorded-observation inference only after that review. The
 [runtime compatibility review](runtime-compatibility.md) preserves these constraints.
 In parallel, verify physical power-cycle recovery onsite and map B2's

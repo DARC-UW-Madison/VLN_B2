@@ -34,7 +34,7 @@ dist/
 install/
 
 # External models and raw experimental artifacts
-models/
+/models
 datasets/
 recordings/
 logs/

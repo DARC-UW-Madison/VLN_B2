@@ -82,8 +82,9 @@ a real generated-tensor CPU probe passed on Jetson. A separate Torch 2.15.0+cpu
 converter subsequently passed generated checkpoint conversion and old-runtime
 readback; full-model compatibility remains unverified. The metadata-reviewed [artifact/loading plan](model-artifacts.md)
 proposes isolated modern CPU-only conversion and a safetensors-only Jetson path,
-with exact acquisition candidates and unresolved terms. No model acquisition has
-been approved. Retain strict keys/shapes and no unrestricted-pickle fallback.
+with exact acquisition candidates and unresolved terms. The exact 17-file model acquisition was approved on 2026-10-29;
+the 17 payloads and actual CPU conversion now passed verification, while
+real GPU-model compatibility remains pending. Retain strict keys/shapes and no unrestricted-pickle fallback.
 
 ## Next smoke test and acceptance
 
