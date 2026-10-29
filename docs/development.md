@@ -56,7 +56,16 @@ without writes, unsupported profiles and bounded GDM changes. All **93 tests** p
 locally and in the Jetson venv; read-only NetworkManager inspection also ran
 under the target system Python 3.8. Saving an operator-entered Wi-Fi password,
 actual reconnect, and cold-boot recovery remain separate operator checks.
-See the [system overview](system-overview.md).
+The later Mac tunnel helper adds 12 lifecycle and ownership tests, including
+read-only status, option validation, busy-port protection and separate control
+masters. All **109 tests** passed locally. The actual background tunnel was
+started and checked in a separate invocation; the operator confirmed RDP input
+after the headless software reboot. This does not prove physical power-cycle
+recovery or the inactive eduroam profile. See the [system overview](system-overview.md).
+
+Four additional tests cover exact unique saved-profile selection, inactive
+profile saving without activation or secret output, rejection before password
+entry and separate retained backups. These bring the suite to 109 tests.
 
 ## 1. Understand the system
 

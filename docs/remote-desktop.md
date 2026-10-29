@@ -6,8 +6,10 @@ Use SSH for ordinary terminal work. Prepare RDP as the preferred option for the
 occasional graphical settings task, with Microsoft's Windows App on Mac and an
 xrdp server on Jetson. The pinned server is installed, running and enabled at
 boot. Authentication and desktop display passed on 2026-10-28; the operator
-subsequently confirmed basic interaction. Settings permission, extended input
-checks, reconnect and cold-boot acceptance remain separate checks. RDP has not
+subsequently confirmed basic interaction. A later HDMI-disconnected software reboot restored Wi-Fi, Tailscale, SSH and
+RDP automatically; the operator also confirmed post-reboot GUI display and input.
+Settings permission, extended input and a physical power-cycle test remain
+separate checks. RDP has not
 been measured against VNC on this Jetson, so the preference is not a claim that
 it is more stable. Remote desktop is a management tool; inference and future
 robot control must run locally without requiring a desktop connection.
@@ -77,15 +79,19 @@ The [xrdp project](https://github.com/neutrinolabs/xrdp) provides a Linux RDP
 server and supports ARM. With the Xorg backend, xrdp-sesman starts an Xorg
 server using [xorgxrdp](https://github.com/neutrinolabs/xorgxrdp) modules, then
 starts the user's desktop. A remote virtual session can provide a desktop
-without first logging into the physical display. This is the architecture's
-purpose, not proof that this Jetson already supports headless login.
+without first logging into the physical display. The operator confirmed that HDMI was
+disconnected during the successful desktop test. A physical power-cycle
+acceptance test is still pending.
 
 Typically this creates a separate desktop rather than mirroring the HDMI
 desktop. A browser or settings window already open on the console need not
 appear in the RDP session. Both sessions still use the same host and, for the
 same account, the same home files; a new display is not a separate sandbox.
 RDP sends screen updates and keyboard/mouse events. Applications and any
-computation they start execute on Jetson, not on Mac.
+computation they start execute on Jetson, not on Mac. Resolution and desktop
+session settings can make the dock, scaling or theme differ from HDMI. Such a
+difference alone is not a connection failure. Confirm the login and session
+before assuming that an appearance difference means files or settings were lost.
 
 ## Session and graphics constraints
 
@@ -164,8 +170,8 @@ supported release before forwarding. Do not restart the sole remote path or
 weaken a reauthentication policy to regain access. The controlled update and
 forwarding verification recorded above completed on 2026-10-28.
 
-After xrdp is configured and verified to listen only on Jetson loopback port
-3389, run this **example on Mac**, with real values supplied locally:
+After xrdp is verified to listen only on Jetson loopback port 3389, a foreground
+tunnel can be opened with this **example on Mac**, using real values locally:
 
 ```sh
 ssh -N -L 127.0.0.1:13389:127.0.0.1:3389 RESEARCH_USER@JETSON_MANAGEMENT_ADDRESS
@@ -188,7 +194,43 @@ set to Ask when required; no password was saved. Client folder, clipboard,
 printer, smartcard, microphone, camera and audio redirection are disabled.
 An inherited Chrome crash notification was visible; no crash report was sent.
 The operator confirmed basic desktop interaction. Settings permission, extended
-input checks and reconnect acceptance still need their own evidence.
+input checks still need their own evidence. A later reconnection following the
+headless software reboot was confirmed by the operator.
+
+
+### Keep the tunnel independent of the terminal
+
+A normal SSH shell and this forwarding connection are separate connections.
+SSH can work while Windows App fails because Mac's local port 13389 has no
+listener. This was the diagnosed failure after the initial desktop test; the
+Jetson RDP services were still active. Installing a server does not create a
+permanent Mac-to-Jetson connection.
+
+From this repository on Mac, use the dedicated helper instead of leaving a
+foreground tunnel attached to a chat or terminal:
+
+```sh
+python3 tools/desktop_tunnel.py start RESEARCH_USER@JETSON_MANAGEMENT_ADDRESS
+python3 tools/desktop_tunnel.py status RESEARCH_USER@JETSON_MANAGEMENT_ADDRESS
+python3 tools/desktop_tunnel.py stop RESEARCH_USER@JETSON_MANAGEMENT_ADDRESS
+```
+
+Run `start` before opening the saved Windows App profile; `status` and `stop`
+are separate inspection and cleanup operations, not steps to run immediately
+after starting. Use the same target spelling and port options for all operations.
+The helper uses an owned private control socket and a dedicated OpenSSH master
+started with `-fNT`. It binds only Mac loopback, retains normal SSH host-key and
+identity checks, and stores no password. An occupied port or unrelated connection
+is not stopped. `status` does not initiate authentication when no master exists.
+It checks the SSH master, not RDP login, desktop health or remote reachability
+beyond what that connection currently detects.
+
+Closing the invoking terminal or this chat leaves this background master alive.
+This is not an automatic reconnect service or a Mac startup agent: after either
+computer reboots or a sustained network outage, run `start` again. The helper
+keeps a live matching master and starts a new one if the old connection has ended.
+If a connected but stalled master remains, use `stop`, then `start`. Opening an
+ordinary SSH shell alone does not recreate the RDP forward.
 
 ## Using the installed server
 
@@ -203,9 +245,16 @@ systemctl is-active b2-rdp.service b2-rdp-sesman.service
 After the operator confirmed basic interaction, `b2-rdp.service` was enabled
 with `systemctl enable`; its required `b2-rdp-sesman.service` starts through that
 dependency, without a separate boot enablement. The enablement and active state
-were verified without restarting either service or the host. This configures
-startup but does not prove cold-boot access. It requires neither GUI autologin
-nor robot motion. Start the SSH tunnel from Mac,
+were verified initially without restarting. A subsequent HDMI-disconnected
+software reboot restored Wi-Fi, Tailscale and SSH without operator intervention;
+SSH returned at about 25 seconds of target uptime. NetworkManager, tailscaled,
+SSH, both RDP services and Docker were active, the SSD was mounted, Docker used
+its SSD data root, and RDP still listened only on loopback. The connected Wi-Fi
+was a system-wide non-enterprise profile, not eduroam. This proves recovery for
+that connection after a software reboot; it does not establish eduroam login-free
+access or a physical power-cycle result. Post-reboot GUI display and input were
+subsequently confirmed by the operator. Neither GUI
+autologin nor robot motion is required. Start the SSH tunnel from Mac,
 then open the saved `B2 Jetson (SSH tunnel)` profile. A self-signed certificate
 requires checking the expected server identity; do not ignore changed
 certificates or save a permanent bypass. The independently verified TLS probe
@@ -240,6 +289,62 @@ recording the secret. The owner has deferred the credential change until a
 recovery-capable session; RDP has not removed that prerequisite. Writing a
 profile and testing reconnection are separate steps. Reconnecting the Wi-Fi
 used by RDP/SSH can terminate both connections, so plan recovery first.
+
+### Save an inactive eduroam profile through the GUI
+
+The current Wi-Fi can differ from the stored eduroam profile. The terminal
+helper selects the active profile by default; `--connection-id` selects one
+saved profile explicitly. Switching networks is not a prerequisite for editing it. In a terminal inside the Jetson desktop, run:
+
+```sh
+nm-connection-editor
+```
+
+Select the existing eduroam connection and edit it. In **General**, enable
+automatic connection and **All users may connect to this network**. In
+**Wi-Fi Security**, enter the owner's password and choose **Store the password
+for all users** from the password storage menu. Preserve the institution-provided
+identity, authentication method, CA and server checks. Save; if authorization is
+requested, authenticate with the permitted Linux administrator account. That
+local administrator password and the university Wi-Fi password have different
+purposes. Do not activate a new connection yet, reveal the password in a report,
+or remove certificate checks to make saving succeed. If the remote session lacks
+permission, stop and use an explicitly authorized terminal operation rather than
+broadening polkit rules.
+
+After saving, inspect only whether the profile is system-wide, autoconnect is
+enabled, secret flags are zero and a non-empty password exists; never print its
+value. Prepare a timed NetworkManager rollback to the known working connection
+before switching Wi-Fi, because both RDP and SSH use that link. Confirm a fresh
+SSH connection and Internet/Tailscale access on eduroam before canceling the
+rollback. Then restore the Mac tunnel and test RDP again. A reboot must be
+tested on eduroam separately from the already verified non-enterprise Wi-Fi.
+Saving a profile alone does not establish either result.
+
+### Terminal fallback when polkit denies GUI editing
+
+The operator could display and interact with the RDP desktop, but the editor
+reported no polkit authorization when saving. This establishes a permission
+boundary; it does not diagnose a bad Wi-Fi password. No blanket polkit exception
+was added. In the owner's own SSH terminal on Jetson, use the reviewed helper
+with explicit sudo authorization and the saved profile's name:
+
+```sh
+cd ~/Developer/Projects/Robotics/b2/VLN_B2
+sudo /usr/bin/python3 tools/configure_unattended_wifi.py --connection-id SAVED_PROFILE_NAME --apply
+```
+
+Replace the placeholder locally. The helper rejects missing/duplicate names and
+unsupported authentication methods before asking for the university password.
+Enter that password twice at the hidden prompts; it is not a command argument
+or chat message. The helper preserves CA, alternative-subject/domain checks,
+identity, EAP, IP settings and other profile options, enables system-wide
+connection and writes secret flags 0. It backs up each profile separately under
+root-protected `/etc/NetworkManager/vln-b2-backups`, retaining the first copy.
+The old active-profile backup, if present, remains intact. It verifies secret
+retention without displaying the value and does not activate Wi-Fi, restart any
+service or change GUI autologin unless the separate option is explicitly used.
+The saving test and the controlled network-switch test remain different steps.
 
 ## Vino fallback for sharing the console
 

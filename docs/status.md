@@ -16,11 +16,13 @@ See [runtime setup](jetson-runtime.md) and the [initial baseline](target-baselin
 The [system overview](system-overview.md) records exact storage types, hardware
 specifications and account/container boundaries. GUI boot is retained and
 research-login AC suspend is disabled. Wi-Fi automatic retry and Tailscale boot
-services are enabled; system-stored Wi-Fi credentials and a controlled cold-boot
-test still require operator completion. GUI autologin is optional for local use,
-not required for boot networking; leave it protected for shared use.
-The operator deferred credential saving and autologin changes until an onsite
-visit. The current connection and existing GDM login target are retained.
+services are enabled. A controlled software reboot with HDMI disconnected
+restored the current non-enterprise Wi-Fi, Tailscale, SSH, RDP and Docker; the
+SSD mounted correctly. The operator confirmed post-reboot RDP display and input.
+This does not verify eduroam or a physical power cycle. The eduroam profile still
+needs owner-entered system credential saving and a controlled connection test.
+GUI autologin is optional for local use, not required for boot networking; leave
+it protected for shared use. The existing GDM login target is retained.
 B2 is not connected through the wired port; no model inference, camera capture,
 or robot control has been validated. All project CLI commands remain
 observation-only or offline. A reviewed source archive is on the Jetson; the
@@ -97,7 +99,12 @@ enabled at boot; sesman starts as its required dependency. Loopback-only
 listening, service privileges, verified TLS 1.3, Xorg/X11 query, Windows App
 authentication/desktop display and the post-install eight FP32/BF16 GPU checks
 passed. Basic interaction is operator-confirmed; settings permission, extended
-input checks, reconnect and cold boot remain pending. Existing NoMachine/GDM
+input checks and a physical power cycle remain pending. A later headless
+software reboot and operator-confirmed RDP reconnection passed. A dedicated
+background SSH tunnel helper now keeps the Mac forward independent of a chat
+or terminal. Its 12 tests and four saved-profile tests bring the local suite
+to **109 passing tests**.
+Existing NoMachine/GDM
 remain in place. See [RDP build and commissioning](rdp-build.md).
 
 The [model-artifact plan](model-artifacts.md) identifies pinned candidates totaling

@@ -206,3 +206,9 @@ GUI/boot acceptance from a visible background alone. Raw build/install/probe
 records remain under ignored `local/remote-desktop-build`, `local/rdp-export-01`
 and `local/access-setup` on Jetson; they include machine-local information and
 are not public source.
+
+A later controlled software reboot with HDMI disconnected restored the current
+non-enterprise Wi-Fi, Tailscale, SSH, both RDP services and Docker; the SSD mount
+and SSD Docker data root were verified. The operator then confirmed RDP display
+and input through the restored dedicated background Mac tunnel. This was not a
+physical power cycle or an eduroam boot test.

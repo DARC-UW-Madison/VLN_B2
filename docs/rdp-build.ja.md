@@ -179,3 +179,8 @@ GNOMEデスクトップの表示が通った．資格情報は保存していな
 背景が表示できただけでGUI・起動全体の合格とは主張しない．生のビルド・導入・試験記録は
 JetsonのGit対象外`local/remote-desktop-build`，`local/rdp-export-01`，`local/access-setup`にある．
 個体の情報を含むため，公開ソースにはしない．
+
+その後，HDMIなしで制御したソフトウェア再起動を行い，接続中の非EnterpriseのWi-Fi，
+Tailscale，SSH，両RDPサービス，Dockerが復帰した．SSDのマウントとDockerのSSD保存先を確認した．
+復旧したMacの専用バックグラウンドトンネル経由で，操作者がRDPの表示と入力を確認した．
+物理的な電源の入れ直しや，eduroamの起動試験ではない．

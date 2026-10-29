@@ -1,4 +1,4 @@
-"""Inspect or configure the active enterprise Wi-Fi profile without disconnecting.
+"""Inspect or configure an existing enterprise Wi-Fi profile without disconnecting.
 
 Run with the host's system Python and python3-dbus. Password entry is local to
 an interactive terminal; never pass passwords as arguments or environment values.
@@ -14,6 +14,7 @@ import re
 import shutil
 import sys
 import tempfile
+import uuid
 from pathlib import Path
 
 SERVICE = "org.freedesktop.NetworkManager"
@@ -41,6 +42,36 @@ def active_connection(interface):
     return dbus, proxy, proxy.GetSettings()
 
 
+def select_saved_connection(candidates, connection_id):
+    matches = [(proxy, settings) for proxy, settings in candidates
+               if str(settings.get("connection", {}).get("id", "")) == connection_id]
+    if len(matches) != 1:
+        raise SetupError("Expected exactly one saved connection with that name; nothing was changed.")
+    return matches[0]
+
+
+def saved_connection(connection_id):
+    import dbus
+
+    bus = dbus.SystemBus()
+    manager = dbus.Interface(bus.get_object(SERVICE, "/org/freedesktop/NetworkManager/Settings"),
+                             SERVICE + ".Settings")
+    candidates = []
+    for path in manager.ListConnections():
+        proxy = dbus.Interface(bus.get_object(SERVICE, path), SERVICE + ".Settings.Connection")
+        candidates.append((proxy, proxy.GetSettings()))
+    proxy, settings = select_saved_connection(candidates, connection_id)
+    return dbus, proxy, settings
+
+
+def validate_enterprise(settings):
+    if settings.get("802-11-wireless-security", {}).get("key-mgmt") != "wpa-eap":
+        raise SetupError("Expected an existing WPA-Enterprise profile.")
+    enterprise = settings.get("802-1x", {})
+    if "peap" not in enterprise.get("eap", []) or not enterprise.get("identity"):
+        raise SetupError("This helper supports the existing PEAP password profile only.")
+
+
 def summary(settings):
     connection = settings["connection"]
     enterprise = settings.get("802-1x", {})
@@ -56,11 +87,8 @@ def summary(settings):
 def configure_settings(settings, password, dbus):
     if not password:
         raise SetupError("An empty password is not saved.")
-    if settings.get("802-11-wireless-security", {}).get("key-mgmt") != "wpa-eap":
-        raise SetupError("Expected an existing WPA-Enterprise profile.")
+    validate_enterprise(settings)
     enterprise = settings.get("802-1x", {})
-    if "peap" not in enterprise.get("eap", []) or not enterprise.get("identity"):
-        raise SetupError("This helper supports the existing PEAP password profile only.")
     # Retain the identity, CA, server checks, phase-2 method and all other settings.
     connection = settings["connection"]
     connection["permissions"] = dbus.Array([], signature="s")
@@ -71,6 +99,7 @@ def configure_settings(settings, password, dbus):
 
 
 def backup_wifi(settings):
+    profile_uuid = str(uuid.UUID(str(settings["connection"]["uuid"])))
     BACKUPS.mkdir(mode=0o700, exist_ok=True)
     for path in Path("/etc/NetworkManager/system-connections").iterdir():
         if not path.is_file():
@@ -78,7 +107,7 @@ def backup_wifi(settings):
         parser = configparser.ConfigParser(interpolation=None)
         parser.read(str(path))
         if parser.get("connection", "uuid", fallback="") == str(settings["connection"]["uuid"]):
-            backup = BACKUPS / "active-wifi.before-vln-b2.nmconnection"
+            backup = BACKUPS / ("wifi-" + profile_uuid + ".before-vln-b2.nmconnection")
             if not backup.exists():
                 shutil.copy2(str(path), str(backup))
                 backup.chmod(0o600)
@@ -124,6 +153,7 @@ def set_autologin(username):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--interface", default="wlan0")
+    parser.add_argument("--connection-id", help="Edit exactly one saved profile by name, even if inactive")
     parser.add_argument("--apply", action="store_true", help="Prompt locally and save boot-time credentials")
     parser.add_argument("--autologin", help="Set this regular GDM login after saving Wi-Fi")
     args = parser.parse_args(argv)
@@ -136,12 +166,14 @@ def main(argv=None):
             if pwd.getpwnam(args.autologin).pw_uid < 1000:
                 raise SetupError("Select a regular research login, not a system account.")
             autologin_text(GDM_CONFIG.read_text(), args.autologin)
-        dbus, proxy, settings = active_connection(args.interface)
+        dbus, proxy, settings = (saved_connection(args.connection_id) if args.connection_id
+                                 else active_connection(args.interface))
         if not args.apply:
             print(json.dumps(summary(settings), indent=2))
             return 0
         if not sys.stdin.isatty():
             raise SetupError("Use an interactive terminal; piped password input is not accepted.")
+        validate_enterprise(settings)
         # Identity is shown only in the operator's terminal, never in a saved report.
         identity = str(settings.get("802-1x", {}).get("identity", ""))
         print("Configured enterprise account: " + identity)

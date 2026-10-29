@@ -65,7 +65,8 @@ System-wide changes are explicit: the SSD mount entry in `/etc/fstab`, Docker's
 data root, and its mount guard under `docker.service.d`. Backups and the old
 Docker store remain. The Wi-Fi profile now retries autoconnection indefinitely;
 its old profile is backed up. Research-login automatic AC suspend is disabled.
-GUI boot remains enabled. No reboot or network disconnection was requested.
+GUI boot remains enabled. A later controlled software reboot verified automatic
+recovery on the then-active Wi-Fi; see the boot checks below.
 
 ## What is isolated
 
@@ -100,7 +101,10 @@ For Mac screen control, [remote desktop](remote-desktop.md) now prioritizes
 Windows App/RDP with the installed host xrdp server. The server is installed under `/opt/b2-remote`
 and running; Windows App authentication/desktop display and operator-reported
 basic interaction passed. RDP boot startup is enabled, with sesman as a required
-dependency; HDMI-disconnected cold boot remains pending. Existing Vino is stopped.
+dependency. An HDMI-disconnected software reboot restored Wi-Fi, Tailscale,
+SSH and RDP services without manual reconnection; SSD mount and Docker startup
+also passed. The active Wi-Fi was non-enterprise, so this is not an eduroam
+boot result. A physical power-cycle test remains pending. Existing Vino is stopped.
 Tailscale retains login state; it does not normally require `tailscale up` on
 every boot. Its node-key expiry must still be checked in the
 [Tailscale admin console](https://tailscale.com/docs/features/access-control/key-expiry).
@@ -114,6 +118,11 @@ helper refuses credential changes on a non-PEAP profile. Identify the intended
 eduroam profile again before any credential operation. A login-independent enterprise configuration needs
 one local password entry, in either a physical terminal or the operator's own
 interactive SSH terminal. Do not send the password to a chat or put it in a command.
+By default the helper edits the active profile. To select a saved inactive
+profile, add `--connection-id SAVED_PROFILE_NAME`; the name must match exactly
+one connection. Neither mode activates the connection. Do not switch Wi-Fi just
+to select a profile. The remote-desktop guide describes both GUI and terminal
+procedures.
 
 ```sh
 cd ~/Developer/Projects/Robotics/b2/VLN_B2
@@ -158,14 +167,15 @@ them. A separate Linux login, venv, or ordinary container does not protect a
 personal university password from the host's administrators. Do not put the
 profile in this repository, an image, a general backup or a support log.
 
-Current Wi-Fi uses a user secret agent; we have not saved its password in the
-system profile. Its existing user-keyring contents were not inspected. The
-current working connection is not proof of login-independent boot access: an
-already logged-in desktop or an existing authenticated session may explain it.
-The observed CA setting is present, but the server-name match was unset; the
-setup helper preserves rather than certifies those settings. Compare the profile
-with the university's official Linux installer before storing personal credentials;
-do not invent a server name or disable certificate validation.
+The stored eduroam profile still uses a user secret agent and login restriction;
+we have not saved its password in the system profile or inspected its keyring.
+The active non-enterprise connection recovered after reboot, which does not
+validate the inactive eduroam profile. A targeted inspection found a CAT CA file
+and an explicit DNS alternative-subject match. Earlier reporting based only on
+empty domain-match fields missed that alternative form of server-name checking.
+The helper preserves rather than certifies trust settings; compare the CA bundle
+and server checks with the university's official Linux installer before storing
+personal credentials. Do not invent a server name or disable certificate validation.
 
 At the onsite visit, with this source build finished and console recovery ready:
 
