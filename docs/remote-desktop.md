@@ -285,8 +285,8 @@ all remote polkit actions just to make a settings dialog work.
 System-stored Wi-Fi credentials let NetworkManager connect before GUI login;
 they do not require automatic desktop login or RDP. Credential entry belongs to
 the account owner in an interactive terminal or trusted settings dialog, without
-recording the secret. The owner has deferred the credential change until a
-recovery-capable session; RDP has not removed that prerequisite. Writing a
+recording the secret. The owner completed saving through the terminal after
+GUI authorization was denied; no broader polkit permission was added. Writing a
 profile and testing reconnection are separate steps. Reconnecting the Wi-Fi
 used by RDP/SSH can terminate both connections, so plan recovery first.
 
@@ -345,6 +345,21 @@ The old active-profile backup, if present, remains intact. It verifies secret
 retention without displaying the value and does not activate Wi-Fi, restart any
 service or change GUI autologin unless the separate option is explicitly used.
 The saving test and the controlled network-switch test remain different steps.
+
+### Completed eduroam acceptance
+
+On 2026-10-28, the owner's interactive SSH save succeeded. A privileged check
+confirmed system-wide autoconnect, password flags 0, a non-empty stored secret,
+and retained CA/server checks, without exposing the value. A 180-second
+NetworkManager checkpoint protected activation; a fresh Tailscale SSH connection,
+full connectivity and active management services passed before it was canceled.
+The next software reboot was again HDMI-disconnected and returned to eduroam
+automatically. Fresh SSH worked at about 24 seconds of target uptime. Boot-ID
+comparison, enabled/active services, SSD mount, SSD Docker data root and
+loopback-only RDP passed. The Mac tunnel was restarted and the operator confirmed
+Windows App display and interaction again. GUI autologin was not changed;
+physical power-cycle recovery and extended desktop checks remain untested.
+Private records and backups remain on the host, outside Git.
 
 ## Vino fallback for sharing the console
 

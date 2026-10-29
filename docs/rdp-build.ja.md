@@ -184,3 +184,9 @@ JetsonのGit対象外`local/remote-desktop-build`，`local/rdp-export-01`，`loc
 Tailscale，SSH，両RDPサービス，Dockerが復帰した．SSDのマウントとDockerのSSD保存先を確認した．
 復旧したMacの専用バックグラウンドトンネル経由で，操作者がRDPの表示と入力を確認した．
 物理的な電源の入れ直しや，eduroamの起動試験ではない．
+
+その後のeduroam認証情報の保存，時間制限付き復元を用意した切り替え，2回目のHDMIなしの
+ソフトウェア再起動も成功した．対象機の稼働時間が約24秒の時点で新規SSHが動き，boot IDの変更，
+自動eduroam接続，インターネット，管理サービス，SSDのマウント，Docker保存先を確認した．
+Macのトンネル再開後，操作者がWindows Appの表示と入力を確認した．物理的な電源の入れ直しや
+GUI自動ログインの変更は行っていない．

@@ -104,13 +104,15 @@ basic interaction passed. RDP boot startup is enabled, with sesman as a required
 dependency. An HDMI-disconnected software reboot restored Wi-Fi, Tailscale,
 SSH and RDP services without manual reconnection; SSD mount and Docker startup
 also passed. The active Wi-Fi was non-enterprise, so this is not an eduroam
-boot result. A physical power-cycle test remains pending. Existing Vino is stopped.
+boot result. A subsequent eduroam switch and second headless software reboot
+also passed, with operator-confirmed RDP display/input. A physical power-cycle
+test remains pending. Existing Vino is stopped.
 Tailscale retains login state; it does not normally require `tailscale up` on
 every boot. Its node-key expiry must still be checked in the
 [Tailscale admin console](https://tailscale.com/docs/features/access-control/key-expiry).
 
-The enterprise Wi-Fi profile inspected on 2026-10-27 uses a user secret agent
-(`password-flags=1`) and is restricted to a login. Its password is unavailable
+The enterprise Wi-Fi profile inspected on 2026-10-27 initially used a user secret agent
+(`password-flags=1`) and was restricted to a login. Its password was unavailable
 through NetworkManager's settings cache. A later 2026-10-28 inspection found
 that the then-active Wi-Fi profile had no 802.1X settings. Do not transfer the
 earlier enterprise-profile conclusions to a different active connection. The
@@ -142,9 +144,10 @@ desired, replacing the placeholder with the intended regular login. That change
 occurs only after credential saving succeeds. Prefer leaving the desktop login
 protected on a shared device; boot Wi-Fi/Tailscale/SSH does not need autologin.
 
-After saving, perform a controlled reconnect and cold-boot test with someone
-present and local console recovery available. Do not interrupt the active source
-build. Until this test passes, unattended access is configured, not proven.
+For future changes, perform a controlled reconnect with timed or local recovery.
+The completed eduroam reconnect and software-reboot evidence is recorded below.
+A physical power-cycle test still needs someone present with console recovery.
+Do not interrupt running work. Configuration alone does not prove recovery.
 Network coverage, campus authentication and expired credentials remain external
 dependencies. Preserve the university's [official Wi-Fi setup](https://kb.wisc.edu/ns/page.php?id=25020)
 and [NetworkManager's credential/trust settings](https://networkmanager.dev/docs/api/latest/settings-802-1x.html).
@@ -167,17 +170,28 @@ them. A separate Linux login, venv, or ordinary container does not protect a
 personal university password from the host's administrators. Do not put the
 profile in this repository, an image, a general backup or a support log.
 
-The stored eduroam profile still uses a user secret agent and login restriction;
-we have not saved its password in the system profile or inspected its keyring.
-The active non-enterprise connection recovered after reboot, which does not
-validate the inactive eduroam profile. A targeted inspection found a CAT CA file
-and an explicit DNS alternative-subject match. Earlier reporting based only on
-empty domain-match fields missed that alternative form of server-name checking.
-The helper preserves rather than certifies trust settings; compare the CA bundle
-and server checks with the university's official Linux installer before storing
-personal credentials. Do not invent a server name or disable certificate validation.
+The saved eduroam profile initially used a user secret agent and a login
+restriction. The owner later entered the password in their own SSH terminal;
+the helper made the profile system-wide with autoconnect, indefinite retries
+and password flags 0. A privileged check confirmed a stored non-empty secret
+without displaying it. The existing user keyring was not inspected or cleared.
+The CAT CA bundle includes USERTrust RSA Certification Authority and retains
+its explicit DNS alternative-subject match. Earlier reporting based only on
+empty domain-match fields missed that alternative server-name check. No CA or
+server check was disabled or replaced. The helper preserves trust settings;
+it does not independently certify that an arbitrary profile is correct.
 
-At the onsite visit, with this source build finished and console recovery ready:
+A 180-second NetworkManager rollback protected the initial switch from the
+working Wi-Fi to eduroam. Fresh Tailscale SSH, full connectivity and management
+services passed, so the checkpoint was canceled. A second HDMI-disconnected
+software reboot connected to eduroam automatically; fresh SSH returned at about
+24 seconds of target uptime. A changed boot ID, all enabled/active management
+services, SSD mount, SSD Docker data root and loopback-only RDP were verified.
+The owner confirmed RDP display and input again. GUI autologin was not changed.
+This is an observed software-reboot result, not a physical power-cycle result
+or a guarantee of campus coverage, credential validity or Tailscale policy.
+
+For later reconfiguration, finish running jobs and arrange console or timed network recovery:
 
 1. Use the operator's own approved eduroam identity during dedicated use; do not
    reuse another researcher's password. Verify the actual profile, official

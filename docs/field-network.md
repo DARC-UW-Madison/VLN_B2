@@ -197,8 +197,9 @@ their localization/clearance role separately from TIC-VLA's RGB input.
 
 ## 6. Access, boot and operation without campus Wi-Fi
 
-- Complete the deferred [boot/credential checks](system-overview.md#personal-credentials-sharing-and-return).
-  Verify local recovery, then cold boot with no GUI login and test SSH.
+- Review the completed [boot/credential checks](system-overview.md#personal-credentials-sharing-and-return).
+  eduroam system saving, a headless software reboot and subsequent SSH/RDP
+  passed. Verify local recovery, then test a physical power cycle and SSH.
 - Test [remote desktop](remote-desktop.md) from Mac, both with and
   without HDMI, and after logout/reboot. Validate an actual usable framebuffer,
   authentication and restricted access; package presence is not success.

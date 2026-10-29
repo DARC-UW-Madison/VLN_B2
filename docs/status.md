@@ -19,8 +19,12 @@ research-login AC suspend is disabled. Wi-Fi automatic retry and Tailscale boot
 services are enabled. A controlled software reboot with HDMI disconnected
 restored the current non-enterprise Wi-Fi, Tailscale, SSH, RDP and Docker; the
 SSD mounted correctly. The operator confirmed post-reboot RDP display and input.
-This does not verify eduroam or a physical power cycle. The eduroam profile still
-needs owner-entered system credential saving and a controlled connection test.
+The owner then saved eduroam credentials through the terminal after GUI polkit
+denied editing. System-wide automatic connection, secret flags 0 and retained
+trust settings were verified without disclosing the secret. A timed-rollback
+switch to eduroam and a second headless software reboot passed; fresh Tailscale
+SSH returned at about 24 seconds of target uptime, and the operator confirmed
+RDP display/input again. A physical power cycle remains untested.
 GUI autologin is optional for local use, not required for boot networking; leave
 it protected for shared use. The existing GDM login target is retained.
 B2 is not connected through the wired port; no model inference, camera capture,
@@ -74,8 +78,9 @@ not part of these mocked tests.
 The [runtime flow guide](runtime-flow.md) explains source synchronization,
 separate upstream/weight inputs, actual container contents and each communication
 layer. The [credential lifecycle](system-overview.md#personal-credentials-sharing-and-return)
-records onsite boot checks and the required review before sharing/return. Neither
-personal credential saving nor a new GUI login target has been applied.
+records boot checks and the required review before sharing/return. Personal
+eduroam credentials are now saved in the root-protected host profile; no secret
+is in the repository. The existing GUI login target has not been changed.
 
 The [documentation index](README.md) now separates the manual from the project
 README. [Deployment choices](deployment-design.md), [terminology](glossary.md),
@@ -155,7 +160,7 @@ artifact-specific terms, then obtain separate approval for exact model files,
 revisions, sizes and official-cache location before acquisition.
 Run recorded-observation inference only after that review. The
 [runtime compatibility review](runtime-compatibility.md) preserves these constraints.
-In parallel, complete the deferred onsite boot/credential checks and map B2's
+In parallel, verify physical power-cycle recovery onsite and map B2's
 actual computers, cables and service/domain. Verify receive-only camera/state,
 frames/timestamps, control authority and stopping before motion integration.
 

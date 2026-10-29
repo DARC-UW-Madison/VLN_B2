@@ -212,3 +212,10 @@ non-enterprise Wi-Fi, Tailscale, SSH, both RDP services and Docker; the SSD moun
 and SSD Docker data root were verified. The operator then confirmed RDP display
 and input through the restored dedicated background Mac tunnel. This was not a
 physical power cycle or an eduroam boot test.
+
+The subsequent eduroam credential save, timed-rollback switch and second
+headless software reboot also passed. Fresh SSH worked at about 24 seconds of
+target uptime; a changed boot ID, automatic eduroam connection, Internet access,
+management services, SSD mount and Docker data root were verified. The operator
+confirmed Windows App display/input after the Mac tunnel was restarted. No
+physical power cycle or GUI autologin change was performed.
