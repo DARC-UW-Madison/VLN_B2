@@ -2,6 +2,10 @@
 
 [English](field-card.md) · [詳しい手順と問題の切り分け](onsite.ja.md)
 
+今回のカメラだけの訪問では，[外付けZEDの準備](camera-runtime.ja.md)から始める．
+以下のEthernet・B2調査は次の機体訪問で行う．ホストvenvだけには準備したbindingがないため，
+記載したコンテナ経路を使う．
+
 プロジェクトをJetsonにコピーし，ルートフォルダで端末を開きます．SSHやGitHubのURLは
 不要です．以下のコマンドはモーターへ指令を送りません．
 

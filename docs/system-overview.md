@@ -2,6 +2,12 @@
 
 [日本語](system-overview.ja.md) · [Status](status.md) · [Runtime setup](jetson-runtime.md)
 
+Current Mac policy (2026-10-29): the dedicated screen tunnel and saved B2
+Windows App profile are disabled/removed. No matching Mac startup task was found
+in the inspected locations. Do not recreate them without a new request. Existing
+Tailscale and ordinary foreground setup SSH are retained. The RDP commissioning
+results below are historical; the Jetson server itself was not changed.
+
 ## Verified external Jetson
 
 Inspection on 2026-10-27 identifies a Jetson AGX Orin Developer Kit, 64 GB class.
@@ -99,7 +105,7 @@ once. On this 64 GB system, CLI-only boot is not currently required.
 The desired sequence is power-on → Ubuntu → system Wi-Fi → Tailscale → SSH.
 GUI automatic login is optional for network services, though useful for local
 operation. NetworkManager, tailscaled and SSH are already enabled and active.
-For Mac screen control, [remote desktop](remote-desktop.md) now prioritizes
+For the earlier Mac screen test, [remote desktop](remote-desktop.md) used
 Windows App/RDP with the installed host xrdp server. The server is installed under `/opt/b2-remote`
 and running; Windows App authentication/desktop display and operator-reported
 basic interaction passed. RDP boot startup is enabled, with sesman as a required

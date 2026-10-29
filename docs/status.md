@@ -8,8 +8,9 @@ Updated **2026-10-29**. TIC-VLA now loads on the external Jetson GPU and complet
 one synthetic-image inference offline. Strict loading accepted 1,324 tensor keys,
 948,462,978 unique parameters, horizon 30 and three action layers. The one
 synthetic call returned 30 finite XY points in **13.64 seconds**. Its three-second
-prediction horizon does not make this a real-time controller. No actual camera,
-B2 state or navigation task was evaluated, and no motor command was sent.
+prediction horizon does not make this a real-time controller. That synthetic run evaluated no actual camera, B2 state or navigation task,
+and no motor command was sent. The subsequent first ZED RGB capture passed;
+see [camera preparation](camera-runtime.md).
 
 The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
@@ -18,7 +19,7 @@ safetensors; the older GPU runtime never decoded the original pickle checkpoint.
 All **130 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
-B2 is still disconnected from the wired interface. Actual camera/state capture,
+B2 is still disconnected from the wired interface. Actual B2 state reception,
 asynchronous cache/control integration, command sending, physical stopping and
 navigation evaluation remain unvalidated or unimplemented. The lab destination
 is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); no push has
@@ -33,7 +34,7 @@ upstream code, weights or converted derivatives.
 | External Jetson | AGX Orin 64 GB class, native CUDA and container GPU operations; real model load and synthetic inference | Real observations, delay profiling and asynchronous execution |
 | Onboard Jetson | Separate unit reported | Type, services, sensor connections and network reachability |
 | Motion controller | Separate computer suspected | Actual device, public control interface and ownership |
-| Camera | ZED 2i reported; pre-existing ZED headers 4.1.2 | Physical USB/network path, account access, binding, RGB and timing |
+| Camera | ZED 2i, USB 5 Gbps; SDK/binding and one 1280×720 left RGB capture passed | Mounted view, sustained capture and source-clock alignment |
 | LiDAR | Livox Mid-360 reported | Existing driver/network and defined use outside RGB model input |
 | Management | eduroam/Tailscale/SSH/RDP software-reboot recovery passed with HDMI disconnected | Physical power cycle, mobile network recovery and node-key policy |
 
@@ -49,7 +50,7 @@ Hardware availability is not sensor or navigation validation. The
 | CPU conversion | Verified for the actual checkpoint | 1,324 names retained; 3,773,492,276-byte output and readback manifest |
 | GPU model loading | Passed | Exact keys/shapes, parameter/device checks, no original pickle input |
 | Synthetic-image inference | One call passed | 30 finite points; not camera quality, navigation accuracy or a rate guarantee |
-| Live camera/state observation | Adapters implemented, hardware unverified | RGB, state, timestamps, frames and recording need field checks |
+| Live camera/state observation | One camera capture passed; B2 state unverified | Sustained RGB, state, clocks, frames and paired recording need checks |
 | Asynchronous runtime and motion sender | Not implemented | Consistent cache metadata, fresh observation path, watchdog and control authority |
 | Physical stopping and B2 evaluation | Not validated | Review and execute staged field tests before movement |
 
@@ -76,9 +77,15 @@ Hardware availability is not sensor or navigation validation. The
   The return review includes the pre-existing lab login where UWNet portal
   authentication occurred, not only the new research login. No cleanup was run.
 - Keep VNC outside the current plan. Existing NoMachine is unchanged; no
-  performance comparison proves xrdp is faster. RDP uses a loopback listener plus
-  a separate Mac SSH tunnel by configuration, not protocol necessity. A direct
-  tailnet-only RDP design could remove that tunnel. See [remote desktop](remote-desktop.md).
+  performance comparison proves xrdp is faster. Historical screen-connection
+  procedures are in [remote desktop](remote-desktop.md).
+- Mac remote GUI is disabled at the operator's request: no dedicated tunnel or
+  13389 listener remains; the B2 Windows App profile was removed. Existing
+  Tailscale and unrelated connections remain. Do not restart or add a Mac
+  background service. Foreground setup SSH is closed after use.
+- Camera SDK/binding import and dependency checks passed in a separate private
+  prefix/container, without changing host groups or the GPU image. USB capture
+  acceptance is tracked in [camera preparation](camera-runtime.md).
 
 ## Next deliverable
 

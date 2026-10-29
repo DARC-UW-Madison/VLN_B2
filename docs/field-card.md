@@ -2,6 +2,10 @@
 
 [日本語](field-card.ja.md) · [Detailed steps and troubleshooting](onsite.md)
 
+For the current camera-only visit, start with [external ZED preparation](camera-runtime.md).
+The Ethernet/B2 steps below belong to the later robot visit. The host venv alone
+does not supply the prepared camera binding; use the documented container path.
+
 Bring a copy of this project to the Jetson and open a terminal in its root.
 No SSH or GitHub URL is needed. These commands send no motor commands.
 

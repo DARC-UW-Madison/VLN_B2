@@ -2,6 +2,10 @@
 
 [English](system-overview.md) · [進捗](status.ja.md) · [実行環境構築](jetson-runtime.ja.md)
 
+2026-10-29のMac方針：画面用トンネルとB2用Windows App接続は停止・解除した．調査した場所には
+該当するMacの自動起動はなかった．新しい依頼なしに再作成しない．既存Tailscaleと通常の前景の作業用SSHは
+維持する．以下のRDP導入結果は過去の検証で，Jetson側のサーバー自体は変更していない．
+
 ## 外付けJetsonの確認済み構成
 
 2026-10-27の調査では，Jetson AGX Orin Developer Kitの64 GBクラスである．
@@ -88,7 +92,7 @@ GPUイメージはモデル実行環境の候補用である．カメラや状�
 現地の操作に便利だが，ネットワークサービスの起動には本来不要である．NetworkManager，tailscaled，SSHは
 起動時に有効で，現在も動作している．
 Macからの画面操作は[リモートデスクトップ](remote-desktop.ja.md)を参照する．既存Vinoは未起動で，
-Windows App・RDPとホストのxrdpを使う．サーバーは`/opt/b2-remote`へ導入して動作中で，Windows Appの認証・画面表示が通り，操作者も基本操作を確認した．
+以前の確認ではWindows App・RDPとホストのxrdpを使った．サーバーは`/opt/b2-remote`へ導入して動作中で，Windows Appの認証・画面表示が通り，操作者も基本操作を確認した．
 RDP本体を起動時に有効化し，sesmanは必要な依存先として起動する．HDMIなしでソフトウェアから再起動し，
 Wi-Fi，Tailscale，SSH，RDPサービスが手動の再接続なしで復帰した．SSDのマウントとDockerの起動も通った．
 初回のWi-Fiは非Enterprise設定だったため，その後eduroamへ切り替え，2回目のHDMIなしのソフトウェア再起動と，

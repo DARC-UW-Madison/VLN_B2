@@ -2,17 +2,21 @@
 
 [日本語](remote-desktop.ja.md) · [Documentation](README.md) · [System overview](system-overview.md) · [Field procedure](field-network.md)
 
-Use SSH for ordinary terminal work. Prepare RDP as the preferred option for the
-occasional graphical settings task, with Microsoft's Windows App on Mac and an
-xrdp server on Jetson. The pinned server is installed, running and enabled at
-boot. Authentication and desktop display passed on 2026-10-28; the operator
-subsequently confirmed basic interaction. A later HDMI-disconnected software reboot restored Wi-Fi, Tailscale, SSH and
-RDP automatically; the operator also confirmed post-reboot GUI display and input.
-Settings permission, extended input and a physical power-cycle test remain
-separate checks. RDP has not
-been measured against VNC on this Jetson, so the preference is not a claim that
-it is more stable. Remote desktop is a management tool; inference and future
-robot control must run locally without requiring a desktop connection.
+Current policy, **2026-10-29**: remote GUI connections from Mac are disabled at
+the operator's request. The dedicated tunnel was not running; port 13389 had no
+listener, and no matching startup configuration was found in the inspected Mac
+launch-agent/daemon and shell/SSH configuration locations. Its inactive lock
+was removed. The B2 Windows App profile was exported privately for recovery and
+removed from the app; Windows App was then closed. Existing Tailscale and
+unrelated saved connections were preserved. Do not restart the tunnel, add a
+Mac service or install another remote-desktop client without a new request.
+
+The Jetson RDP installation remains unchanged. RDP login, display/input and
+headless software-reboot recovery passed previously; those are historical
+results, not an active Mac connection. Ordinary foreground SSH remains available
+for setup and should be closed when that work ends. The examples below are
+reference procedures, not an instruction to recreate the removed configuration.
+Inference and future robot control must run locally without a desktop link.
 
 ## What is currently known
 
