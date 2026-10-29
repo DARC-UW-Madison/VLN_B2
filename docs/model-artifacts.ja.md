@@ -189,6 +189,35 @@ TransformersのAutoModel wrapperは，呼び出し元が別の指定をしても
 `tools/verify_tensor_loading.py`を用意した．CPU変換，来歴の検証，変換・推論の全体は，
 引き続き実装・検証が必要である．
 
+### Jetsonで完了した生成tensorの検証
+
+2026-10-29に既存のTorch 2.2.2イメージで実際の読込部の試験が成功した．生成したファイルは
+4,504バイトで，もともとstorageを共有していた二つの名前を含む4キーである．FP32・BF16の
+値・shape・dtypeを維持し，重複した両方の名前も残った．壊れたsafetensorsと古いTorchの
+チェックポイント復元を拒否し，`torch.load`は呼ばなかった．通常の113件のテストもJetsonで成功した．
+検査した入出力の境界の証拠であり，変換処理，実チェックポイント，基盤モデルの構築，ナビゲーション推論の成功ではない．
+
+Jetsonのプロジェクトルートで，次のコマンドで再現できる．
+
+```sh
+sudo docker run --rm --runtime runc --network none --read-only \
+  --user 1000:1000 --cap-drop ALL --security-opt no-new-privileges \
+  --pids-limit 128 --memory 1g --cpus 2 \
+  --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+  --mount "type=bind,src=$(pwd)/src,dst=/workspace/src,readonly" \
+  --mount "type=bind,src=$(pwd)/tools/verify_tensor_loading.py,dst=/workspace/verify_tensor_loading.py,readonly" \
+  -e PYTHONPATH=/workspace/src -e PYTHONDONTWRITEBYTECODE=1 \
+  --entrypoint python3.11 vln-b2-runtime:jp5 /workspace/verify_tensor_loading.py
+```
+
+`runc`でNVIDIA runtimeを使わず，`--network none`でネットワークをなくす．読み取り専用のroot・
+ソースマウント，通常のUID，capabilityの削除，`no-new-privileges`で処理の権限を制限する．
+CPU，メモリ，プロセス数，一時領域にも小さな試験向けの上限がある．マウントするのは確認した
+アプリケーションソースと検査ツールだけで，モデルキャッシュ，ホーム，Docker socket，センサー，
+認証情報は渡さない．新しいイメージのビルドやパッケージ追加は不要だった．イメージID，ソースの版と
+hash，報告のhash，上限と出力は，JetsonのGit対象外`local/access-setup`へ非公開で記録した．
+再試験に失敗したら古い試行を残し，制限を無条件に緩めずに原因を調べる．
+
 ## 6．公式変換ツールも自動的な承認にはならない
 
 Hugging Faceの[変換ガイド](https://huggingface.co/docs/safetensors/en/convert-weights)には公式converterがある．

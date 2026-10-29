@@ -33,8 +33,8 @@ Ubuntu 20.04，L4T 35.4.1，CUDA 11.4，ROS Foxy，ZED を維持し，**`nvcr.io
 4. TIC-VLA と将来取得する基底モデルの Python/config のリビジョンを固定し，import，processor/tokenizer の引数，実際のキャッシュ形式を確認します．同期 [`predict()`](https://github.com/ucla-mobility/TIC-VLA/blob/main/ticvla/models/ticvla.py) は従来の tuple または `layers` のあるキャッシュを扱い，[Transformers 4.44.2](https://github.com/huggingface/transformers/blob/v4.44.2/src/transformers/models/qwen2/modeling_qwen2.py) には従来形式を返す経路があります．学習側の厳しいキャッシュ処理は今回の対象外です．ビルド・import・キャッシュで失敗したら原因を記録し，限定した修正や指定変更を検討します．ホスト更新や際限のない依存探索へ拡張しません．
 
 PyTorch 2.2.2 にはアダプタが必要とする [`torch.load(weights_only=True)`](https://github.com/pytorch/pytorch/blob/v2.2.2/torch/serialization.py) がありますが，公式の [2025 年の weights-only 脆弱性](https://github.com/pytorch/pytorch/security/advisories/GHSA-53q9-r3pm-6pq6)と [2026 年の weights-only 脆弱性](https://github.com/pytorch/pytorch/security/advisories/GHSA-63cw-57p8-fm3p)の対象です．フラグの存在だけで安全なデシリアライズとは扱えません．初回候補は以下のモデル不要試験に限定します．外部チェックポイントを読む前に，レビューした修正のバックポート，または safetensors などへの変換・専用読込経路を別途検証する必要があります．アダプターはTorch 2.2.2でのチェックポイント復元を拒否し，tensor専用のsafetensors経路と，
-基盤モデルのAutoModelでsafetensorsを強制する処理を実装しました．モックによる契約の検査は通りましたが，
-変換処理と実モデルの互換性は未検証です．[モデル資材と読込計画](model-artifacts.ja.md)に，メタデータを確認した取得候補と未解決の条件，分離した新しいCPU環境での変換，Jetsonでsafetensorsだけを読む案を記しました．モデルの取得承認はまだありません．厳密なキー・形状検査と，制限のない pickle へのフォールバックをしない方針も維持します．
+基盤モデルのAutoModelでsafetensorsを強制する処理を実装しました．モックによる契約の検査と，
+Jetsonで実際に生成したtensorのCPU入出力は通りましたが，変換処理と実モデルの互換性は未検証です．[モデル資材と読込計画](model-artifacts.ja.md)に，メタデータを確認した取得候補と未解決の条件，分離した新しいCPU環境での変換，Jetsonでsafetensorsだけを読む案を記しました．モデルの取得承認はまだありません．厳密なキー・形状検査と，制限のない pickle へのフォールバックをしない方針も維持します．
 
 ## 次の動作試験と合格条件
 

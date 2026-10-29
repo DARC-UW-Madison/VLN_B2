@@ -57,7 +57,7 @@ Wi-Fi認証情報の保存，実際の再接続，電源投入からの復旧は
 
 tensor専用の接続部には，版を検査するチェックポイント読込，古いTorchでのsafetensors読込，
 壊れた入力からpickleへ戻らないこと，基盤モデルのローカル・safetensors読込の強制に関する4件を追加し，
-ローカルの**全113件が成功**した．実際の生成tensorによる試験は`tools/verify_tensor_loading.py`で，
+**ローカル・Jetsonで全113件が成功**した．実際の生成tensorによる試験は`tools/verify_tensor_loading.py`で，
 モデル構築，GPU，外部の重みは使わない．モデル変換，全モデルの厳密な読込，記録済み画像の推論とは別の試験である．
 
 ## 1. システムを理解する

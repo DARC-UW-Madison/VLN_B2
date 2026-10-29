@@ -156,9 +156,13 @@ exit codes are both `0`. No model weights were acquired or loaded.
 
 The artifact/loading plan is prepared. The independent adapter now accepts
 safetensors, forces tensor-only base loading and blocks checkpoint decoding on
-older Torch; all **113 local tests** passed. The generated-tensor runtime probe
-is prepared, with target execution still pending. Next implement and test the
-reviewed CPU conversion, resolve
+older Torch; all **113 tests passed locally and on Jetson**. The existing
+Torch 2.2.2 image also passed real generated-tensor I/O on CPU: four keys,
+4,504 bytes, FP32/BF16 values/shapes/dtypes, both alias names, malformed-input
+rejection and the old-Torch checkpoint gate. The container had no network/GPU,
+a read-only root, no capabilities, UID 1000 and bounded resources. No external
+weights, model construction or inference were involved. Next implement and test
+the reviewed CPU conversion, resolve
 artifact-specific terms, then obtain separate approval for exact model files,
 revisions, sizes and official-cache location before acquisition.
 Run recorded-observation inference only after that review. The

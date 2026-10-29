@@ -225,6 +225,39 @@ a separate generated-tensor check for the real runtime; no external assets or
 model construction are involved. The CPU converter, provenance verification and
 full conversion/inference path still require implementation and validation.
 
+### Generated-tensor verification completed on Jetson
+
+On 2026-10-29, the existing Torch 2.2.2 image passed the real-reader probe.
+The generated file was 4,504 bytes with four keys, including two names that
+originally shared storage. FP32/BF16 values, shapes and dtypes survived; both
+alias names remained. Malformed safetensors was rejected and old-Torch
+checkpoint decoding was blocked, with no `torch.load` call. All 113 ordinary
+tests also passed on Jetson. This proves the tested I/O boundary, not a working
+converter, real checkpoint, base-model construction or navigation inference.
+
+From the project root on Jetson, the repeatable probe command is:
+
+```sh
+sudo docker run --rm --runtime runc --network none --read-only \
+  --user 1000:1000 --cap-drop ALL --security-opt no-new-privileges \
+  --pids-limit 128 --memory 1g --cpus 2 \
+  --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+  --mount "type=bind,src=$(pwd)/src,dst=/workspace/src,readonly" \
+  --mount "type=bind,src=$(pwd)/tools/verify_tensor_loading.py,dst=/workspace/verify_tensor_loading.py,readonly" \
+  -e PYTHONPATH=/workspace/src -e PYTHONDONTWRITEBYTECODE=1 \
+  --entrypoint python3.11 vln-b2-runtime:jp5 /workspace/verify_tensor_loading.py
+```
+
+`runc` avoids the NVIDIA runtime; `--network none` removes network access.
+Read-only root/source mounts, an ordinary UID, dropped capabilities and
+`no-new-privileges` restrict the process. CPU, memory, process and temporary-space
+limits bound this small test. The mounts contain only reviewed application
+source and the verifier, with no model cache, home directory, Docker socket,
+sensors or credentials. No image build or new package was needed. The image ID,
+source revision/hashes, report hash, limits and output are recorded privately
+under ignored `local/access-setup` on Jetson. Preserve old failed attempts if a
+repeat fails, and investigate rather than weakening the restrictions blindly.
+
 ## 6. Official conversion tools are not automatic approval
 
 Hugging Face's [conversion guide](https://huggingface.co/docs/safetensors/en/convert-weights)
