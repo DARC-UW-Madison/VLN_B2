@@ -11,7 +11,8 @@ from b2_tic_vla.types import Frame, RobotState
 def observation(at, x=0., y=0., yaw=0.):
     return Observation(Frame("immutable-frame.jpg", at, captured_at=at, timestamp_verified=True),
                        RobotState(at, x, y, yaw, .1, .0, .2, frame_id="odom", velocity_frame="body"),
-                       "Go ahead", state_timing_verified=True, pose_frame_verified=True)
+                       "Go ahead", state_timing_verified=True, pose_frame_verified=True,
+                       state_aligned_at=at)
 
 
 class SemanticCacheTests(unittest.TestCase):
@@ -75,13 +76,28 @@ class SemanticCacheTests(unittest.TestCase):
             (replace(current, instruction="Turn left"), "instruction_changed"),
             (replace(current, state=replace(current.state, frame_id="different")),
              "pose_frame_mismatch_or_unknown"),
-            (replace(current, state=replace(current.state, received_at=109.)), "stale_state"),
+            (replace(current, state=replace(current.state, received_at=109.), state_aligned_at=109.),
+             "stale_state"),
             (replace(current, frame=replace(current.frame, received_at=109., captured_at=109.)),
              "stale_observation"),
         ]
         for value, reason in cases:
             with self.subTest(reason=reason):
                 self.assertEqual(self.cache.select(value, 110.1, self.limits).reason, reason)
+
+    def test_fresh_receipts_do_not_hide_misaligned_or_old_source_samples(self):
+        old = observation(100.)
+        old = replace(old, frame=replace(old.frame, captured_at=90.))
+        self.publish(old)
+        self.assertEqual(self.cache.select(observation(110.), 110.1, self.limits).reason,
+                         "image_state_capture_skew")
+        self.cache.reset()
+        self.publish()
+        current = observation(110.)
+        current = replace(current, frame=replace(current.frame, captured_at=109.4),
+                          state_aligned_at=109.4)
+        self.assertEqual(self.cache.select(current, 110.1, self.limits).reason,
+                         "stale_state_sample")
 
     def test_invalid_time_limit_and_overflowing_geometry_fail_closed(self):
         with self.assertRaises(ValueError):

@@ -4,13 +4,17 @@ Run in the dedicated SDK image with Docker --network none. Network isolation is
 an external precondition: this verifier cannot prove the container's network
 mode. It never constructs a DDS domain, participant, factory or robot client.
 No library-loading bypass variable is allowed. No Hugging Face assets are used.
+The SDK is imported from pinned source for its state path only. Its full pip
+distribution is not installed and its declared dependencies are not satisfied.
 """
 
 import argparse
+import ast
 from dataclasses import asdict
 from datetime import datetime, timezone
 import hashlib
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, distribution, version
+from importlib.util import find_spec
 import json
 import os
 from pathlib import Path
@@ -20,12 +24,83 @@ import time
 import traceback
 
 
+SDK_REVISION = "814556d15970dd2ecf1c9984e845ca02ab07e206"
+SDK_REPOSITORY = "https://github.com/unitreerobotics/unitree_sdk2_python"
+SDK_SOURCE = Path("/opt/vendor/unitree_sdk2_python")
+SDK_METADATA = Path("/opt/runtime-metadata/unitree")
+
+
 def sha256(path):
     digest = hashlib.sha256()
     with path.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def verify_sdk_source(report):
+    """Check build-recorded source provenance without executing setup.py."""
+    try:
+        distribution("unitree_sdk2py")
+    except PackageNotFoundError:
+        report["sdk_distribution_installed"] = False
+    else:
+        report["sdk_distribution_installed"] = True
+        raise RuntimeError("Remove the installed SDK distribution; source/distribution mixing is refused")
+    source = SDK_SOURCE.resolve(strict=True)
+    if os.environ.get("PYTHONPATH") != str(source):
+        raise ValueError("PYTHONPATH must select only the pinned SDK source directory")
+    manifest_path = SDK_METADATA / "unitree-sdk2-source.json"
+    manifest = json.loads(manifest_path.read_text())
+    if manifest.get("repository") != SDK_REPOSITORY or manifest.get("revision") != SDK_REVISION:
+        raise RuntimeError("SDK source manifest does not identify the reviewed repository/revision")
+    if (source / ".git/HEAD").read_text().strip() != SDK_REVISION:
+        raise RuntimeError("SDK source is not detached at the reviewed revision")
+    if (SDK_METADATA / "unitree-sdk2-revision.txt").read_text().strip() != SDK_REVISION:
+        raise RuntimeError("SDK source revision record differs from the reviewed revision")
+    if manifest.get("sdk_import_mode") != "pinned source; state path only":
+        raise RuntimeError("SDK source manifest has an unexpected import mode")
+    if manifest.get("declared_full_sdk_dependencies_satisfied") is not False:
+        raise RuntimeError("SDK source manifest must not claim full distribution dependency coverage")
+    setup_path = source / "setup.py"
+    if sha256(setup_path) != manifest.get("setup_py_sha256"):
+        raise RuntimeError("SDK original setup.py differs from the pinned build manifest")
+    if sha256(SDK_METADATA / "unitree-sdk2-setup.py") != manifest["setup_py_sha256"]:
+        raise RuntimeError("SDK archived original setup.py differs from its source")
+    if sha256(source / "LICENSE") != manifest.get("license_sha256"):
+        raise RuntimeError("SDK original license differs from the pinned build manifest")
+    if sha256(SDK_METADATA / "licenses/unitree-sdk2-LICENSE") != manifest["license_sha256"]:
+        raise RuntimeError("SDK archived original license differs from its source")
+    syntax = ast.parse(setup_path.read_text(), filename="upstream/setup.py")
+    calls = [node for node in ast.walk(syntax) if isinstance(node, ast.Call)
+             and isinstance(node.func, ast.Name) and node.func.id == "setup"]
+    if len(calls) != 1:
+        raise RuntimeError("Expected exactly one upstream setup() declaration")
+    fields = {item.arg: ast.literal_eval(item.value) for item in calls[0].keywords
+              if item.arg in {"name", "version", "install_requires"}}
+    if fields.get("name") != "unitree_sdk2py" or fields.get("version") != "1.0.1":
+        raise RuntimeError("SDK original setup.py has an unexpected package name/version")
+    if manifest.get("version") != fields["version"]:
+        raise RuntimeError("SDK source manifest version differs from its original declaration")
+    if fields.get("install_requires") != ["cyclonedds==0.10.2", "numpy", "opencv-python"]:
+        raise RuntimeError("SDK original full dependency declarations were changed")
+    files = sorted([setup_path, *(source / "unitree_sdk2py").rglob("*.py")])
+    actual_hashes = {str(path.relative_to(source)): sha256(path) for path in files}
+    if actual_hashes != manifest.get("python_source_sha256"):
+        raise RuntimeError("SDK Python source file set/hashes differ from the pinned build manifest")
+    spec = find_spec("unitree_sdk2py")
+    if spec is None or spec.origin is None:
+        raise RuntimeError("Pinned SDK source package cannot be resolved")
+    if Path(spec.origin).resolve(strict=True) != source / "unitree_sdk2py/__init__.py":
+        raise RuntimeError("SDK import would resolve outside the pinned source package")
+    report["sdk_source"] = {"repository": SDK_REPOSITORY, "revision": SDK_REVISION,
+                            "version": fields["version"], "path": str(source),
+                            "setup_py_sha256": manifest["setup_py_sha256"],
+                            "manifest_sha256": sha256(manifest_path),
+                            "python_source_files_verified": len(actual_hashes),
+                            "declared_full_sdk_dependencies": fields["install_requires"],
+                            "origin_verified": True, "setup_executed": False}
+    return source
 
 
 def verify(report):
@@ -41,12 +116,12 @@ def verify(report):
         raise ValueError("CYCLONEDDS_HOME must select /opt/cyclonedds")
     if any(name.split(".")[0] in {"cyclonedds", "unitree_sdk2py"} for name in sys.modules):
         raise RuntimeError("Start a fresh verifier process without preloaded DDS/SDK modules")
-    report["versions"] = {name: version(name) for name in
-                          ("cyclonedds", "unitree_sdk2py", "numpy", "opencv-python")}
-    expected = {"cyclonedds": "0.10.2", "unitree_sdk2py": "1.0.1",
-                "numpy": "1.26.4", "opencv-python": "4.10.0.84"}
-    if report["versions"] != expected:
-        raise RuntimeError("Installed SDK runtime versions differ from the reviewed pins")
+    report["versions"] = {"cyclonedds": version("cyclonedds")}
+    if report["versions"] != {"cyclonedds": "0.10.2"}:
+        raise RuntimeError("Installed CycloneDDS version differs from the reviewed pin")
+    report["stage"] = "sdk_source_provenance"
+    source = verify_sdk_source(report)
+    report["versions"]["unitree_sdk2py_source"] = report["sdk_source"]["version"]
 
     report["stage"] = "native_import"
     from cyclonedds.internal import DDS
@@ -73,6 +148,11 @@ def verify(report):
     from unitree_sdk2py.idl.default import unitree_go_msg_dds__SportModeState_
     from unitree_sdk2py.idl.unitree_go.msg.dds_ import SportModeState_
 
+    for name, module in list(sys.modules.items()):
+        if name == "unitree_sdk2py" or name.startswith("unitree_sdk2py."):
+            origin = getattr(module, "__file__", None)
+            if origin is not None and not Path(origin).resolve(strict=True).is_relative_to(source):
+                raise RuntimeError("Imported SDK module origin is outside the pinned source directory")
     if not callable(ChannelSubscriber):
         raise RuntimeError("SDK ChannelSubscriber definition is unavailable")
     report["stage"] = "state_serialization"
@@ -115,6 +195,9 @@ def main(argv=None):
                   "dds_entities_created_by_verifier": False,
                   "robot_client_created": False, "robot_connected": False,
                   "motion_sent": False, "external_model_assets_used": False,
+                  "sdk_import_mode": "pinned source; state path only",
+                  "declared_full_sdk_dependencies_satisfied": False,
+                  "sdk_distribution_installed": None,
                   "serialization_verified": False}
         started = time.monotonic()
         try:

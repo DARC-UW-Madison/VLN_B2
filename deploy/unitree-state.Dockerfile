@@ -5,7 +5,8 @@ FROM ${BASE_IMAGE}
 
 ARG CYCLONEDDS_REVISION=9995905bce6c4cf9f740d6438bbf7fcfd1c83dfd
 ARG UNITREE_REVISION=814556d15970dd2ecf1c9984e845ca02ab07e206
-ENV PATH=/opt/unitree/bin:/opt/python/bin:${PATH} \
+ENV PATH=/opt/unitree/bin:/opt/sdk-build-tools/bin:/opt/python/bin:${PATH} \
+    PYTHONPATH=/opt/vendor/unitree_sdk2_python \
     CYCLONEDDS_HOME=/opt/cyclonedds \
     LD_LIBRARY_PATH=/opt/cyclonedds/lib \
     PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 \
@@ -14,14 +15,20 @@ ENV PATH=/opt/unitree/bin:/opt/python/bin:${PATH} \
 RUN test "$(uname -m)" = aarch64 && \
     /opt/python/bin/python3.11 -c 'import pathlib, sys, sysconfig; assert sys.version_info[:2] == (3, 11); assert (pathlib.Path(sysconfig.get_path("include")) / "Python.h").is_file()' && \
     /opt/python/bin/python3.11 -m venv /opt/unitree && \
-    mkdir -p /opt/runtime-metadata/unitree/licenses /opt/vendor
+    /opt/python/bin/python3.11 -m venv --without-pip /opt/sdk-build-tools && \
+    mkdir -p /opt/runtime-metadata/unitree/licenses /opt/runtime-metadata/sdk-build-tools /opt/vendor
 COPY deploy/unitree-requirements.lock /opt/runtime-metadata/unitree-requirements.lock
-# Bootstrap every binary requirement before building the C/Python extensions.
-RUN /opt/python/bin/python3.11 -c 'from pathlib import Path; source=Path("/opt/runtime-metadata/unitree-requirements.lock"); Path("/opt/runtime-metadata/unitree-binary-requirements.lock").write_text("\n".join(line for line in source.read_text().splitlines() if not line.startswith("cyclonedds @")) + "\n")' && \
+# Split the complete input manifest into runtime binaries, CMake and DDS source.
+# The build-only CMake wheel stays outside runtime package metadata/pip check.
+RUN /opt/python/bin/python3.11 -c 'from pathlib import Path; root=Path("/opt/runtime-metadata"); lines=(root / "unitree-requirements.lock").read_text().splitlines(); assert sum(line.startswith("cmake @") for line in lines) == 1; assert sum(line.startswith("cyclonedds @") for line in lines) == 1; groups={"unitree-binary": [line for line in lines if not line.startswith(("cyclonedds @", "cmake @"))], "unitree-build-tools": [line for line in lines if line.startswith("cmake @")], "unitree-source": [line for line in lines if line.startswith("cyclonedds @")]}; [(root / (name + "-requirements.lock")).write_text("\n".join(selected) + "\n") for name, selected in groups.items()]' && \
     /opt/python/bin/python3.11 -m pip --python /opt/unitree install \
       --no-cache-dir --only-binary=:all: --require-hashes \
       --report /opt/runtime-metadata/unitree-binary-install-report.json \
-      -r /opt/runtime-metadata/unitree-binary-requirements.lock
+      -r /opt/runtime-metadata/unitree-binary-requirements.lock && \
+    /opt/python/bin/python3.11 -m pip --python /opt/sdk-build-tools install \
+      --no-cache-dir --only-binary=:all: --require-hashes \
+      --report /opt/runtime-metadata/unitree-build-tools-install-report.json \
+      -r /opt/runtime-metadata/unitree-build-tools-requirements.lock
 
 RUN git init /opt/vendor/cyclonedds && cd /opt/vendor/cyclonedds && \
     git remote add origin https://github.com/eclipse-cyclonedds/cyclonedds.git && \
@@ -40,7 +47,7 @@ RUN git init /opt/vendor/cyclonedds && cd /opt/vendor/cyclonedds && \
 RUN /opt/unitree/bin/python -m pip install --no-cache-dir --no-build-isolation \
       --no-deps --require-hashes \
       --report /opt/runtime-metadata/unitree-python-install-report.json \
-      -r /opt/runtime-metadata/unitree-requirements.lock
+      -r /opt/runtime-metadata/unitree-source-requirements.lock
 
 RUN git init /opt/vendor/unitree_sdk2_python && cd /opt/vendor/unitree_sdk2_python && \
     git remote add origin https://github.com/unitreerobotics/unitree_sdk2_python.git && \
@@ -49,15 +56,21 @@ RUN git init /opt/vendor/unitree_sdk2_python && cd /opt/vendor/unitree_sdk2_pyth
     test "$(git rev-parse HEAD)" = "${UNITREE_REVISION}" && \
     printf '%s\n' "${UNITREE_REVISION}" > /opt/runtime-metadata/unitree/unitree-sdk2-revision.txt && \
     cp LICENSE /opt/runtime-metadata/unitree/licenses/unitree-sdk2-LICENSE && \
-    PIP_NO_INDEX=1 /opt/unitree/bin/python -m pip install \
-      --no-cache-dir --no-deps --no-build-isolation \
-      --report /opt/runtime-metadata/unitree-sdk2-install-report.json . && \
+    cp setup.py /opt/runtime-metadata/unitree/unitree-sdk2-setup.py && \
+    /opt/unitree/bin/python -c 'import hashlib, json; from pathlib import Path; source=Path("/opt/vendor/unitree_sdk2_python"); digest=lambda path: hashlib.sha256(path.read_bytes()).hexdigest(); manifest={"repository": "https://github.com/unitreerobotics/unitree_sdk2_python", "revision": (source / ".git/HEAD").read_text().strip(), "version": "1.0.1", "sdk_import_mode": "pinned source; state path only", "declared_full_sdk_dependencies_satisfied": False, "setup_py_sha256": digest(source / "setup.py"), "license_sha256": digest(source / "LICENSE"), "python_source_sha256": {str(path.relative_to(source)): digest(path) for path in sorted([source / "setup.py", *(source / "unitree_sdk2py").rglob("*.py")])}}; Path("/opt/runtime-metadata/unitree/unitree-sdk2-source.json").write_text(json.dumps(manifest, indent=2) + "\n")' && \
     /opt/unitree/bin/python -m pip check && \
     /opt/unitree/bin/python -m pip freeze --all > /opt/runtime-metadata/unitree-freeze.txt && \
+    /opt/python/bin/python3.11 -m pip --python /opt/sdk-build-tools freeze --all > /opt/runtime-metadata/sdk-build-tools-freeze.txt && \
     dpkg-query -W > /opt/runtime-metadata/unitree-debian-packages.txt
-# Preserve full installed metadata and every bundled license/notice, including
-# NumPy/OpenCV binary component notices. Vendor source trees retain originals too.
-RUN /opt/unitree/bin/python -c 'import importlib.metadata as m, json, pathlib, shutil; root=pathlib.Path("/opt/runtime-metadata/unitree"); distributions=list(m.distributions()); (root / "python-distributions.json").write_text(json.dumps([{"name": d.metadata["Name"], "version": d.version, "license": d.metadata.get("License"), "license_expression": d.metadata.get("License-Expression"), "requires": d.requires or []} for d in distributions], indent=2) + "\n"); metadata=[(d, f) for d in distributions for f in (d.files or []) if ".dist-info" in str(f) or any(token in str(f).lower() for token in ("license", "copying", "notice", "copyright"))]; [(target.parent.mkdir(parents=True, exist_ok=True), shutil.copy2(d.locate_file(f), target)) for d, f in metadata if pathlib.Path(d.locate_file(f)).is_file() for target in [root / "python-notices" / d.metadata["Name"] / str(f).replace("..", "_parent_")]]'
+# SDK source is not a pip distribution: upstream setup.py/declarations stay intact,
+# and the full SDK's declared NumPy/OpenCV dependencies are not satisfied here.
+# pip check covers installed CycloneDDS/runtime tooling only, excluding SDK source.
+# Preserve installed metadata and bundled notices. Vendor trees retain originals.
+# Each interpreter exports only its own venv, keeping CMake provenance separate.
+RUN for environment in unitree sdk-build-tools; do \
+      /opt/${environment}/bin/python -c 'import importlib.metadata as m, json, pathlib, shutil, sys; root=pathlib.Path(sys.argv[1]); distributions=list(m.distributions()); (root / "python-distributions.json").write_text(json.dumps([{"name": d.metadata["Name"], "version": d.version, "license": d.metadata.get("License"), "license_expression": d.metadata.get("License-Expression"), "requires": d.requires or []} for d in distributions], indent=2) + "\n"); metadata=[(d, f) for d in distributions for f in (d.files or []) if ".dist-info" in str(f) or any(token in str(f).lower() for token in ("license", "copying", "notice", "copyright"))]; [(target.parent.mkdir(parents=True, exist_ok=True), shutil.copy2(d.locate_file(f), target)) for d, f in metadata if pathlib.Path(d.locate_file(f)).is_file() for target in [root / "python-notices" / d.metadata["Name"] / str(f).replace("..", "_parent_")]]' \
+        /opt/runtime-metadata/${environment} || exit 1; \
+    done
 COPY LICENSE THIRD_PARTY.md /opt/runtime-metadata/
 COPY tools/verify_unitree_sdk.py /opt/runtime-tools/verify_unitree_sdk.py
 WORKDIR /opt

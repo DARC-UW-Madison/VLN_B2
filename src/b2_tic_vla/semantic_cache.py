@@ -20,13 +20,18 @@ def _finite(*values):
 
 @dataclass(frozen=True)
 class Observation:
-    """Planar pose experiment; pose verification must include the yaw-only assumption."""
+    """Planar pose experiment; aligned pose/velocity times use the host clock.
+
+    State timing verification requires a real sample/interpolation time, not its
+    transport receipt. Pose verification must include the yaw-only assumption.
+    """
 
     frame: Frame
     state: RobotState
     instruction: str
     state_timing_verified: bool = False
     pose_frame_verified: bool = False
+    state_aligned_at: float | None = None
 
 
 @dataclass(frozen=True)
@@ -92,6 +97,13 @@ def _validate(observation):
             raise ValueError("Timing/frame verification flags must be booleans")
     if frame.timestamp_verified and frame.captured_at is None:
         raise ValueError("Verified image timing requires a capture time")
+    if observation.state_timing_verified and observation.state_aligned_at is None:
+        raise ValueError("Verified state timing requires its aligned sample time")
+    if observation.state_aligned_at is not None and (
+        not _finite(observation.state_aligned_at)
+        or observation.state_aligned_at > state.received_at + 0.001
+    ):
+        raise ValueError("State sample time must be finite and no later than receipt")
     if frame.captured_at is not None and (
         not _finite(frame.captured_at) or frame.captured_at > frame.received_at + 0.001
     ):
@@ -169,6 +181,12 @@ class SemanticCache:
         if any(abs(o.frame.received_at - o.state.received_at) > limits.max_pair_skew_s
                for o in (reference, current)):
             return CacheDecision(None, "image_state_receipt_skew")
+        if any(o.frame.timestamp_verified and o.state_timing_verified
+               and abs(o.frame.captured_at - o.state_aligned_at) > limits.max_pair_skew_s
+               for o in (reference, current)):
+            return CacheDecision(None, "image_state_capture_skew")
+        if current.state_timing_verified and now - current.state_aligned_at > limits.max_state_age_s:
+            return CacheDecision(None, "stale_state_sample")
         if state.frame_id in {"", "unknown"} or state.frame_id != old_state.frame_id:
             return CacheDecision(None, "pose_frame_mismatch_or_unknown")
         if any(s.velocity_frame not in {"body", "base_link"} for s in (old_state, state)):
