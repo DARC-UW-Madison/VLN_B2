@@ -67,6 +67,13 @@ Four additional tests cover exact unique saved-profile selection, inactive
 profile saving without activation or secret output, rejection before password
 entry and separate retained backups. These bring the suite to 109 tests.
 
+The tensor-only adapter adds four contract tests: version-gated checkpoint
+loading, safetensors on older Torch, malformed input without pickle fallback,
+and enforced local/safetensors base loading. All **113 local tests** passed.
+The real generated-tensor probe is `tools/verify_tensor_loading.py`; it does not
+construct a model, use a GPU or read external weights. It is distinct from a
+model-conversion test, strict full-model loading and recorded-image inference.
+
 ## 1. Understand the system
 
 Read the [architecture](architecture.md) and [project status](status.md).

@@ -79,6 +79,35 @@ Xorgバックエンドでは，xrdp-sesmanが[xorgxrdp](https://github.com/neutr
 解像度やデスクトップセッションの設定によって，ドック，拡大率，テーマがHDMI画面と違う場合がある．
 見た目の差だけで接続不良とは判断しない．ファイルや設定が失われたと考える前に，ログイン先とセッションを確認する．
 
+## NoMachine，RDP，VNC
+
+| 名称 | 何を指すか | 今回の構成との関係 |
+|---|---|---|
+| NoMachine | NXという独自方式を使う遠隔操作製品．利用できるセッションは版・設定による | ホストに以前から存在し，変更していない．Macクライアントは未検証 |
+| RDP | 遠隔デスクトップの通信方式．今回はWindows Appとxrdp・xorgxrdpが実装する | 選択して検証した管理経路．今回のbackendは別の仮想Xorgデスクトップを開始する |
+| VNC | RFBを使う遠隔デスクトップ技術．実装によって既存画面の共有も仮想画面の生成もある | 既存のVinoは未起動で，今回は採用していない |
+
+製品の[NoMachine FAQ](https://www.nomachine.com/support/faq)と
+[RealVNCの方式の説明](https://help.realvnc.com/hc/en-us/articles/360002320638-How-does-VNC-technology-work)を参照する．
+方式の名前だけでは，画面の共有，暗号化，性能，安定性は決まらない．RDPで別に作る画面は，
+同じユーザーのホームを使っていてもドック，テーマ，解像度，セッション設定が違う場合がある．
+別のLinuxアカウントやサンドボックスではない．
+
+今回のRDPサーバーは，**Jetson自身**のloopbackアドレスだけでTCP接続を受ける．
+Windows Appは**Mac自身**のloopbackポートへ接続し，SSHが通信を転送する．
+
+```text
+Windows App -> Mac 127.0.0.1:13389 -> SSH over Tailscale
+            -> Jetson 127.0.0.1:3389 -> xrdp -> virtual desktop
+```
+
+Tailscaleはプライベートなネットワークの到達性，SSHは認証とTCP転送，RDPは画面の認証・描画・入力を担当する．
+RDPサーバーのTLSも有効なままである．別の待受・アクセス方針を承認して設定すればMacからRDPへ
+直接接続することも可能だが，今回の構成は異なる．3389番を大学・機体のインターフェースに公開せず，
+確認したSSH経路を使う．転送用masterは対話型のSSH端末とは別であり，端末を開くだけでは画面の
+トンネルはできない．専用トンネルを閉じてもxrdpやロボットのアプリケーションは終了しない．
+このトンネルは画面接続だけを運び，機体のDDS通信全般やモデルの制御ループは運ばない．
+
 ## セッションと描画の制約
 
 [xrdpのFAQ](https://github.com/neutrinolabs/xrdp/wiki/Tips-and-FAQ)には，systemdを使う環境で，

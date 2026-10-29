@@ -10,7 +10,7 @@ from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
 
-from b2_tic_vla.inference import TicVlaPredictor
+from b2_tic_vla.inference import TicVlaPredictor, _offline_loaders
 from b2_tic_vla.types import RobotState
 
 
@@ -98,6 +98,7 @@ class InferenceTests(unittest.TestCase):
                 return "reasoning", test.output, "prompt"
 
         self.torch = ModuleType("torch")
+        self.torch.__version__ = "2.10.0+cpu"
         self.torch.bfloat16 = "bfloat16"
         self.torch.device = str
         self.torch.inference_mode = nullcontext
@@ -140,8 +141,58 @@ class InferenceTests(unittest.TestCase):
         self.assertFalse(self.model_kwargs["train_vlm"])
         self.assertTrue(self.strict)
         self.assertEqual(predictor._model.constructor_offline, "1")
-        self.assertEqual(self.loader_calls, [{"local_files_only": True}] * 3)
+        self.assertEqual(self.loader_calls, [
+            {"local_files_only": True, "use_safetensors": True},
+            {"local_files_only": True}, {"local_files_only": True},
+        ])
         self.assertTrue(predictor.describe()["loaded"])
+
+    def test_vulnerable_unknown_and_prerelease_torch_never_deserialize(self):
+        for version in ("2.2.2", "2.9.1", "2.10.0rc1", "2.10.0a0+git", "unknown", ""):
+            with self.subTest(version=version):
+                self.torch.__version__ = version
+                with self.assertRaisesRegex(RuntimeError, "stable Torch >=2.10.0"):
+                    self.predictor().load()
+                self.assertIsNone(self.load_arguments)
+                self.assertIsNone(self.model_kwargs)
+
+    def test_safetensors_on_older_torch_preserves_all_keys_and_strict_loading(self):
+        self.torch.__version__ = "2.2.2"
+        path = self.root / "model.safetensors"
+        path.write_bytes(b"mock safetensors; real reader exercised separately")
+        reader = ModuleType("safetensors.torch")
+        calls = []
+        def load_file(filename, device):
+            calls.append((filename, device))
+            return self.checkpoint["state_dict"]
+        reader.load_file = load_file
+        with patch.dict(sys.modules, {"safetensors.torch": reader}):
+            TicVlaPredictor(self.base, path).load()
+            self.assertTrue(self.strict)
+            self.assertEqual(calls, [(str(path.resolve()), "cpu")])
+            self.assertIsNone(self.load_arguments)
+            self.checkpoint["state_dict"].pop("model.vlm.weight")
+            with self.assertRaisesRegex(ValueError, "missing keys"):
+                TicVlaPredictor(self.base, path).load()
+
+    def test_mislabeled_safetensors_never_falls_back_to_pickle(self):
+        path = self.root / "model.safetensors"
+        path.write_bytes(b"invalid")
+        reader = ModuleType("safetensors.torch")
+        def rejected(*args, **kwargs):
+            raise ValueError("invalid safetensors header")
+        reader.load_file = rejected
+        with patch.dict(sys.modules, {"safetensors.torch": reader}):
+            with self.assertRaisesRegex(ValueError, "invalid safetensors header"):
+                TicVlaPredictor(self.base, path).load()
+        self.assertIsNone(self.load_arguments)
+        self.assertIsNone(self.model_kwargs)
+
+    def test_base_model_cannot_override_safetensors_or_local_only_policy(self):
+        with _offline_loaders():
+            self.transformers.AutoModel.from_pretrained(
+                str(self.base), local_files_only=False, use_safetensors=False)
+        self.assertEqual(self.loader_calls, [{"local_files_only": True, "use_safetensors": True}])
 
     def test_remote_identifier_and_missing_config_are_rejected_before_import(self):
         with self.assertRaisesRegex(ValueError, "local model directory"):

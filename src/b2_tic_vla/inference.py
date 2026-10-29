@@ -35,12 +35,41 @@ def _offline_loaders():
             loader = getattr(transformers, name)
             original = loader.from_pretrained
 
-            def local_loader(*args, _original=original, **kwargs):
+            def local_loader(*args, _original=original, _model=name == "AutoModel", **kwargs):
                 kwargs["local_files_only"] = True
+                if _model:
+                    kwargs["use_safetensors"] = True
                 return _original(*args, **kwargs)
 
             stack.enter_context(patch.object(loader, "from_pretrained", local_loader))
         yield
+
+
+def _load_local_checkpoint(path, torch):
+    """Keep tensor-only input separate from restricted pickle deserialization."""
+    if path.suffix.lower() == ".safetensors":
+        reader = importlib.import_module("safetensors.torch")
+        # A parse error is final: never retry a mislabeled file as pickle.
+        return {"state_dict": reader.load_file(str(path), device="cpu")}
+    version = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:\+[A-Za-z0-9_.]+)?",
+                           str(getattr(torch, "__version__", "")))
+    if version is None or tuple(map(int, version.groups())) < (2, 10, 0):
+        raise RuntimeError(
+            "Checkpoint deserialization requires stable Torch >=2.10.0 for the documented "
+            "advisories. Use a converted .safetensors artifact on this runtime."
+        )
+    try:
+        return torch.load(str(path), map_location="cpu", weights_only=True)
+    except pickle.UnpicklingError as error:
+        raise RuntimeError(
+            "Checkpoint cannot be decoded with weights_only=True. "
+            "Use a compatible weights-only artifact; unsafe pickle fallback is disabled."
+        ) from error
+    except TypeError as error:
+        raise RuntimeError(
+            "This adapter requires torch.load(weights_only=True); upgrade PyTorch. "
+            "Unsafe pickle loading is disabled."
+        ) from error
 
 
 def _checkpoint_state(checkpoint):
@@ -102,7 +131,7 @@ class TicVlaPredictor:
         self._last_runtime_seconds = None
 
     def load(self):
-        """Load trusted existing local files with restricted checkpoint deserialization."""
+        """Load reviewed local tensors or a version-gated restricted checkpoint."""
         if self._model is not None:
             return self
         if not self.base_model_path.is_dir() or not (self.base_model_path / "config.json").is_file():
@@ -114,15 +143,7 @@ class TicVlaPredictor:
                 raise ValueError("upstream_root must contain ticvla/models/ticvla.py.")
         with _offline_loaders():
             torch = importlib.import_module("torch")
-            try:
-                checkpoint = torch.load(str(self.checkpoint_path), map_location="cpu", weights_only=True)
-            except pickle.UnpicklingError as error:
-                raise RuntimeError(
-                    "Checkpoint cannot be decoded with weights_only=True. "
-                    "Use a compatible weights-only artifact; unsafe pickle fallback is disabled."
-                ) from error
-            except TypeError as error:
-                raise RuntimeError("This adapter requires torch.load(weights_only=True); upgrade PyTorch. Unsafe pickle loading is disabled.") from error
+            checkpoint = _load_local_checkpoint(self.checkpoint_path, torch)
             state = _checkpoint_state(checkpoint)
             horizon, layers = _architecture(state, checkpoint)
             root = str(self.upstream_root) if self.upstream_root else None

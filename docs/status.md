@@ -154,8 +154,11 @@ FP32/BF16 GPU operations; Transformers, Lightning, timm and the pinned upstream
 TIC-VLA module imported without constructing a model. Build and verification
 exit codes are both `0`. No model weights were acquired or loaded.
 
-The artifact/loading plan is prepared. Next implement and test the reviewed
-CPU conversion and safetensors-only path with synthetic tensors, resolve
+The artifact/loading plan is prepared. The independent adapter now accepts
+safetensors, forces tensor-only base loading and blocks checkpoint decoding on
+older Torch; all **113 local tests** passed. The generated-tensor runtime probe
+is prepared, with target execution still pending. Next implement and test the
+reviewed CPU conversion, resolve
 artifact-specific terms, then obtain separate approval for exact model files,
 revisions, sizes and official-cache location before acquisition.
 Run recorded-observation inference only after that review. The

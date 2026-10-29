@@ -6,7 +6,8 @@ Metadata review date: **2026-10-28**. This is an acquisition and loading plan,
 not approval to download, evidence of a loaded model, or permission to distribute
 an artifact. Only official repository/API metadata, small packaging metadata and
 HTTP headers were inspected. No checkpoint, model asset or wheel listed below
-was acquired, and no converter or model-loading change was implemented here.
+was acquired. The tensor-only reader and model-loader restrictions described
+below are implemented; the CPU converter and full-model loading remain untested.
 
 The existing Jetson GPU runtime passed model-free checks. Its Torch 2.2.2 must
 not deserialize the external TIC-VLA checkpoint while the documented loading
@@ -205,9 +206,24 @@ are acquisition references, not instructions to fetch them now.
    expected waypoint shape and measured memory/latency. Record failures. Only
    then consider live observation and later asynchronous/motion integration.
 
-The existing adapter has not yet been changed to implement steps 6–7. Its
-current `weights_only=True` argument is not evidence that the loading blocker is
-resolved. The full conversion/inference path remains a proposal.
+The independent adapter now implements the application-side reader and wrapper
+in steps 6–7. A `.safetensors` input uses `safetensors.torch.load_file` on CPU;
+parse errors never retry pickle. Every key still passes prefix normalization,
+architecture inference and strict full-model key/shape checks. For other inputs,
+a stable parsed Torch version of at least 2.10.0 is required before calling
+`torch.load(weights_only=True)`; older, unknown and prerelease versions are
+rejected before decoding. This minimum addresses the documented advisories,
+not all possible current or future vulnerabilities.
+
+The Transformers AutoModel wrapper forces `use_safetensors=True` and
+`local_files_only=True`, including when a caller requests otherwise. Tokenizer
+and processor calls retain local-only loading. This is not an OS network sandbox
+or protection against arbitrary trusted custom Python; review pinned code and
+run actual inference without network access. Mocked contract tests bring the
+local suite to **113 passing tests**. `tools/verify_tensor_loading.py` provides
+a separate generated-tensor check for the real runtime; no external assets or
+model construction are involved. The CPU converter, provenance verification and
+full conversion/inference path still require implementation and validation.
 
 ## 6. Official conversion tools are not automatic approval
 

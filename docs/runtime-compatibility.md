@@ -75,8 +75,10 @@ and [2026 weights-only advisory](https://github.com/pytorch/pytorch/security/adv
 Do not describe its deserializer as safe merely because that flag exists.
 The initial candidate is limited to the model-free smoke below. Before external
 checkpoint loading, resolve reviewed fixes/backports or a separately reviewed
-conversion and loading path such as safetensors. This work has not implemented
-either. The metadata-reviewed [artifact/loading plan](model-artifacts.md)
+conversion and loading path such as safetensors. The adapter now rejects
+checkpoint decoding on Torch 2.2.2, supports a tensor-only safetensors path and
+forces safetensors for base-model AutoModel loading. Its mocked contracts passed;
+the converter and full-model compatibility remain unverified. The metadata-reviewed [artifact/loading plan](model-artifacts.md)
 proposes isolated modern CPU-only conversion and a safetensors-only Jetson path,
 with exact acquisition candidates and unresolved terms. No model acquisition has
 been approved. Retain strict keys/shapes and no unrestricted-pickle fallback.

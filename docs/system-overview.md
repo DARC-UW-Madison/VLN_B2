@@ -158,6 +158,49 @@ checked physically. B2 battery/output specifications are still unknown; do not
 infer compatibility from a connector or connect an unverified robot supply.
 Automatic login does not make motors or this project start automatically.
 
+## UWNet portal registration versus eduroam
+
+The first non-enterprise reboot test used UWNet. A later credential save,
+network switch and second reboot verified eduroam. These are sequential
+observations, not contradictory reports of the same connection. The saved UWNet
+profile remains; retaining a profile is not proof of Internet authorization.
+
+| Location | Possible state | What has been established |
+|---|---|---|
+| Host NetworkManager | UWNet SSID, autoconnect, network parameters; an open network does not need the university password as a Wi-Fi secret | The prior UWNet profile was non-enterprise and remains saved |
+| Browser/keyring | Saved passwords, cookies and login history depending on browser choices | Not inspected; entering a portal password does not prove it was or was not saved locally |
+| University systems | Device MAC-to-account registration, expiry and authentication/access records | UW documents account-linked device registration; this device's portal record was not inspected |
+| eduroam host profile | Enterprise identity, trust configuration and system-stored password | This setup verified system-wide PEAP autoconnect and password retention; root administrators can read the secret |
+
+Using the same university credentials does not make the two authentication paths
+the same. UWNet's portal authenticates an account and authorizes the device;
+eduroam authenticates during enterprise Wi-Fi connection. According to
+[UWNet's browser-registration guide](https://kb.wisc.edu/helpdesk/22915), campus
+affiliate registration lasts through the current semester and associates the
+MAC address with the NetID. This is distinct from the
+[manual device-registration procedure](https://kb.wisc.edu/ns/79140), whose
+renewal sets a six-month expiry. Do not apply either interval to every guest or
+assume this device's exact expiry without checking its registration.
+
+The university [describes UWNet as unencrypted and eduroam as encrypted](https://chemconnect.wisc.edu/comphelp/chemistry-network/).
+HTTPS and SSH can still encrypt their application connections on UWNet; an
+open Wi-Fi link does not by itself prove portal credentials were exposed.
+Conversely, browser logout, deleting a Wi-Fi profile and deleting a university
+registration are different operations. None proves that all institutional logs
+were erased. Actual server-side password representation and retention are not
+observable here; do not claim that the university stores plaintext passwords
+or that entering a password leaves no record. For an approved shared identity,
+usage remains associated with that identity; verify institutional authorization
+rather than assuming sharing is allowed. Review saved browser credentials and
+device registration at handover, preserving approved research files and avoiding
+unapproved removal of another account's registrations.
+
+Automatic reconnection still requires power, valid credentials, network coverage
+and working Tailscale authorization. Mounting Jetson on B2 supplies no new Wi-Fi
+coverage. Future inference/control must operate locally without a persistent Mac
+connection; the robot Ethernet link and local stopping behavior are separate
+field tests.
+
 ## Personal credentials, sharing and return
 
 UW's [official eduroam instructions](https://kb.wisc.edu/ns/page.php?id=25020)

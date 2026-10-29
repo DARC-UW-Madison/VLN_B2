@@ -93,6 +93,39 @@ session settings can make the dock, scaling or theme differ from HDMI. Such a
 difference alone is not a connection failure. Confirm the login and session
 before assuming that an appearance difference means files or settings were lost.
 
+## NoMachine, RDP and VNC
+
+| Name | What it is | Relation to this setup |
+|---|---|---|
+| NoMachine | Remote-access product using its NX protocol; available session types depend on edition and configuration | Pre-existing host installation, retained unchanged; its Mac client has not been validated here |
+| RDP | A remote-desktop protocol, implemented here by Windows App and xrdp/xorgxrdp | The selected, tested management path; this backend starts a separate virtual Xorg desktop |
+| VNC | Remote-desktop technology using RFB; implementations may share a display or create a virtual desktop | Existing Vino is stopped and was not selected |
+
+See the vendor's [NoMachine FAQ](https://www.nomachine.com/support/faq) and
+[RealVNC protocol explanation](https://help.realvnc.com/hc/en-us/articles/360002320638-How-does-VNC-technology-work).
+Protocol name alone does not establish session sharing, encryption, performance
+or stability. A separately created RDP display can have different dock, theme,
+resolution or session settings while using the same user's home files. It is
+not a separate Linux account or sandbox.
+
+The current RDP server accepts TCP only on **Jetson's** loopback address.
+Windows App connects to **Mac's** loopback port, where SSH forwards the stream:
+
+```text
+Windows App -> Mac 127.0.0.1:13389 -> SSH over Tailscale
+            -> Jetson 127.0.0.1:3389 -> xrdp -> virtual desktop
+```
+
+Tailscale provides private network reachability; SSH authenticates and carries
+the TCP forward; RDP handles desktop authentication, graphics and input. The
+RDP server's TLS remains enabled. Direct Mac-to-server RDP is possible with a
+different approved listener/access policy, but is not this configuration. We
+keep 3389 off the campus and robot interfaces and reuse the reviewed SSH path.
+The forwarding master is separate from an interactive SSH terminal. Opening a
+terminal session does not create the screen tunnel, and closing the dedicated
+tunnel does not stop xrdp or a robot application. This tunnel carries the screen
+connection only, not general robot DDS traffic or the model's control loop.
+
 ## Session and graphics constraints
 
 The [xrdp FAQ](https://github.com/neutrinolabs/xrdp/wiki/Tips-and-FAQ) describes
