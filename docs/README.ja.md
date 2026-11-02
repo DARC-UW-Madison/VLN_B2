@@ -41,6 +41,8 @@
 | [ローカルのチェックポイント変換](checkpoint-conversion.ja.md) | 分離したCPU環境の構築，制限，検証とGPU推論との境界は何か？ |
 | [オフラインモデル確認](model-runtime.ja.md) | 承認資材，変換，GPU権限，隔離した読込・推論で何が通り，移動まで何が残るか？ |
 | [外付けZEDカメラ](camera-runtime.ja.md) | SDK・bindingの読込と初回の実画像取得をどう確認し，何を隔離したか？ |
+| [非同期cacheと観測実験](asynchronous-runtime.ja.md) | 正確な参照，cache期限，現在画像，制限付きの意味情報処理を，移動指令なしでどう一貫させるか |
+| [Unitree状態受信環境](unitree-runtime.ja.md) | どのSDK・DDS sourceとネイティブbuildがオフライン検査を通り，実B2受信に何が残るか |
 | [実行環境の互換性](runtime-compatibility.ja.md) | 候補の版とモデル不要の検査は何が通ったか．なぜチェックポイント読込が保留か |
 | [RDPのビルドと導入確認](rdp-build.ja.md) | なぜ別の固定版をビルドするか．ホストの利用前に何を出力・設定・検証するか |
 | [Macからの遠隔画面](remote-desktop.ja.md) | Windows App・RDP・xrdpのセッションはVNCと何が違うか．通常のHDMI利用を省く前に何を確認するか |

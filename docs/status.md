@@ -4,7 +4,7 @@
 
 ## Current stage
 
-Updated **2026-10-29**. TIC-VLA now loads on the external Jetson GPU and completes
+Updated **2026-11-01**. TIC-VLA now loads on the external Jetson GPU and completes
 one synthetic-image inference offline. Strict loading accepted 1,324 tensor keys,
 948,462,978 unique parameters, horizon 30 and three action layers. The one
 synthetic call returned 30 finite XY points in **13.64 seconds**. Its three-second
@@ -23,11 +23,17 @@ The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-All **134 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+All **157 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
+A bounded real-camera asynchronous shadow trial completed 35 actions with
+assumed stationary state, while exposing startup/cache-expiry gaps. A separate
+state-only SDK/DDS image passed offline source/native-library and synthetic
+serialization checks. See [the cache experiment](asynchronous-runtime.md) and
+[SDK environment](unitree-runtime.md). Neither result validates robot motion.
+
 B2 is still disconnected from the wired interface. Actual B2 state reception,
-asynchronous cache/control integration, command sending, physical stopping and
+real-state asynchronous control integration, command sending, physical stopping and
 navigation evaluation remain unvalidated or unimplemented. The lab destination
 is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); no push has
 been made. The [MIT License](../LICENSE) covers only original code/docs, not
@@ -38,7 +44,7 @@ upstream code, weights or converted derivatives.
 | Component | Confirmed | Remaining work |
 |---|---|---|
 | Robot | Unitree B2 without wheels, reported by the operator | Firmware, actual computers/services, authority and stopping |
-| External Jetson | AGX Orin 64 GB class, native CUDA and container GPU operations; real model load and synthetic inference | Real observations, delay profiling and asynchronous execution |
+| External Jetson | AGX Orin 64 GB class, native CUDA and container GPU operations; real model load, recorded-image profiling and bounded camera shadow inference | Real B2 state, time/frame alignment, continuous cache availability and longer operation |
 | Onboard Jetson | Separate unit reported | Type, services, sensor connections and network reachability |
 | Motion controller | Separate computer suspected | Actual device, public control interface and ownership |
 | Camera | ZED 2i, USB 5 Gbps; SDK/binding and one 1280×720 left RGB capture passed | Mounted view, sustained capture and source-clock alignment |
@@ -57,8 +63,10 @@ Hardware availability is not sensor or navigation validation. The
 | CPU conversion | Verified for the actual checkpoint | 1,324 names retained; 3,773,492,276-byte output and readback manifest |
 | GPU model loading | Passed | Exact keys/shapes, parameter/device checks, no original pickle input |
 | Offline numerical inference | One generated image and two recorded-camera calls passed | 30 finite points per call; real-image state was assumed, not received from B2 |
-| Live camera/state observation | One camera capture passed; B2 state unverified | Sustained RGB, state, clocks, frames and paired recording need checks |
-| Asynchronous runtime and motion sender | Not implemented | Consistent cache metadata, fresh observation path, watchdog and control authority |
+| Live camera/state observation | 275 JPEGs in a bounded camera trial; B2 state unverified | Mounted view, longer capture, state, clocks, frames and paired recording need checks |
+| Atomic cache and asynchronous observer | Experimental shadow trial passed | 35 actions; assumed stationary state, unverified capture clock, substantial cache gaps |
+| Unitree state-only environment | Build/offline verifier passed | Fixed SDK/DDS, 202 source hashes, 516-byte synthetic round trip; no actual B2 traffic |
+| Motion sender | Not implemented | Real-state integration, independent command expiry, watchdog and control authority |
 | Physical stopping and B2 evaluation | Not validated | Review and execute staged field tests before movement |
 
 ## Decisions in effect
@@ -75,9 +83,10 @@ Hardware availability is not sensor or navigation validation. The
 - Actual GPU tests used network isolation, ordinary UID, dropped capabilities,
   read-only source/weights and temporary module caches. Only the GPU device's
   video group was added inside the container; host groups/permissions were not
-  changed. No robot/USB/profiling mounts or profiling groups were explicitly
-  requested; the NVIDIA runtime supplies its vendor GPU interfaces. Home and
-  credentials were not mounted.
+  changed. Model-only checks requested no robot/USB/profiling mounts. Camera checks
+  separately mapped the observed video/USB nodes and read-only SDK with its group
+  added inside that container. The NVIDIA runtime supplies GPU interfaces. Home
+  and credentials were not mounted.
 - The headless eduroam reboot and subsequent RDP interaction passed. Wi-Fi secret
   saving does not require GUI autologin; the existing GDM target is unchanged.
   GUI editing was denied by polkit and saving succeeded via the owner's terminal.
@@ -101,10 +110,10 @@ Hardware availability is not sensor or navigation validation. The
    Preserve management Wi-Fi and keep the robot LAN separate from campus.
 2. Initial ZED RGB and short-stream checks passed. Validate B2 state without commands. Establish frame axes, units,
    source/receipt timing, odometry and calibration before interpreting live plans.
-3. Use the measured stage costs to implement and validate asynchronous
-   reasoning/cache/action execution. The observed 13.64-second call cannot simply
-   feed a three-second plan into a walking loop. Bound cache age and verify
-   behavior under inference stalls and stale/missing observations.
+3. Extend the bounded asynchronous shadow trial with actual verified state and
+   clock/frame inputs. Investigate startup/refresh gaps, inference stalls and
+   stale/missing observations. A 0.156-second median action calculation does not
+   establish continuous control availability or valid navigation with old semantics.
 4. Confirm control authority, remote-controller priority and actual stopping.
    Only then prepare guarded, low-speed motion trials and predefined evaluation.
 

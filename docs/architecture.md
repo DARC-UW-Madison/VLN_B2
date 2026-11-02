@@ -4,8 +4,9 @@
 
 The full live system below is a proposed integration. The repository now
 implements observation adapters, synchronous offline inference, and candidate
-tracking for offline evaluation. It does not implement the asynchronous live
-cache or motor output. See [the current code boundary](#current-code-boundary).
+tracking for offline evaluation, and cache-reference management. Separate tools
+provide a bounded real-camera asynchronous shadow experiment. Real-state live
+control and motor output remain unimplemented. See [the current code boundary](#current-code-boundary).
 
 ## Problem and approach
 
@@ -131,6 +132,9 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | `tools/verify_model_load.py` | Strict offline GPU loading; synthetic-image inference only with an explicit flag |
 | `tools/profile_model_runtime.py` | Explicit recorded-image/assumed-state stage timing, without robot I/O |
 | `deploy/checkpoint-converter.Dockerfile`, `deploy/converter-requirements.lock` | Separate hash-pinned CPU software environment; preserves the GPU stack |
+| `src/b2_tic_vla/semantic_cache.py` | Atomic cache/reference publication and time/frame gates; starts no worker |
+| `tools/record_camera_stream.py`, `tools/observe_async.py` | Bounded live-camera/asynchronous-cache experiment; assumed state, no motor output |
+| `deploy/unitree-state.Dockerfile`, `tools/verify_unitree_sdk.py` | Separate SDK/DDS state environment and synthetic serialization without communication initialization |
 | `src/b2_tic_vla/control.py` | Pure candidate tracking with freshness, frame, and limit checks |
 | `src/b2_tic_vla/cli.py` | Separate probe, recording, replay, and inference commands |
 | `examples/` | Synthetic data, unvalidated limits, and blank onsite notes |

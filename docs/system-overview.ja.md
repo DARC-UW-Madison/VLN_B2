@@ -27,7 +27,8 @@
 [AGX Orinの技術資料](https://www.nvidia.com/content/dam/en-zz/Solutions/gtcf21/jetson-orin/nvidia-jetson-agx-orin-technical-brief.pdf)を参照する．
 ディスク速度，継続時の消費電力，TIC-VLAの実行速度は未測定である．ネイティブCUDAの数値演算，
 一致する基底コンテナ内の演算，PythonコンテナのCUDA可視性を確認した．完成した実行環境でも，
-FP32・BF16の8種類のGPU演算と本家ソースのimportが通ったが，モデルは構築していない．
+モデル不要の段階でFP32・BF16の8種類のGPU演算と本家sourceのimportが通った．
+その後，モデル読込，保存画像の計測，時間制限付きカメラshadow推論も成功した．[現在の進捗](status.ja.md)を参照する．
 
 ## ストレージと変更箇所
 
@@ -48,7 +49,11 @@ SSDには既存の割り当て済みデータが約1 TBあり，当初`needs_rec
 | `~/Developer/Environments/pyenv/versions/3.11.18` | システムPython 3.8とは別のユーザー用Python |
 | `/mnt/b2-research/VLN_B2/docker` | SSD上の新しい共有Dockerデーモン保存先 |
 | `/mnt/b2-research/VLN_B2/build-logs` | イメージのビルドログとモデル不要の検査結果 |
-| `/mnt/b2-research/VLN_B2/huggingface` | 空のモデルキャッシュ．標準の`~/.cache/huggingface`から参照する |
+| `/mnt/b2-research/VLN_B2/models` | 非公開の変換済みsafetensors・manifest．Git対象外の`models` symlinkで参照 |
+| `/mnt/b2-research/VLN_B2/observations` | 非公開の時間制限付きカメラ実験画像・各frame manifest |
+| `local/camera-runtime/attempt-01` | 非公開pyzed・Cython prefix，専用校正，カメラ検査記録．SDKは読み取り専用 |
+| `local/async-shadow`，`local/unitree-build`，`local/unitree-check-01` | 非公開の実験・build・オフライン検査の来歴と報告 |
+| `/mnt/b2-research/VLN_B2/huggingface` | 承認した元モデル資材．標準の`~/.cache/huggingface`から参照する |
 
 最初のPython構築でホストへ追加した開発用パッケージは`libbz2-dev`，`libncurses-dev`，`libreadline-dev`の三つで，
 その時点で既存パッケージは更新・削除していない．2026-10-28には通常のLAN SSHを確認後，
@@ -79,8 +84,10 @@ SSDのmodels領域へ置いてプロジェクトのGit対象外symlinkから参�
 
 イメージはアプリ環境のひな形で，コンテナはそれを動かした実体である．Torchのイメージを作っても，
 全ユーザーのホストPythonへTorchが入るわけではない．ホストのvenvはプロジェクトのツール用，
-GPUイメージはモデル実行環境の候補用である．カメラや状態を取得する前には，SDKの権限とバインディングの
-互換性を別途確認する．
+GPUイメージはモデル実行環境の候補用である．カメラには，別に検証した非公開binding prefix，
+読み取り専用のネイティブSDK，コンテナ内だけのグループを使う．別のUnitree状態専用イメージは
+オフラインのimport・符号化を通った．どちらもホストvenvへvendor packageを導入しない．
+実際のB2状態取得は未検証である．[カメラ設定](camera-runtime.ja.md)と[状態環境](unitree-runtime.ja.md)を参照する．
 
 ## GUIと無人起動
 

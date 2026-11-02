@@ -14,7 +14,7 @@
 | TIC-VLAのソフトウェア | [リポジトリ](https://github.com/ucla-mobility/TIC-VLA)と[確認した版のライセンス](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e121d5df5df071297bba8e5353ebb/LICENSE.md) | `9fa6f8b`のAcademic Software Licenseを確認した．import検査用のソースだけをプロジェクト外へ取得した．本プロジェクトへのコードのコピーはない |
 | TIC-VLAのチェックポイント | [公式リポジトリが案内する配布先](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/671de608f39ccae41b66cbb24ab923c0275f8fb4/TIC-VLA-model.ckpt) | 承認した固定版を取得し，非公開でCPU変換済み．本家の条件を維持する |
 | InternVL3-1B | [モデルの配布先](https://huggingface.co/OpenGVLab/InternVL3-1B) | 固定した承認済みsnapshotを取得し，隔離した読込用にコードを確認．model card・構成要素の条件と表示を維持する |
-| Unitree SDK2 Python | [B2クライアント](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py)，[BSD-3-Clauseライセンス](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | APIと`814556d`のライセンスを確認した．実行に使う版，依存先，ファームウェアとの互換性は未確認 |
+| Unitree SDK2 Python | [B2クライアント](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py)，[BSD-3-Clauseライセンス](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | 固定source `814556d`の状態・IDLだけを別のローカルイメージで読み，オフラインのimport・符号化は成功．SDK全体の宣言依存は未充足，実B2互換性は未確認 |
 
 確認したTIC-VLAのソフトウェアライセンスは，学術・非営利研究者による所定の教育・学術研究用途を認め，
 派生物を含むソフトウェアの第三者への移転を禁止している．研究利用できることは，
@@ -43,8 +43,8 @@
 
 | 資料 | 出典 | 用途と配布 |
 |---|---|---|
-| ZED SDK／Pythonバインディング | [公式画像取得手順](https://docs.stereolabs.com/docs/tutorials/image-capture)，[Jetson Docker手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson) | 任意の`pyzed.sl`呼び出し．SDK，ドライバ，イメージ，ベンダーモデルは非同梱．導入・共有前に選択したSDK・イメージの条件を確認する |
-| PyTorch | [公式文書](https://docs.pytorch.org/docs/stable/index.html) | Torch 2.2.2の`39901f2`をBSD系の利用条件と付属の外部表示事項のもとでローカルにビルドした．ローカルイメージでは，ハッシュ照合付きの機能判定で未使用のPython RPCを無効化し，元のwheel・ライセンス・NOTICEを維持する．リポジトリのソースやホストのvenvには非同梱で，重みの読込は保留する |
+| ZED SDK／Pythonバインディング | [公式画像取得手順](https://docs.stereolabs.com/docs/tutorials/image-capture)，[Jetson Docker手順](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson) | 既存SDK 4.1.2を読み取り専用で再利用し，公式pyzed 4.1 MIT wheel・Cython 3.0.12 Apache-2.0を非公開で照合．import・取得は成功．SDK・wheel・driver・image・vendor modelは同梱せず，ネイティブSDKの条件は別である |
+| PyTorch | [公式文書](https://docs.pytorch.org/docs/stable/index.html) | Torch 2.2.2の`39901f2`をBSD系の利用条件と付属の外部表示事項のもとでローカルにビルドした．ローカルイメージでは，ハッシュ照合付きの機能判定で未使用のPython RPCを無効化し，元のwheel・ライセンス・NOTICEを維持する．レポsource・ホストvenvには同梱しない．承認したsafetensorsの読込は成功し，元のpickleの読込は拒否する |
 | Transformers／InternVL実行環境 | [Transformers文書](https://huggingface.co/docs/transformers/index)，[InternVL3-1B](https://huggingface.co/OpenGVLab/InternVL3-1B) | 上流モデルの任意のローダー．ローカルのみ参照するが，信頼したモデルのPythonコードは実行する．ソースと成果物の版を固定する |
 | Livoxドライバ | [公式ドライバ](https://github.com/Livox-SDK/livox_ros_driver2) | 参照のみで，実装上の依存先ではない．ソースは非同梱 |
 | ベースコンテナイメージ | [NVIDIAのJetson資料](https://developer.nvidia.com/embedded/jetson-cloud-native/)，[提供元のJetPack EULA](https://docs.nvidia.com/jetson/jetpack/eula/index.html) | L4Tに一致する基底をOrinでのローカル利用用に取得し，Python段階をビルドした．イメージと各構成物の条件は引き続き適用される．バイナリイメージは同梱・公開しない |
@@ -102,3 +102,16 @@ safetensorsはApache-2.0，NumPyは公開されたBSD-3-Clause・0BSD・MIT・Zl
 2026-10-29に既存ZED SDK 4.1.2を読み取り専用で使い，公式pyzed 4.1のwheel内MIT表示と
 Cython 3.0.12のApache-2.0表示を確認した．専用配置先でimport・画像取得が通った．
 SDK・wheel・撮影画像・メーカーのモデルは配布せず，ネイティブSDKの条件は別に維持する．
+
+## 状態受信用SDK環境
+
+[状態だけのレシピ](deploy/unitree-state.Dockerfile)は，Unitree sourceを
+`814556d15970dd2ecf1c9984e845ca02ab07e206`（BSD-3-Clause），CycloneDDS C coreを
+`9995905bce6c4cf9f740d6438bbf7fcfd1c83dfd`，Pythonを0.10.2へ固定する．DDSの両部品は
+EPL-2.0またはEDL-1.0を選べるため，ローカルbuildではEDL-1.0を選び，元の表示を維持する．
+[C core](https://github.com/eclipse-cyclonedds/cyclonedds/blob/0.10.2/LICENSE)，
+[Python](https://github.com/eclipse-cyclonedds/cyclonedds-python/blob/0.10.2/LICENSE)を参照する．
+hash固定lockにはソフト・build入力12個を記録する．CMakeはbuild専用環境へ分ける．
+SDK source・setup・licenseのhashを維持し，SDK wheelは導入せず，NumPy・OpenCVを含む全宣言依存を
+満たしていないと明記する．狭い状態経路はオフラインの合成符号化を通った．他のSDK機能と実B2互換性は別途確認する．
+本家source，wheel，作ったバイナリイメージは配布しない．[buildの来歴と限界](docs/unitree-runtime.ja.md)を参照する．

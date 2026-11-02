@@ -3,8 +3,8 @@
 [English](architecture.md) · [ホーム](../README.ja.md)
 
 以下のライブシステム全体は接続構成の計画である．現在のリポジトリには観測アダプタ，
-保存データの同期推論，オフライン評価用の追従計算がある．非同期ライブキャッシュと
-移動指令の送信は未実装である．[現在の実装範囲](#現在の実装範囲)を参照する．
+保存データの同期推論，オフライン評価用の追従計算，cacheの参照管理がある．別の実験ツールは
+時間制限付きの実カメラ非同期shadow試験を行う．実状態を使うライブ制御・移動指令送信は未実装である．[現在の実装範囲](#現在の実装範囲)を参照する．
 
 ## 課題と方針
 
@@ -119,6 +119,9 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | `tools/verify_model_load.py` | 厳密なオフラインGPU読込．生成画像の推論には明示的なflagが必要 |
 | `tools/profile_model_runtime.py` | 保存画像・仮定した状態を明示した段階別計測．機体の入出力なし |
 | `deploy/checkpoint-converter.Dockerfile`，`deploy/converter-requirements.lock` | GPU環境を維持した，hash固定の独立したCPUソフトウェア環境 |
+| `src/b2_tic_vla/semantic_cache.py` | 参照観測とcacheの一体公開，時刻・座標の検査．workerは始めない |
+| `tools/record_camera_stream.py`，`tools/observe_async.py` | 時間制限付きの実カメラ・非同期cache実験．状態は仮定，移動指令なし |
+| `deploy/unitree-state.Dockerfile`，`tools/verify_unitree_sdk.py` | 別のSDK・DDS状態環境と，通信を初期化しない合成符号化検査 |
 | `src/b2_tic_vla/control.py` | 鮮度，座標系，制限値を確認する候補速度の計算 |
 | `src/b2_tic_vla/cli.py` | 個別確認，記録，再生，推論の各コマンド |
 | `examples/` | 合成データ，未検証の制限値，空の現地記録欄 |

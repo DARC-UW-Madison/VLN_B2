@@ -33,14 +33,17 @@ Follow [the Ethernet/onboard procedure](field-network.md) in this order:
    actual services and control ownership using authorized lab access.
 5. Attach the external ZED 2i by USB; map built-in camera/sensor exports and
    Mid-360 wiring separately. Built-in USB access from this Jetson is unavailable.
-6. Complete boot/credential tests; validate Windows App/RDP with and without
-   HDMI. With no separate AP available, inspect/test a Jetson hotspot and direct
-   local SSH with recovery access; then test offline process lifetime without Mac.
+6. Retain the verified boot-time eduroam/Tailscale setup. The Mac screen profile
+   and tunnel have been disabled at the operator's request; do not recreate them.
+   With no separate AP, investigate a Jetson hotspot only with recovery access
+   and an explicit network plan; later test offline process lifetime without Mac.
 7. Record axes/timestamps, sensor origins, remaining dependencies and next action.
    Motion, operator-link-loss behavior and physical stopping require later validation.
 
-These steps are prepared, not already completed. SDK/camera bindings are still
-required before the probes below. Keep private values/results in `local/`.
+These steps are prepared, not already completed. Use the prepared camera and Unitree containers described in their guides; the
+host venv still lacks those bindings. Keep private values/results in `local/`.
+Use the [prepared state-container invocation](unitree-runtime.md#prepared-receive-only-command);
+the venv examples below do not supply vendor dependencies by themselves.
 
 ## Observation probes
 
@@ -79,5 +82,5 @@ copy Go2-W SDK patches just to make a command run. Choose a new numbered output
 for every attempt; files are not overwritten.
 
 After the two probes work, use [paired recording and offline inference](onsite.md#4-save-a-paired-observation).
-Live asynchronous inference and motor integration remain separate work. Raw
+Real-state live asynchronous inference and motor integration remain separate work. Raw
 reports and recordings stay in ignored `local/`; review before sharing.

@@ -30,7 +30,9 @@ and [AGX Orin technical brief](https://www.nvidia.com/content/dam/en-zz/Solution
 No storage-speed, sustained power, or TIC-VLA frame-rate benchmark has been run.
 Native CUDA arithmetic, arithmetic in the matching base container, and the Python
 container's CUDA visibility passed. The completed runtime also passed eight
-FP32/BF16 GPU-operation checks and upstream imports; no model was constructed.
+FP32/BF16 GPU-operation checks and upstream imports at that model-free stage.
+Subsequent model loading, recorded-image timing and bounded camera shadow
+inference passed; see [current status](status.md).
 
 ## Storage and changes made
 
@@ -53,7 +55,11 @@ of previous data occurred. See [storage procedure](jetson-runtime.md#storage-pre
 | `~/Developer/Environments/pyenv/versions/3.11.18` | Per-user Python, separate from system Python 3.8 |
 | `/mnt/b2-research/VLN_B2/docker` | New shared Docker-daemon data root on the SSD |
 | `/mnt/b2-research/VLN_B2/build-logs` | Image-build logs and model-free check results |
-| `/mnt/b2-research/VLN_B2/huggingface` | Empty model-cache directory; `~/.cache/huggingface` points here |
+| `/mnt/b2-research/VLN_B2/models` | Private derived safetensors/manifest; ignored project `models` symlink |
+| `/mnt/b2-research/VLN_B2/observations` | Private bounded camera experiment images and per-frame manifests |
+| `local/camera-runtime/attempt-01` | Private pyzed/Cython prefix, dedicated calibration and camera check records; SDK remains read-only |
+| `local/async-shadow`, `local/unitree-build`, `local/unitree-check-01` | Private experiment/build/offline-verification provenance and reports |
+| `/mnt/b2-research/VLN_B2/huggingface` | Approved raw model assets; standard `~/.cache/huggingface` points here |
 
 The initial Python setup added three development-header packages to the host:
 `libbz2-dev`, `libncurses-dev`, and `libreadline-dev`; none was upgraded or removed in that initial step. On 2026-10-28 Tailscale alone
@@ -92,8 +98,11 @@ See the [Docker security model](https://docs.docker.com/engine/security/).
 An image is the application environment template; a container is a running
 instance. Building a Torch image does not install Torch into every host user's
 Python. The host venv is for project tools, while the GPU image is for the
-candidate model runtime. Existing SDK permissions and binding compatibility
-still need checking before camera/state acquisition.
+candidate model runtime. The camera uses a separately verified private binding
+prefix with read-only native SDK and container-only groups. A separate Unitree
+state-only image passed offline imports/serialization. Neither installs vendor
+packages into the host venv. Actual B2 state acquisition remains unverified; see
+[camera setup](camera-runtime.md) and [state environment](unitree-runtime.md).
 
 ## GUI and unattended boot
 

@@ -15,7 +15,7 @@ or hardware experiments.
 | TIC-VLA software | [Repository](https://github.com/ucla-mobility/TIC-VLA) and [license at reviewed revision](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e121d5df5df071297bba8e5353ebb/LICENSE.md) | Academic Software License reviewed at `9fa6f8b`; source-only checkout outside the project for import checks; no source copied into this project |
 | TIC-VLA checkpoint | [Official repository's linked checkpoint](https://huggingface.co/datasets/handsomeYun/TIC-VLA/blob/671de608f39ccae41b66cbb24ab923c0275f8fb4/TIC-VLA-model.ckpt) | Approved pinned payload acquired and CPU-converted privately; source terms remain applicable |
 | InternVL3-1B | [Model repository](https://huggingface.co/OpenGVLab/InternVL3-1B) | Pinned approved snapshot acquired and code-reviewed for isolated loading; model-card/component terms and notices retained |
-| Unitree SDK2 Python | [B2 client](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py), [BSD-3-Clause license](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | API inspected; license reviewed at `814556d`; runtime revision, dependencies, and firmware compatibility remain unverified |
+| Unitree SDK2 Python | [B2 client](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/unitree_sdk2py/b2/sport/sport_client.py), [BSD-3-Clause license](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/LICENSE) | Pinned source `814556d` imported only for state/IDL in a separate local image; offline import/serialization passed; full SDK dependency declaration is not satisfied and real B2 compatibility remains unverified |
 
 The inspected TIC-VLA software license permits specified educational or academic
 research use by academic or nonprofit researchers and prohibits onward transfer
@@ -50,7 +50,7 @@ results and identifying recordings in approved laboratory storage.
 | Material | Source | Use and distribution |
 |---|---|---|
 | ZED SDK / Python binding | [Official capture tutorial](https://docs.stereolabs.com/docs/tutorials/image-capture), [Jetson Docker guide](https://docs.stereolabs.com/docs/integrations/docker/install-on-nvidia-jetson) | Existing SDK 4.1.2 reused read-only; official pyzed 4.1 MIT wheel and Cython 3.0.12 Apache-2.0 verified privately; import/capture passed. No SDK, wheel, driver, image or vendor model bundled; native SDK terms remain separate |
-| PyTorch | [Official documentation](https://docs.pytorch.org/docs/stable/index.html) | Torch 2.2.2 at `39901f2` built locally under its BSD-style license and included third-party notices. Local image disables unused Python RPC with a hash-checked feature guard; original wheel/license/NOTICE retained. Not bundled with repository source or host venv; checkpoint loading remains blocked |
+| PyTorch | [Official documentation](https://docs.pytorch.org/docs/stable/index.html) | Torch 2.2.2 at `39901f2` built locally under its BSD-style license and included third-party notices. Local image disables unused Python RPC with a hash-checked feature guard; original wheel/license/NOTICE retained. Not bundled with repository source or host venv; approved safetensors loading passed, original pickle loading remains blocked |
 | Transformers / InternVL runtime | [Transformers documentation](https://huggingface.co/docs/transformers/index), [InternVL3-1B](https://huggingface.co/OpenGVLab/InternVL3-1B) | Optional upstream model loaders; local-only resolution. Trusted model Python code still executes; pin source and artifact revisions |
 | Livox driver | [Official driver](https://github.com/Livox-SDK/livox_ros_driver2) | Reference only; not an implemented dependency and no source bundled |
 | Base container image | [NVIDIA Jetson resources](https://developer.nvidia.com/embedded/jetson-cloud-native/), [publisher's JetPack EULA](https://docs.nvidia.com/jetson/jetpack/eula/index.html) | Matching-L4T base pulled for local Orin use; Python stage built. Image and component notices remain applicable; no binary image is bundled or published |
@@ -116,3 +116,19 @@ packages in a new container venv, with no model data or upstream TIC-VLA source.
 The pinned container build, `pip check`, generated checkpoint conversion and
 old-runtime readback passed. The approved actual checkpoint was subsequently
 converted and loaded privately; this repository distributes neither payload. No converter image or third-party wheel is released by this repository.
+
+## State-receive SDK environment
+
+The [state-only recipe](deploy/unitree-state.Dockerfile) fixes Unitree source at
+`814556d15970dd2ecf1c9984e845ca02ab07e206` (BSD-3-Clause) and CycloneDDS C core at
+`9995905bce6c4cf9f740d6438bbf7fcfd1c83dfd` / Python 0.10.2. Both DDS components
+allow EPL-2.0 or EDL-1.0; this local build selects EDL-1.0 and retains original
+notices: [C core](https://github.com/eclipse-cyclonedds/cyclonedds/blob/0.10.2/LICENSE),
+[Python](https://github.com/eclipse-cyclonedds/cyclonedds-python/blob/0.10.2/LICENSE).
+The hash-pinned lock records twelve software/build artifacts. CMake is a
+separate build-only environment. SDK source/setup/license hashes are preserved;
+no SDK wheel is installed and its full NumPy/OpenCV dependency declaration is
+explicitly unsatisfied. The narrow state path passed an offline synthetic
+serialization test. Other SDK features and physical B2 compatibility need review.
+No vendor source, wheel or resulting binary image is distributed here. See
+[build provenance and limits](docs/unitree-runtime.md).

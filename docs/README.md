@@ -49,6 +49,8 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 | [Local checkpoint conversion](checkpoint-conversion.md) | How is the separate CPU environment built, bounded, verified and kept apart from GPU inference? |
 | [Offline model checks](model-runtime.md) | Which approved files, conversion, GPU permissions and isolated load/inference actually passed? What remains before movement? |
 | [External ZED camera](camera-runtime.md) | Which SDK and binding can be imported, how was first capture verified, and what is isolated? |
+| [Asynchronous cache and observation experiment](asynchronous-runtime.md) | How are exact references, cache expiry, current images and bounded semantic work kept coherent without motor output? |
+| [Unitree state runtime](unitree-runtime.md) | Which SDK/DDS source and native build passed offline checks, and what remains for real B2 state? |
 | [Runtime compatibility](runtime-compatibility.md) | Which candidate versions and model-free checks passed? Why is checkpoint loading still blocked? |
 | [RDP build and commissioning](rdp-build.md) | Why a separately pinned source build? What is exported, configured and tested before a host server is used? |
 | [Remote desktop from Mac](remote-desktop.md) | How do Windows App/RDP/xrdp sessions differ from VNC? What must work before remote GUI can replace routine HDMI? |

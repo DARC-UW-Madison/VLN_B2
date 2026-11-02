@@ -15,7 +15,7 @@ network. No camera, SDK control client or robot command sender participates.
 | Strict GPU loading | 948,462,978 unique parameters; horizon 30; action layers 3; about 10.42 seconds | One load, excluding the preceding checksum; not inference timing |
 | Synthetic inference | One generated 448×448 RGB image and zero velocities; 30 finite XY points; about 13.64 seconds | No real image, accuracy, stopping or control-rate validation |
 | PyTorch allocation | Load peak 2,110,120,960 bytes; inference peak 2,624,592,384 bytes | GPU allocator only; excludes CPU RAM, driver allocations and total unified memory |
-| Ordinary tests | 134 passed on Mac and Jetson | Unit/synthetic tests do not validate sensors, firmware or movement |
+| Ordinary tests | 157 passed on Mac and Jetson | Unit/synthetic tests do not validate sensors, firmware or movement |
 
 The synthetic run retained the upstream sampling configuration: maximum 200
 new tokens, sampling enabled, temperature 0.7. No seed was fixed or recorded.
@@ -23,14 +23,15 @@ This is one bounded smoke, not a repeatable numerical benchmark or latency
 average. Returned coordinates from an artificial scene establish no navigation
 quality. A three-second predicted path taking 13.64 seconds in this synchronous
 call cannot simply be connected to a walking loop. Asynchronous reasoning,
-coherent cache metadata, fresh observations, watchdogs and stopping remain work.
+real-state integration, continuous cache availability, watchdogs and stopping
+remain work even after the shadow experiment described below.
 
 The 13.64-second measurement wraps the synchronous image-to-plan call; it is
 not a separately measured action-policy period. TIC-VLA separates delayed
 semantic reasoning from action generation using current observations and delay
-metadata. We have not yet measured those stages separately on this Jetson.
-First-call initialization, repeated-call latency and output-token count also
-need separate recording before judging steady-state performance. Asynchrony
+metadata. That first trial did not separate stages; the recorded-image trials
+below subsequently did. Longer repeated runs and actual output-token counts
+remain necessary before judging steady-state performance. Asynchrony
 does not by itself establish that an arbitrarily old semantic result is usable.
 
 The GPU image was the existing `vln-b2-runtime:jp5`:
@@ -188,14 +189,36 @@ python3.11 /workspace/profile_model_runtime.py \
 
 This requires an explicit assumed-state flag. Report overwrite, non-offline
 execution and a checkpoint checksum mismatch fail before model loading. Hook
-restoration/nested accounting and input guards are unit-tested. All 134 tests
+restoration/nested accounting and input guards are unit-tested. All 157 tests
 pass on Mac and Jetson. These tests do not validate real B2 observations.
+
+## Owned-cache reuse check
+
+A separate recorded-image run (`local/model-profiling/attempt-03`) captured the
+complete-conversation cache as a 24-layer tuple, cloned 6,721,536 bytes and checked
+zero-delay action output against the synchronous plan. Maximum absolute
+coordinate difference was 0.0 m (test tolerance 0.001 m). Three subsequent
+same-image, assumed-stationary actions took 0.1186, 0.1183 and 0.1181 seconds,
+including image loading/features and GPU synchronization. The cache stayed
+byte-identical. These are broader measurements than the decoder-only 0.006 s.
+
+These three delay inputs were about 12.33–12.57 seconds from the offline replay
+reference. They do not establish real camera capture age, accurate delayed
+navigation, concurrency or a valid B2 delay limit. Use `--cached-actions 3`
+explicitly on the profiler to request this additional check; default zero skips
+it. The original pickle and robot interfaces were not mounted.
+
+A subsequent two-container, real-camera observation experiment completed 35
+shadow actions while a semantic request was in flight. It also exposed cache
+startup/expiry gaps. The complete setup, counts and limits are in the
+[asynchronous runtime guide](asynchronous-runtime.md). It used assumed stationary
+state and unverified camera timing throughout; no commands were sent.
 
 ## Next acceptance
 
-The first RGB capture and two recorded-image stage measurements passed. Next,
-separate semantic reasoning from action execution with coherent cache metadata,
-then test cache age, inference stalls and fresh-frame handling without commands.
+First RGB, recorded-image timing, cache reuse and a bounded live-camera shadow
+experiment passed. Next establish real state, clocks and frames, then investigate
+cache-refresh gaps, inference stalls and longer operation without commands.
 No new model download is needed. Validate sustained camera capture, source-clock
 alignment and the intended mounted view; a desk image does not establish them.
 
