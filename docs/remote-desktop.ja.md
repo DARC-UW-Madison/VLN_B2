@@ -2,16 +2,63 @@
 
 [English](remote-desktop.md) · [文書一覧](README.ja.md) · [システム全体像](system-overview.ja.md) · [現地手順](field-network.ja.md)
 
-**2026-10-29の現在方針**：操作者の依頼でMacからの遠隔画面接続を停止する．専用トンネルは
-既に停止しており，13389番の待受はなかった．調べたMacのlaunch agent・daemon，shell・SSH設定には
-該当する自動起動設定がなかった．残っていた空のlockを除去し，B2用Windows App接続は復元用に
-非公開で書き出してからアプリの一覧から外し，Windows Appも終了した．既存Tailscaleと無関係な接続は
-維持した．新しい依頼なしに，トンネルの再開，Macのサービス追加，別の遠隔画面アプリの導入を行わない．
+**2026-11-01の現在方針**：Windows Appから，JetsonのTailscale IPv4・TCP 3389へ直接接続する．
+以前のMac用tunnel・profileは除去済みである．Macのtunnel，自動起動，経路変更，新しいclientは不要で，
+Windows Appの接続先は操作者が登録する．既存Tailscaleを管理用の非公開networkとして使う．
+モデル推論・将来の実機制御は，画面接続とは独立してJetson上で動く．
 
-Jetson側のRDP導入は変更していない．以前に認証，表示・入力，画面なしのソフトウェア再起動後の復帰が
-通ったが，これは過去の結果で，現在Macから接続中という意味ではない．構築には通常の前景SSHを使い，
-作業が終わったら閉じる．以下の例は参照手順であり，解除した設定を再作成する指示ではない．
-推論と将来の実機制御は，画面接続なしでJetson内で動作させる．
+## Windows Appから直接つなぐ
+
+1. Mac・Jetsonで既存のTailscale接続を有効にする．
+2. Windows Appの**Add PC**で，下表を入力する．
+3. 保存したPCを開き，求められたらJetsonのLinuxアカウントのパスワードを入力する．
+   xrdpのsession選択が出たら**Xorg**を選ぶ．大学・Microsoftの認証をLinuxログインへ使わない．
+4. 証明書の確認が出たら，信頼したJetsonの証明書と照合する．証明書確認を全体で無効にしない．
+   証明書自体は維持していても，新しい接続先の初回は確認が出ることがある．
+
+| 設定 | 値 |
+|---|---|
+| PC name | `JETSON_TAILSCALE_IP:3389`．操作者へ非公開で伝えた実IPを使う |
+| User account | 研究用Linux login，または必要時に入力 |
+| Password | そのLinuxアカウントのパスワード．チャット・Gitへ記録しない |
+| Gateway | No gateway |
+| Friendly name | `B2 Jetson`など任意の説明名 |
+
+古い`127.0.0.1:13389`の接続やtunnel開始は使わない．SSHと同じ研究用アカウントである．
+client画面は[MicrosoftのWindows App手順](https://learn.microsoft.com/en-us/windows-app/get-started-connect-devices-desktops-apps)も参照する．
+指定するのは，変化する大学Wi-FiのleaseではなくnodeのTailscale IPである．
+[Tailscaleのアドレス割当](https://tailscale.com/docs/concepts/ip-and-dns-addresses)を参照する．
+RDP自体が大学portalへログインするわけではない．
+
+## 適用した直接接続の設定
+
+既存ホストxrdpは，loopback・wildcardではなく**設定したTailscale IPv4だけ**で待ち受ける．
+TLS設定，証明書・鍵，PAM，許可group，Linux認証は維持した．IPv4 INPUTへ一つのlabel付きruleを加え，
+その正確な宛先・TCP 3389へ`tailscale0`以外から来た通信をdropする．既存ruleのflush，既定firewall方針，
+SSH，NoMachine，Wi-Fiは変更しない．Tailscale側のアクセス規則も引き続き適用される．
+
+確認した[起動準備helper](../deploy/rdp-tailnet-ready.py)と[systemd drop-in](../deploy/rdp-tailnet.conf)は，
+**Jetsonだけ**で動く．実際の登録IPv4は非公開の`/opt/b2-remote/etc/xrdp/tailnet-address`へ置く．
+helperは`tailscale ip -4`との一致と`tailscale0`上のUP状態を確認してから，対象を絞ったruleの存在を
+確認・必要時だけ追加し，xrdpを開始する．不一致・interface未準備は起動を失敗させ，全interfaceへ代替しない．
+serviceはtailscaledの後で開始し，失敗は5秒ごとに，開始回数の上限なしで再試行する．起動時の有効化は維持した．
+登録・アドレスを変更する場合は，非公開ファイル，xrdpのbind，古い専用ruleを一緒に確認する．
+
+元の設定は非公開の`local/direct-rdp/attempt-01`へ保存した．serviceを二回再起動してlistener・session managerの
+動作と，専用firewall ruleが一つだけであることを確認した．アドレス準備を意図的に失敗させると起動は拒否され，
+設定を戻すと自動再試行で復帰した．Wi-Fi・SSHの再起動やTailscale登録の変更はしていない．
+Macから直接TCP・RDP交渉を行い，TLS 1.3と，
+SSHで確認したJetson証明書とのSHA256一致を確認した．この通信検査ではパスワードを送っていない．
+**新経路でのGUIログインと，変更後の機器全体の再起動は未検証**である．同じbackendでは以前の経路で
+画面・入力を確認済みである．Mac・Jetsonの通常テスト162件も成功したが，模擬guard検査だけで実通信を証明しない．
+
+Jetsonで問題を調べる場合は，`systemctl status b2-rdp.service`，journal，`tailscale ip -4`，
+bind設定，`ss -ltnp`を確認する．アドレス・許可の不具合を避けるために大学・機体interfaceへ3389を開かない．
+戻す場合はRDPを止め，保存した元iniへ戻し，このdrop-inと正確なlabel付きruleだけを除き，
+systemdを再読込して元のloopback serverを始める．Macのtunnelを作る操作ではない．無関係なruleやTailscale登録を除去しない．
+
+以下は以前の調査と，置き換えたSSH経路の仕組みを説明する過去の記録である．現在の接続手順ではない．
+この対象機には上の直接接続を使う．
 
 ## 現在わかっていること
 
@@ -96,7 +143,7 @@ Xorgバックエンドでは，xrdp-sesmanが[xorgxrdp](https://github.com/neutr
 同じユーザーのホームを使っていてもドック，テーマ，解像度，セッション設定が違う場合がある．
 別のLinuxアカウントやサンドボックスではない．
 
-今回のRDPサーバーは，**Jetson自身**のloopbackアドレスだけでTCP接続を受ける．
+以前のRDPサーバーは，**Jetson自身**のloopbackアドレスだけでTCP接続を受けた．
 Windows Appは**Mac自身**のloopbackポートへ接続し，SSHが通信を転送する．
 
 ```text
@@ -106,12 +153,12 @@ Windows App -> Mac 127.0.0.1:13389 -> SSH over Tailscale
 
 Tailscaleはプライベートなネットワークの到達性，SSHは認証とTCP転送，RDPは画面の認証・描画・入力を担当する．
 RDPサーバーのTLSも有効なままである．別の待受・アクセス方針を承認して設定すればMacからRDPへ
-直接接続することも可能だが，今回の構成は異なる．3389番を大学・機体のインターフェースに公開せず，
+直接接続することも可能であり，当時は別の構成だった．3389番を大学・機体のインターフェースに公開せず，
 確認したSSH経路を使う．転送用masterは対話型のSSH端末とは別であり，端末を開くだけでは画面の
 トンネルはできない．専用トンネルを閉じてもxrdpやロボットのアプリケーションは終了しない．
 このトンネルは画面接続だけを運び，機体のDDS通信全般やモデルの制御ループは運ばない．
 
-## 今回トンネルが必要な理由
+## 以前トンネルを使った理由
 
 操作者はMacのシステム・network設定の変更を避けたいと希望している．本プロジェクトのために
 macOSの経路変更，SSHサーバーの有効化，常駐する転送サービスの導入を行わない．既存のトンネルは
@@ -136,10 +183,10 @@ firewallとポリシーでアクセスを制御する構成が一般的である
 [Tailscaleの直接RDPの案内](https://tailscale.com/docs/solutions/access-remote-desktops-using-windows-rdp)も
 RDPホストのtailnetアドレスへ接続する方式を示す．Windows向けの案内であり，Linux側の設定の検証ではない．
 
-今回は導入したxrdpの待受を意図的にloopbackへ限定したため，その設定によりSSH転送が必要になっている．
+以前は導入したxrdpの待受を意図的にloopbackへ限定したため，その設定でSSH転送が必要だった．
 LinuxやRDPの必須条件ではなく，維持する接続が一つ増える．tailnet限定のRDP待受と，対応する
 起動順序，TLS，認証，アクセス規則を整えれば，転送を省ける．ホストの待受・ポリシーの変更が必要で，
-Windows Appの接続先を書き換えるだけでは成立しない．その直接待受への変更はまだ行っていない．
+Windows Appの接続先を書き換えるだけでは成立しない．その直接待受への変更は，上の2026-11-01の手順で適用した．
 Tailscale自体が暗号化したプライベートネットワークを提供し，RDPで使うためにSSH転送を必ず重ねるわけではない．
 
 既存のNoMachineを先に試せば構築作業を減らせた可能性がある．このホストでNoMachineとxrdpを
@@ -203,9 +250,9 @@ NetworkManagerが担当する．このためにモデル用コンテナへデス
 ループバックにしたつもりで，全インターフェースの既定の待受を公開しない．
 この計画が確定するまでは，導入コマンドをここで指定しない．
 
-## 保護されたRDP接続の案
+## 過去のSSHトンネル構成
 
-Jetsonのxrdpはループバックだけで待ち受け，認証付きSSHを通して接続する．
+以下は以前の構成の記録で，現在の接続には実行しない．当時はJetsonのxrdpをloopbackだけで待ち受け，認証付きSSHで接続した．
 大学LANや機体のネットワークへTCP 3389を公開せずに済む．選んだ版の待受設定の書式，
 サーバーの認証，TLS証明書へのアクセス，実際のソケットのアドレスを確認する．
 最初の接続を成功させるために認証・TLSの確認・ファイアウォールを無効にしない．
@@ -248,7 +295,7 @@ RDP gatewayは不要である．別に信頼を確認したホストを通して
 起きた接続不良はこの状態であり，JetsonのRDPサービスは動作していた．サーバーを
 導入しただけでは，MacとJetsonの間に恒久的な接続はできない．
 
-Macのこのリポジトリで専用ヘルパーを使うと，チャットや端末に前景のトンネルを残さずに済む．
+以下の専用helperは過去の経路の説明のために残す．現在の直接RDPでは開始せず，Macの背景処理を再作成しない．
 
 ```sh
 python3 tools/desktop_tunnel.py start RESEARCH_USER@JETSON_MANAGEMENT_ADDRESS

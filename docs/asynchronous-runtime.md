@@ -216,5 +216,5 @@ Private invocation/source/image records and event/summary JSON live under
 SSD observations area. They are excluded from Git. Unit tests cover malformed or
 changed manifests, unknown timing, publication failures, stale/late actions,
 worker failure and shutdown, in addition to the cache module tests. Mac and
-Jetson pass all 157 ordinary tests. These tests and this short run do not
+Jetson pass all 162 ordinary tests. These tests and this short run do not
 establish long-duration reliability or command authority.

@@ -1,86 +1,80 @@
-# First visit: field card
+# B2 connection visit: field card
 
-[日本語](field-card.ja.md) · [Detailed steps and troubleshooting](onsite.md)
+[日本語](field-card.ja.md) · [Detailed Ethernet procedure](field-network.md) · [Current status](status.md)
 
-For the current camera-only visit, start with [external ZED preparation](camera-runtime.md).
-The Ethernet/B2 steps below belong to the later robot visit. The host venv alone
-does not supply the prepared camera binding; use the documented container path.
+The next visit establishes the external Jetson's connection to B2 and receives
+state. Our software sends **no motion commands**. External-camera capture and
+model prediction already passed; a successful cable connection is not yet a
+model-driven walking system.
 
-Bring a copy of this project to the Jetson and open a terminal in its root.
-No SSH or GitHub URL is needed. These commands send no motor commands.
+## Before leaving
 
-On the prepared external Jetson, the source is already present. Activate its
-host venv before the project commands below; system Python remains 3.8. This
-venv does not yet supply camera/Unitree dependencies. For the onsite boot and
-personal-credential checks, use [the system guide](system-overview.md#personal-credentials-sharing-and-return).
+- Bring the external Jetson with its current power supply, Mac and their normal
+  chargers, and an Ethernet cable/adapter appropriate to the lab's **actual B2
+  user-network port**. Confirm the connector/breakout with the lab; do not assume
+  every expansion connector is an ordinary RJ45 port. Keep the Jetson on its own
+  supply for this stationary network visit; robot-mounted power is separate work.
+- Have the charged, paired B2 controller and the lab's normal operating/stop
+  procedure available. Identify who owns the current robot control session.
+- Have the lab's known working robot subnet/service address and approved onboard
+  access available if documented. They are unit-specific facts, not Go2-W or
+  reseller defaults. If unavailable, inspect lab configuration onsite before
+  assigning an address or initiating a state subscription.
+- Keep local recovery available if Wi-Fi fails. Mac uses existing Tailscale and
+  direct RDP when needed; no Mac tunnel or new background service is required.
+  [Windows App settings](remote-desktop.md#connect-directly-from-windows-app).
+- Reference the manufacturer's [B2 manual/controller page](https://www.unitree.com/app/b2/)
+  and [B2 development portal](https://support.unitree.com/home/en/B2_developer).
+  Use the lab's matching manual; do not apply B2-W instructions to this B2.
+  Official B2 user/controller pages were also cached privately on Jetson under
+  `local/reference-manuals/unitree-b2-01`: open each document's `index.html` for
+  offline reading. The cache contains 23/14 image pages and a source/SHA256
+  manifest, about 29.35 MB total; it is excluded from Git and is not redistributed.
 
-```sh
-cd ~/Developer/Projects/Robotics/b2/VLN_B2
-source .venv/bin/activate
-python3 --version
-```
+## Software already staged
 
-## Visit agenda
+| Item | Prepared evidence | Field requirement |
+|---|---|---|
+| Source | Hash-synchronized Jetson archive at `~/Developer/Projects/Robotics/b2/VLN_B2` | Open a terminal in its root |
+| Camera | Private binding/calibration; USB 5 Gbps; 275 saved JPEGs in the bounded trial | Check USB/power and final mounted view if used |
+| Model | Local fixed base/upstream and converted checkpoint; real-image prediction passed | No new download, Mac Docker or model execution required |
+| GPU runtime | Existing `vln-b2-runtime:jp5` image checked | Use reviewed camera/model mounts, not host venv |
+| State runtime | Existing `vln-b2-unitree:jp5`; fresh network-isolated verifier passed | Set the confirmed robot-facing interface and DDS domain |
+| Direct RDP | Tailnet-only listener and Mac TCP/RDP/TLS check passed | Operator registers Windows App; GUI over new route remains to confirm |
 
-Follow [the Ethernet/onboard procedure](field-network.md) in this order:
+The field readiness check revalidated the converted checkpoint SHA256 and the
+presence of the pinned base snapshot, upstream package and camera binding.
+Private results are under `local/field-ready-01`. The 162 ordinary tests pass on
+Mac/Jetson. Those facts do not establish real B2 firmware/topic/frame compatibility.
 
-1. Confirm local recovery and the existing B2 remote-controller positioning,
-   takeover and stop procedure; verify priority over future SDK commands.
-2. Save the external host's current interfaces/routes before plugging Ethernet.
-3. Identify the B2 port, documented subnet, unused client IP and DDS domain;
-   establish the link while preserving management, then verify route and reachability.
-4. Receive B2 state without motor commands; identify accessible onboard computers,
-   actual services and control ownership using authorized lab access.
-5. Attach the external ZED 2i by USB; map built-in camera/sensor exports and
-   Mid-360 wiring separately. Built-in USB access from this Jetson is unavailable.
-6. Retain the verified boot-time eduroam/Tailscale setup. The Mac screen profile
-   and tunnel have been disabled at the operator's request; do not recreate them.
-   With no separate AP, investigate a Jetson hotspot only with recovery access
-   and an explicit network plan; later test offline process lifetime without Mac.
-7. Record axes/timestamps, sensor origins, remaining dependencies and next action.
-   Motion, operator-link-loss behavior and physical stopping require later validation.
+## At the robot
 
-These steps are prepared, not already completed. Use the prepared camera and Unitree containers described in their guides; the
-host venv still lacks those bindings. Keep private values/results in `local/`.
-Use the [prepared state-container invocation](unitree-runtime.md#prepared-receive-only-command);
-the venv examples below do not supply vendor dependencies by themselves.
+1. Confirm the correct B2, normal operator control/stop procedure, intended user
+   Ethernet port and cable endpoints. Do not change onboard services or firmware.
+2. Open [Ethernet steps 1–2](field-network.md#1-before-connecting-the-cable).
+   Save external interfaces/routes **before** attachment and inspect existing
+   profiles. The inspected physical interface was `eth0` without carrier; verify
+   it again. Keep eduroam/Tailscale management and do not bridge to campus.
+3. Use the confirmed subnet and an unused external-client IP. Check carrier,
+   address and route to the known robot service. If DHCP/VLAN/bridge topology is
+   in use, follow that lab setup rather than the static-IP template.
+4. Run the [prepared state-container command](unitree-runtime.md#prepared-receive-only-command)
+   with the verified interface/domain. Read actual received/valid counts and
+   samples; exit code zero or ping alone is insufficient. No model or motion
+   client is needed for this check.
+5. Inspect accessible onboard computers using authorized lab access. Record
+   actual hosts, services, sensor exporters, protocol/topic/domain and ownership.
+   The motion controller and onboard user Jetson must not be treated as one host
+   merely because one Ethernet port reaches both.
+6. Record units, axes, timestamp meaning, world/body velocity convention and the
+   camera/body mount. Built-in streams and Mid-360 wiring are separate from the
+   working external USB camera. Keep frames/timing unverified until established.
+7. Save the conclusion and next step. Later work connects received state to
+   model inputs, addresses cache-refresh gaps, implements guarded sending and
+   verifies command loss/override/stopping before model-driven movement.
 
-## Observation probes
-
-1. **Inspect the existing installation** — Python 3.8+, no extra dependencies:
-
-   ```sh
-   python3 tools/inspect_target.py --output local/target-inventory.json
-   ```
-
-2. **Check one camera image** — requires Python 3.10+, working ZED SDK and `pyzed.sl`:
-
-   ```sh
-   PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla camera --output local/camera-01/frame.jpg
-   ```
-
-   Open the JPEG locally and check its actual forward view and mounting.
-
-3. **Check B2 state** — requires SDK2/DDS. Replace `IFACE` with the actual wired interface:
-
-   ```sh
-   PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state --interface IFACE --domain-id DOMAIN_ID --seconds 3 --output local/state-01.json
-   ```
-
-   Replace `DOMAIN_ID` with the verified lab value. Check valid counts and active
-   topic. DDS discovery/subscription traffic is sent, but no motor request.
-   Received fields do not verify frame conventions.
-
-4. **Keep the results locally** — copy `examples/onsite-notes.json` into `local/` and
-   record the existing manual control/stop procedure, command-loss behavior,
-   coordinate conventions, and camera mounting/time information. Unknown stays null.
-   Use the [detailed checklist](onsite.md#3-record-only-the-facts-requiring-physical-access).
-
-If a dependency is missing, keep the inventory and follow the matching setup
-instructions before retrying. Do not replace system Python, flash the Jetson, or
-copy Go2-W SDK patches just to make a command run. Choose a new numbered output
-for every attempt; files are not overwritten.
-
-After the two probes work, use [paired recording and offline inference](onsite.md#4-save-a-paired-observation).
-Real-state live asynchronous inference and motor integration remain separate work. Raw
-reports and recordings stay in ignored `local/`; review before sharing.
+Use a new numbered private output directory for every attempt. Copy
+[blank visit notes](../examples/onsite-notes.json) into ignored `local/`; keep
+actual IPs, accounts, raw reports and camera images out of Git. An unrecognized
+network or zero DDS samples is a diagnosis task, not a reason to run a movement
+example. The full sequence and recovery commands are in the Ethernet guide.

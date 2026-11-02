@@ -23,7 +23,7 @@ The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-All **157 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+All **162 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
 A bounded real-camera asynchronous shadow trial completed 35 actions with
@@ -95,10 +95,12 @@ Hardware availability is not sensor or navigation validation. The
 - Keep VNC outside the current plan. Existing NoMachine is unchanged; no
   performance comparison proves xrdp is faster. Historical screen-connection
   procedures are in [remote desktop](remote-desktop.md).
-- Mac remote GUI is disabled at the operator's request: no dedicated tunnel or
-  13389 listener remains; the B2 Windows App profile was removed. Existing
-  Tailscale and unrelated connections remain. Do not restart or add a Mac
-  background service. Foreground setup SSH is closed after use.
+- Direct RDP on the Jetson Tailscale IPv4 is prepared at the operator's request.
+  Mac TCP/RDP/TLS and certificate matching passed; GUI login over the new route
+  and a new whole-device reboot remain untested. The operator creates the Windows
+  App entry. No Mac tunnel/startup job is added; foreground setup SSH closes
+  after use. The host adds only the scoped RDP guard/drop-in described in the
+  [desktop guide](remote-desktop.md).
 - Camera SDK/binding import and dependency checks passed in a separate private
   prefix/container, without changing host groups or the GPU image. USB capture
   acceptance is tracked in [camera preparation](camera-runtime.md).
@@ -108,6 +110,9 @@ Hardware availability is not sensor or navigation validation. The
 1. Follow the [field card](field-card.md) and [Ethernet runbook](field-network.md)
    to map the actual B2 network, computers, sensors and receive-only SDK path.
    Preserve management Wi-Fi and keep the robot LAN separate from campus.
+   Required images/local model inputs were rechecked, the converted checkpoint
+   SHA256 matched, and a fresh offline SDK probe passed. The [visit card](field-card.md)
+   lists cable/power/controller preparation and the exact receive-container path.
 2. Initial ZED RGB and short-stream checks passed. Validate B2 state without commands. Establish frame axes, units,
    source/receipt timing, odometry and calibration before interpreting live plans.
 3. Extend the bounded asynchronous shadow trial with actual verified state and

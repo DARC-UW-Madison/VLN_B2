@@ -2,6 +2,10 @@
 
 [English](rdp-build.md) · [文書目次](README.ja.md) · [遠隔画面の概念](remote-desktop.ja.md)
 
+以下の待受設定は，最初のloopback限定での導入を説明する．2026-11-01に操作者から直接tailnet RDPの
+依頼があり，bind変更，起動・受信guard，確認は[遠隔画面ガイド](remote-desktop.ja.md)に記す．
+既存のバイナリ・TLS・login backendを維持し，再buildは不要だった．
+
 ## このビルドが必要な理由
 
 調べたUbuntu Focalの配布候補はxrdp `0.9.12-1ubuntu0.1`である．

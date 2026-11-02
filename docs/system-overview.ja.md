@@ -2,9 +2,12 @@
 
 [English](system-overview.md) · [進捗](status.ja.md) · [実行環境構築](jetson-runtime.ja.md)
 
-2026-10-29のMac方針：画面用トンネルとB2用Windows App接続は停止・解除した．調査した場所には
-該当するMacの自動起動はなかった．新しい依頼なしに再作成しない．既存Tailscaleと通常の前景の作業用SSHは
-維持する．以下のRDP導入結果は過去の検証で，Jetson側のサーバー自体は変更していない．
+2026-11-01のMac方針：JetsonのTailscale IPv4へ直接RDP接続する．Windows Appの登録は操作者が行い，
+Macのtunnel，自動起動，経路変更，新clientは追加しない．既存Tailscaleと前景の作業用SSHを使い，
+作業SSHは使用後に終了する．Jetsonにはアドレス準備helper，`b2-rdp.service`の再試行drop-in，
+TCP 3389だけのINPUT ruleを加えた．TLS，認証，大学Wi-Fi，機体Ethernetは維持する．
+Macから通信・TLSは通ったが，新経路のGUIログインと変更後の機器全体の再起動は未検証である．
+[直接画面接続](remote-desktop.ja.md)を参照する．
 
 ## 外付けJetsonの確認済み構成
 
@@ -49,6 +52,7 @@ SSDには既存の割り当て済みデータが約1 TBあり，当初`needs_rec
 | `~/Developer/Environments/pyenv/versions/3.11.18` | システムPython 3.8とは別のユーザー用Python |
 | `/mnt/b2-research/VLN_B2/docker` | SSD上の新しい共有Dockerデーモン保存先 |
 | `/mnt/b2-research/VLN_B2/build-logs` | イメージのビルドログとモデル不要の検査結果 |
+| `/opt/b2-remote/libexec/rdp-tailnet-ready.py`，`b2-rdp.service.d/tailnet.conf` | Jetsonだけの直接RDP準備・受信制限と起動再試行．非公開アドレスはRDP設定フォルダへ置く |
 | `/mnt/b2-research/VLN_B2/models` | 非公開の変換済みsafetensors・manifest．Git対象外の`models` symlinkで参照 |
 | `/mnt/b2-research/VLN_B2/observations` | 非公開の時間制限付きカメラ実験画像・各frame manifest |
 | `local/camera-runtime/attempt-01` | 非公開pyzed・Cython prefix，専用校正，カメラ検査記録．SDKは読み取り専用 |

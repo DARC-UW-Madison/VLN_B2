@@ -21,7 +21,7 @@ B2の利用者向けEthernetポートと，ケーブルの反対側を確認す�
 
 ```sh
 cd ~/Developer/Projects/Robotics/b2/VLN_B2
-mkdir -p local/field-visit-01
+mkdir -m 700 local/field-visit-01
 ip -br link > local/field-visit-01/link-before.txt
 ip -br address > local/field-visit-01/address-before.txt
 ip -4 route show table main > local/field-visit-01/routes-before.txt
@@ -100,14 +100,22 @@ sudo nmcli connection down b2-research-link
 
 ## 3．B2の状態を購読する
 
-現在のホストvenvにはUnitree SDK2・CycloneDDSがない．確認したSDKとPythonの互換性を用意してから
-実行する．新しいプロセスで，確認済みのインターフェースとドメインを明示する．
+準備済みの[状態専用イメージ](unitree-runtime.ja.md)を使い，SDK・DDS依存のないホストvenvは使わない．
+オフラインのimport・符号化は通ったが，以下の実機購読は**未実行**である．確認したinterface・domainと，
+上で作った新しい非公開フォルダを使う．オフライン検査の`--network none`と違い，選んだ機体側interfaceへ
+到達するためhost networkingを使う．networkを共有する設定であり，ホストのファイル・認証情報の共有やbridgeではない．
 
 ```sh
-source .venv/bin/activate
-PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state \
+sudo docker run --rm --pull never --runtime runc --network host --read-only \
+  --user "$(id -u):$(id -g)" --cap-drop ALL --security-opt no-new-privileges \
+  --memory 1g --cpus 2 --pids-limit 64 --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+  --mount "type=bind,src=$(pwd)/src,dst=/workspace/src,readonly" \
+  --mount "type=bind,src=$(pwd)/local/field-visit-01,dst=/reports" \
+  -e HOME=/tmp -e PYTHONPATH=/workspace/src:/opt/vendor/unitree_sdk2_python \
+  --entrypoint timeout vln-b2-unitree:jp5 -k 5s 15s \
+  /opt/unitree/bin/python -m b2_tic_vla state \
   --interface "$ROBOT_IFACE" --domain-id "$DDS_DOMAIN_ID" \
-  --seconds 3 --output local/field-visit-01/state-01.json
+  --seconds 3 --output /reports/state-01.json
 ```
 
 DDSの相手の発見・購読の通信は送るが，モーター指令は送らない．トピック，有効数と受信数，挙動，
@@ -161,7 +169,8 @@ B2内蔵のカメラ・センサーは，今回の構成では外付けJetsonへ
 内蔵センサーには対応する外部配信・購読経路が必要であり，EthernetだけでUSB機器を転送できない．
 既存サービスを止めたり，所有関係が不明なまま競合する利用側を追加したりしない．
 
-実際のSDK・バインディングが利用可能になった後，外付けカメラは次で確認する．
+以下のホスト用カメラ例にはSDK・bindingが必要である．準備した対象機では[隔離カメラ環境](camera-runtime.ja.md)・
+[時間制限付きの観測](asynchronous-runtime.ja.md)を使い，裸のホストvenvの依存不足をカメラ故障と解釈しない．
 
 ```sh
 PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla camera \
@@ -179,7 +188,8 @@ LiDARには別のEthernetアダプターや，構成を確認した共通スイ�
   現地での復旧を確認した後，GUIへログインせず，電源投入からSSHまでを試す．
 - Macから[リモートデスクトップ](remote-desktop.ja.md)を試す．HDMIあり・なし，
   ログアウト・再起動後を確認し，実際に使える画面，認証，アクセス制限を検証する．パッケージの存在だけでは成功ではない．
-  転送の試験前に，復旧手段と，記載したTailscale SSHの更新を整える．それまでは唯一の動作中の遠隔経路を維持する．
+  直接tailnet RDPは準備済みで，MacのSSH転送は不要である．復旧手段を保ち，新経路のGUIログインを確認し，動作中のSSHを維持する．
+  Tailscale・eduroamの再起動復帰は以前に通ったが，新RDP guardはservice再起動までで，変更後の機器全体の再起動は未確認である．
 - 別のAPは利用できない前提で，[オフライン運用](offline-operation.ja.md)に従い，JetsonのAP候補と直接OpenSSHを調べる．
   現地の復旧手段を確保して切り替え，インターネットやeduroam・APの同時利用を仮定しない．中核処理のMacは任意とする．
   B2リモコンの手動介入，停止，研究用指令の禁止は別に確認し，ボタンの挙動を想定で決めない．

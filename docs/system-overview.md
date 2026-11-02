@@ -2,11 +2,14 @@
 
 [日本語](system-overview.ja.md) · [Status](status.md) · [Runtime setup](jetson-runtime.md)
 
-Current Mac policy (2026-10-29): the dedicated screen tunnel and saved B2
-Windows App profile are disabled/removed. No matching Mac startup task was found
-in the inspected locations. Do not recreate them without a new request. Existing
-Tailscale and ordinary foreground setup SSH are retained. The RDP commissioning
-results below are historical; the Jetson server itself was not changed.
+Current Mac policy (2026-11-01): use direct RDP to the Jetson Tailscale IPv4.
+The operator creates the Windows App entry; no Mac tunnel, startup task, routing
+change or new client is added. Existing Tailscale and foreground setup SSH are
+retained; setup SSH closes after use. Jetson now has an address-readiness helper,
+a retry drop-in for `b2-rdp.service` and one scoped INPUT rule for TCP 3389.
+TLS, credentials, campus Wi-Fi and robot Ethernet are unchanged. Transport/TLS
+passed from Mac; new-route GUI login and a new whole-device reboot remain
+unverified. See [direct desktop setup](remote-desktop.md).
 
 ## Verified external Jetson
 
@@ -55,6 +58,7 @@ of previous data occurred. See [storage procedure](jetson-runtime.md#storage-pre
 | `~/Developer/Environments/pyenv/versions/3.11.18` | Per-user Python, separate from system Python 3.8 |
 | `/mnt/b2-research/VLN_B2/docker` | New shared Docker-daemon data root on the SSD |
 | `/mnt/b2-research/VLN_B2/build-logs` | Image-build logs and model-free check results |
+| `/opt/b2-remote/libexec/rdp-tailnet-ready.py`, `b2-rdp.service.d/tailnet.conf` | Jetson-only direct-RDP readiness/ingress guard and startup retry; private address file in the RDP config directory |
 | `/mnt/b2-research/VLN_B2/models` | Private derived safetensors/manifest; ignored project `models` symlink |
 | `/mnt/b2-research/VLN_B2/observations` | Private bounded camera experiment images and per-frame manifests |
 | `local/camera-runtime/attempt-01` | Private pyzed/Cython prefix, dedicated calibration and camera check records; SDK remains read-only |

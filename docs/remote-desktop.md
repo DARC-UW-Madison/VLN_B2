@@ -2,21 +2,82 @@
 
 [日本語](remote-desktop.ja.md) · [Documentation](README.md) · [System overview](system-overview.md) · [Field procedure](field-network.md)
 
-Current policy, **2026-10-29**: remote GUI connections from Mac are disabled at
-the operator's request. The dedicated tunnel was not running; port 13389 had no
-listener, and no matching startup configuration was found in the inspected Mac
-launch-agent/daemon and shell/SSH configuration locations. Its inactive lock
-was removed. The B2 Windows App profile was exported privately for recovery and
-removed from the app; Windows App was then closed. Existing Tailscale and
-unrelated saved connections were preserved. Do not restart the tunnel, add a
-Mac service or install another remote-desktop client without a new request.
+Current policy, **2026-11-01**: connect Windows App directly to the Jetson's
+Tailscale IPv4 address on TCP 3389. The former Mac tunnel/profile was removed;
+no Mac tunnel, startup task, routing change or new client is required. The
+operator creates the Windows App entry. Existing Tailscale remains the private
+management network. Model inference and future robot control run on Jetson
+independently of a remote desktop.
 
-The Jetson RDP installation remains unchanged. RDP login, display/input and
-headless software-reboot recovery passed previously; those are historical
-results, not an active Mac connection. Ordinary foreground SSH remains available
-for setup and should be closed when that work ends. The examples below are
-reference procedures, not an instruction to recreate the removed configuration.
-Inference and future robot control must run locally without a desktop link.
+## Connect directly from Windows App
+
+1. Keep the existing Tailscale connection active on Mac and Jetson.
+2. In Windows App, choose **Add PC** and enter the values below.
+3. Save/open the PC and enter the Jetson Linux account password when prompted.
+   If xrdp presents a session chooser, select **Xorg**. Do not use a university
+   password or a Microsoft login as the Linux account credential.
+4. On a certificate prompt, compare the server certificate with the trusted
+   Jetson copy; do not disable certificate verification globally. The first new
+   address can prompt even though the existing certificate was retained.
+
+| Setting | Value |
+|---|---|
+| PC name | `JETSON_TAILSCALE_IP:3389`; use the actual IP privately supplied to the operator |
+| User account | Research Linux login, or Ask when required |
+| Password | That Linux account's password; keep it out of chat/Git |
+| Gateway | No gateway |
+| Friendly name | Optional descriptive name such as `B2 Jetson` |
+
+Do not use the old `127.0.0.1:13389` entry or start a tunnel. The account is the
+same research account used over SSH. For the client UI, see
+[Microsoft's Windows App instructions](https://learn.microsoft.com/en-us/windows-app/get-started-connect-devices-desktops-apps).
+The address is the node's Tailscale address, not a changing campus Wi-Fi lease;
+see [Tailscale address assignment](https://tailscale.com/docs/concepts/ip-and-dns-addresses).
+No university-portal login is performed by RDP itself.
+
+## Applied direct-listener configuration
+
+The existing host xrdp now binds **only the configured Tailscale IPv4**, not
+loopback or a wildcard. TLS settings, certificate/key, PAM, allow group and
+Linux credentials were retained. A single labelled IPv4 INPUT rule drops
+traffic to that exact address/TCP 3389 arriving outside `tailscale0`. It neither
+flushes rules nor changes the default firewall policy, SSH, NoMachine or Wi-Fi.
+Existing Tailscale access rules still apply.
+
+The reviewed [readiness helper](../deploy/rdp-tailnet-ready.py) and
+[systemd drop-in](../deploy/rdp-tailnet.conf) run on **Jetson only**. The private
+`/opt/b2-remote/etc/xrdp/tailnet-address` holds its actual enrolled IPv4. The
+helper checks the configured address against `tailscale ip -4`, confirms it is
+up on `tailscale0`, then idempotently checks/adds the narrowly scoped rule before
+xrdp starts. A mismatch or unavailable interface fails startup; it never falls
+back to all interfaces. The service starts after tailscaled and retries failure
+every five seconds without a start-rate cutoff. It remains enabled at boot.
+Changing enrollment/address requires reviewing that private file, xrdp's bind
+address and any old dedicated rule together.
+
+The configuration was backed up under private `local/direct-rdp/attempt-01`.
+The listener and session manager were active after two service restarts, and
+only one dedicated firewall rule existed. A controlled address-readiness failure
+rejected startup; restoring the configuration recovered automatically on retry
+without restarting Wi-Fi/SSH or changing Tailscale enrollment. From Mac, a direct TCP/RDP negotiation
+selected TLS 1.3 and the server certificate SHA256 matched the copy inspected
+through SSH. No password was sent for that transport check. **GUI login over
+this new route and a new whole-device reboot have not yet been tested.** The
+same backend previously passed visible desktop/input tests over the old route.
+The 162 ordinary tests passed on Mac and Jetson; mocked guard tests do not
+replace the actual transport check.
+
+For diagnosis on Jetson, inspect `systemctl status b2-rdp.service`, its journal,
+`tailscale ip -4`, the configured bind and `ss -ltnp`. Do not open 3389 on campus
+or robot interfaces to bypass an address/access failure. To roll back, stop the
+RDP service, restore the saved original ini, remove only this drop-in and exact
+labelled firewall rule, reload systemd and start the original loopback server.
+That restores the old server restriction; it does not create a Mac tunnel.
+Do not remove unrelated firewall rules or Tailscale enrollment.
+
+The following sections retain earlier inspections and the superseded SSH
+transport for explanation. They are historical records, not current connection
+instructions. Use the direct steps above for this target.
 
 ## What is currently known
 
@@ -112,7 +173,7 @@ or stability. A separately created RDP display can have different dock, theme,
 resolution or session settings while using the same user's home files. It is
 not a separate Linux account or sandbox.
 
-The current RDP server accepts TCP only on **Jetson's** loopback address.
+The former RDP server accepted TCP only on **Jetson's** loopback address.
 Windows App connects to **Mac's** loopback port, where SSH forwards the stream:
 
 ```text
@@ -123,14 +184,15 @@ Windows App -> Mac 127.0.0.1:13389 -> SSH over Tailscale
 Tailscale provides private network reachability; SSH authenticates and carries
 the TCP forward; RDP handles desktop authentication, graphics and input. The
 RDP server's TLS remains enabled. Direct Mac-to-server RDP is possible with a
-different approved listener/access policy, but is not this configuration. We
-keep 3389 off the campus and robot interfaces and reuse the reviewed SSH path.
+different listener/access policy. The earlier configuration kept 3389 off
+campus/robot interfaces by using the reviewed SSH path; the direct configuration
+above now uses an explicit tailnet bind and ingress restriction.
 The forwarding master is separate from an interactive SSH terminal. Opening a
 terminal session does not create the screen tunnel, and closing the dedicated
 tunnel does not stop xrdp or a robot application. This tunnel carries the screen
 connection only, not general robot DDS traffic or the model's control loop.
 
-## Why this configuration uses a tunnel
+## Why the earlier setup used a tunnel
 
 The operator wants to avoid Mac system/network changes. Do not change macOS
 routes, enable its SSH server, or install a persistent forwarding service for
@@ -164,7 +226,7 @@ SSH forward is required by that chosen configuration, not by Linux or RDP.
 This adds a connection to maintain. A tailnet-only RDP listener with matching
 startup order, TLS, authentication and access rules could remove that forward;
 changing the host listener/policy is separate from merely changing Windows App's
-address. No such direct-listener change has been applied. Tailscale already
+address. That direct-listener change was subsequently applied on 2026-11-01 as described above. Tailscale already
 provides an encrypted private network; SSH forwarding is not a universal extra
 requirement for using RDP through it.
 
@@ -238,10 +300,10 @@ restricted initial startup before installing, then verify actual listeners.
 Do not expose a default all-interface listener while assuming it is loopback.
 No installation command is prescribed here until this plan is resolved.
 
-## Proposed protected RDP connection
+## Historical SSH-tunnel configuration
 
-Use a loopback-only xrdp listener on Jetson and reach it through authenticated
-SSH. This avoids exposing TCP 3389 to the campus network or the robot network.
+The following records the superseded setup; do not execute it for the current
+direct connection. It used a loopback-only Jetson listener and authenticated SSH. This avoids exposing TCP 3389 to the campus network or the robot network.
 Verify the selected version's binding syntax, server authentication, TLS
 certificate access and actual socket addresses. Do not disable authentication,
 TLS checks or the firewall to make an initial connection work. Only enable
@@ -292,8 +354,8 @@ listener. This was the diagnosed failure after the initial desktop test; the
 Jetson RDP services were still active. Installing a server does not create a
 permanent Mac-to-Jetson connection.
 
-From this repository on Mac, use the dedicated helper instead of leaving a
-foreground tunnel attached to a chat or terminal:
+The helper below remains as a record of the former transport. Do not start it
+for current direct RDP or recreate a Mac background connection:
 
 ```sh
 python3 tools/desktop_tunnel.py start RESEARCH_USER@JETSON_MANAGEMENT_ADDRESS

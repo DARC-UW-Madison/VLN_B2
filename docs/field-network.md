@@ -25,7 +25,7 @@ Use a fresh numbered directory; do not overwrite an earlier visit:
 
 ```sh
 cd ~/Developer/Projects/Robotics/b2/VLN_B2
-mkdir -p local/field-visit-01
+mkdir -m 700 local/field-visit-01
 ip -br link > local/field-visit-01/link-before.txt
 ip -br address > local/field-visit-01/address-before.txt
 ip -4 route show table main > local/field-visit-01/routes-before.txt
@@ -113,15 +113,25 @@ sudo nmcli connection down b2-research-link
 
 ## 3. Subscribe to B2 state
 
-The host venv currently lacks Unitree SDK2/CycloneDDS. Verify an approved SDK
-installation and its Python compatibility before running the probe. Use the
-verified interface/domain explicitly in a fresh process:
+Use the already built [state-only image](unitree-runtime.md), not the host
+venv that lacks SDK/DDS dependencies. Offline import/serialization passed; the
+following real robot subscription has **not** been run. Use the confirmed
+interface/domain and the fresh private directory created above. Host networking
+is needed here to reach the selected robot-facing interface, unlike the offline
+verifier's `--network none`. This shares networking, not the host filesystem or
+credentials, and does not bridge networks.
 
 ```sh
-source .venv/bin/activate
-PYTHONPATH=src timeout -k 5s 15s python3 -m b2_tic_vla state \
+sudo docker run --rm --pull never --runtime runc --network host --read-only \
+  --user "$(id -u):$(id -g)" --cap-drop ALL --security-opt no-new-privileges \
+  --memory 1g --cpus 2 --pids-limit 64 --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+  --mount "type=bind,src=$(pwd)/src,dst=/workspace/src,readonly" \
+  --mount "type=bind,src=$(pwd)/local/field-visit-01,dst=/reports" \
+  -e HOME=/tmp -e PYTHONPATH=/workspace/src:/opt/vendor/unitree_sdk2_python \
+  --entrypoint timeout vln-b2-unitree:jp5 -k 5s 15s \
+  /opt/unitree/bin/python -m b2_tic_vla state \
   --interface "$ROBOT_IFACE" --domain-id "$DDS_DOMAIN_ID" \
-  --seconds 3 --output local/field-visit-01/state-01.json
+  --seconds 3 --output /reports/state-01.json
 ```
 
 The probe sends DDS discovery/subscription traffic but no motor requests. Record
@@ -183,7 +193,10 @@ Built-in streams need a supported network export/subscription path; Ethernet
 does not automatically forward USB devices. Do not stop existing sensor services
 or attach a competing consumer without understanding ownership.
 
-After the actual SDK/binding is available, the external-camera command is:
+The host-only camera example below requires SDK/binding dependencies. On the
+prepared target, use [the isolated camera environment](camera-runtime.md) or
+[bounded camera observer](asynchronous-runtime.md); do not run it in the bare
+host venv and interpret a missing binding as a camera failure:
 
 ```sh
 PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla camera \
@@ -203,8 +216,10 @@ their localization/clearance role separately from TIC-VLA's RGB input.
 - Test [remote desktop](remote-desktop.md) from Mac, both with and
   without HDMI, and after logout/reboot. Validate an actual usable framebuffer,
   authentication and restricted access; package presence is not success.
-  Establish recovery access and address the documented Tailscale SSH update
-  before forwarding tests; preserve the only working remote path meanwhile.
+  Direct tailnet RDP is now prepared; the Mac needs no SSH forwarding. Keep
+  recovery access, confirm the new-route GUI login and preserve working SSH.
+  Tailscale/eduroam reboot recovery was previously tested; the new RDP guard
+  has passed service restarts, not a new whole-device reboot.
 - Assume no separate AP. Follow [offline operation](offline-operation.md) to
   inspect a possible Jetson AP and direct local OpenSSH before a console-backed
   switch; no internet or concurrent eduroam/AP service is assumed. Mac remains

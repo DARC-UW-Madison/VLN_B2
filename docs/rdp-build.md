@@ -2,6 +2,11 @@
 
 [日本語](rdp-build.ja.md) · [Documentation](README.md) · [Remote desktop concepts](remote-desktop.md)
 
+The listener settings below describe initial loopback-only commissioning.
+On 2026-11-01 the operator requested direct tailnet RDP; the controlled bind,
+startup/ingress guard and verification are in [the desktop guide](remote-desktop.md).
+The existing binary/TLS/login backend was retained; no rebuild was needed.
+
 ## Why this build exists
 
 The inspected Ubuntu Focal repository offers xrdp `0.9.12-1ubuntu0.1`.

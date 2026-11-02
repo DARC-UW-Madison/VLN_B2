@@ -15,7 +15,7 @@ network. No camera, SDK control client or robot command sender participates.
 | Strict GPU loading | 948,462,978 unique parameters; horizon 30; action layers 3; about 10.42 seconds | One load, excluding the preceding checksum; not inference timing |
 | Synthetic inference | One generated 448×448 RGB image and zero velocities; 30 finite XY points; about 13.64 seconds | No real image, accuracy, stopping or control-rate validation |
 | PyTorch allocation | Load peak 2,110,120,960 bytes; inference peak 2,624,592,384 bytes | GPU allocator only; excludes CPU RAM, driver allocations and total unified memory |
-| Ordinary tests | 157 passed on Mac and Jetson | Unit/synthetic tests do not validate sensors, firmware or movement |
+| Ordinary tests | 162 passed on Mac and Jetson | Unit/synthetic tests do not validate sensors, firmware or movement |
 
 The synthetic run retained the upstream sampling configuration: maximum 200
 new tokens, sampling enabled, temperature 0.7. No seed was fixed or recorded.
@@ -189,7 +189,7 @@ python3.11 /workspace/profile_model_runtime.py \
 
 This requires an explicit assumed-state flag. Report overwrite, non-offline
 execution and a checkpoint checksum mismatch fail before model loading. Hook
-restoration/nested accounting and input guards are unit-tested. All 157 tests
+restoration/nested accounting and input guards are unit-tested. All 162 tests
 pass on Mac and Jetson. These tests do not validate real B2 observations.
 
 ## Owned-cache reuse check

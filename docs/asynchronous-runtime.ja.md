@@ -174,4 +174,4 @@ python3.11 /workspace/tools/observe_async.py \
 非公開の呼出し・source・image記録とevent・summary JSONは`local/async-shadow/attempt-01`，
 画像・各frame情報はSSD専用observations領域へ置き，Git対象外にする．cacheモジュールの検査に加え，
 壊れた・変化したmanifest，不明な時刻，公開失敗，古い・遅い行動，worker失敗，終了を単体テストで確認する．
-Mac・Jetsonで通常テスト157件が成功する．これらのテストと短い試験は，長時間信頼性や制御権の証明ではない．
+Mac・Jetsonで通常テスト162件が成功する．これらのテストと短い試験は，長時間信頼性や制御権の証明ではない．
