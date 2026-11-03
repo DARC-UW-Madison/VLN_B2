@@ -4,7 +4,7 @@
 
 ## Current stage
 
-Updated **2026-11-01**. TIC-VLA now loads on the external Jetson GPU and completes
+Updated **2026-11-03**. TIC-VLA now loads on the external Jetson GPU and completes
 one synthetic-image inference offline. Strict loading accepted 1,324 tensor keys,
 948,462,978 unique parameters, horizon 30 and three action layers. The one
 synthetic call returned 30 finite XY points in **13.64 seconds**. Its three-second
@@ -23,7 +23,7 @@ The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-All **162 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+All **164 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
 A bounded real-camera asynchronous shadow trial completed 35 actions with
@@ -38,6 +38,14 @@ navigation evaluation remain unvalidated or unimplemented. The lab destination
 is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); no push has
 been made. The [MIT License](../LICENSE) covers only original code/docs, not
 upstream code, weights or converted derivatives.
+
+The 2026-11-03 onsite restart restored eduroam/Tailscale. Saved logs show
+pre-restart Wi-Fi authentication timeouts despite stored credentials; the exact
+AP/authenticator/client cause remains unresolved. Desktop initialization warnings
+are a separate investigation. The agent fixed an expected RDP-readiness exception
+that had left its own crash report and archived only that report; Wi-Fi/GDM
+settings were not changed by the agent. See [access incident findings](system-overview.md#diagnosing-access-loss-and-desktop-failures).
+B2 remains disconnected; recovery is not evidence of robot readiness.
 
 ## Target setup
 

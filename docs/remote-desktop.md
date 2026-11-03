@@ -64,8 +64,13 @@ selected TLS 1.3 and the server certificate SHA256 matched the copy inspected
 through SSH. No password was sent for that transport check. **GUI login over
 this new route and a new whole-device reboot have not yet been tested.** The
 same backend previously passed visible desktop/input tests over the old route.
-The 162 ordinary tests passed on Mac and Jetson; mocked guard tests do not
+The 164 ordinary tests passed on Mac and Jetson; mocked guard tests do not
 replace the actual transport check.
+
+On 2026-11-03 the helper was corrected to handle expected startup failures
+without an unhandled exception/desktop crash report. The previous deliberate
+test report was archived; normal systemd retry behavior remains. See
+[incident evidence and limits](system-overview.md#diagnosing-access-loss-and-desktop-failures).
 
 For diagnosis on Jetson, inspect `systemctl status b2-rdp.service`, its journal,
 `tailscale ip -4`, the configured bind and `ss -ltnp`. Do not open 3389 on campus

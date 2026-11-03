@@ -343,3 +343,53 @@ assets/loading, map the actual onboard computers and sensor connections, receive
 images/state without commands, and validate command ownership and independent
 stopping before controlled motion. Keep the onboard software intact until its
 role and interfaces are understood.
+
+
+## Diagnosing access loss and desktop failures
+
+The 2026-11-03 inspection separated three observations rather than treating a
+popup, lost connectivity and a desktop freeze as one proven fault:
+
+- Before the operator's restart, persistent syslog recorded repeated eduroam
+  association/authentication timeouts. NetworkManager explicitly said stored
+  secrets existed, requested new secrets and finally failed with `no-secrets`.
+  That final reason alone does not prove the saved password was absent or wrong.
+  After restart the same stored profile completed PEAP and connected before the
+  desktop login. AP/authentication-service/supplicant responsibility remains
+  unresolved. No Wi-Fi credentials, CA checks or retry settings were changed.
+- The legacy desktop account was the previously retained autologin target.
+  The operator changed it to the research account after restarting; the agent
+  did not make that change. Before restart Linux login authentication had
+  succeeded, followed by a GNOME FIFO warning and XRDP audio environment values
+  in the local desktop launch. Session residue/conflict is a hypothesis, not a
+  proven freeze cause. Current local and RDP GUI sessions share one account;
+  avoid assuming that a disconnected RDP client has logged that session out.
+  No session was terminated, GNOME reset or graphics driver replaced.
+- One pending crash report belonged to the project's **intentional readiness
+  failure test** on 2026-11-01. An unhandled expected exception had invoked the
+  host crash-report mechanism. The helper now catches expected address/file/
+  subprocess failures, logs a concise diagnostic and exits 1 for systemd retry.
+  Its own identified old test report was archived privately; an unrelated older
+  browser report was left alone. Which report the operator's popup displayed
+  was not independently observed. The helper failure does not explain Wi-Fi loss.
+
+Journal storage was volatile and held only the current boot. Persistent syslog
+and authentication logs supplied partial previous-boot evidence; raw excerpts
+stay in ignored `local/access-incident-20261103-01`. The boot clock was corrected
+by time synchronization. A Tailscale message describing a large apparent sleep
+interval during that correction is not independent proof of physical suspend.
+Use monotonic time within a boot and verify time corrections before interpreting
+cross-boot wall-clock durations. Both inspected desktop accounts currently had
+AC suspend action `nothing`; that does not reconstruct earlier settings.
+
+For a recurrence, preserve current/previous boot availability, NetworkManager/
+supplicant messages and login/session state before restarting if possible. Read
+crash **metadata** first; do not upload reports, collect browser content or print
+network passwords. Check the exact active connection and secret-storage flags
+without displaying secrets. Distinguish missing credentials, authentication
+failure and failure to obtain an IP. Keep peer identities and raw logs private.
+The [upstream XRDP discussion](https://github.com/neutrinolabs/xrdp/issues/2027)
+is a related GNOME/FIFO case, not proof that this device has the same cause.
+The expected-failure handler and installed-helper check passed, with all 164
+ordinary tests passing on Mac and Jetson. Recovery after one restart does not
+establish automatic recovery from a future eduroam authentication stall.
