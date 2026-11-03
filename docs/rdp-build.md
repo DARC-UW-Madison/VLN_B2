@@ -224,3 +224,9 @@ target uptime; a changed boot ID, automatic eduroam connection, Internet access,
 management services, SSD mount and Docker data root were verified. The operator
 confirmed Windows App display/input after the Mac tunnel was restarted. No
 physical power cycle or GUI autologin change was performed.
+
+The earlier commissioning table records clipboard-disabled defaults. On
+2026-11-03 the operator requested usable copy/paste; the host configuration was
+changed to text-only bidirectional `cliprdr`, with other channels blocked. See
+[the current clipboard and editor procedure](remote-desktop.md). Existing GUI
+sessions were retained; new-session/client transfer confirmation is pending.

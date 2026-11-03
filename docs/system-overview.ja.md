@@ -383,3 +383,8 @@ sudo apt install --only-upgrade PACKAGE_NAME
 変更前・適用・検証の非公開記録は`local/update-policy-01`にある．戻す場合は，元のユーザーoverrideが
 存在したら復元し，なければ新しく作ったユーザーoverrideだけを取り除いて再ログインする．この対象機に
 以前のoverrideはなかった．systemのファイルを維持し，通知を戻すためにクラッシュログを書き換えない．
+
+2026-11-03に依頼されたARM64 VS Codeを，新規host package `code`（1.144.1）1個だけ導入した．
+この取引で他の導入済みpackage版は変わらず，Microsoft APT sourceも追加しなかった．
+RDPはclipboard無効から文字だけ双方向転送へ変更し，既存sessionは閉じていない．
+[操作手順](remote-desktop.ja.md)を参照する．証拠と設定backupは非公開`local/editor-setup-01`に置いた．

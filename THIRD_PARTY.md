@@ -101,6 +101,15 @@ is installed per user under the [PSF License Agreement and included notices](htt
 No interpreter binary is redistributed. See [runtime setup](docs/jetson-runtime.md).
 Review updated for these references: 2026-10-27.
 
+
+Microsoft VS Code 1.144.1 (official ARM64 Debian binary) was installed at the
+operator's request as optional host editing software. It is not bundled with
+this repository or model image. Its [Microsoft binary license](https://code.visualstudio.com/license)
+and [privacy terms](https://privacy.microsoft.com/en-us/privacystatement) apply;
+the MIT license of this project or the Code OSS source does not relicense that
+distributed binary. No extension/account/sync setup was performed. See
+[installation and clipboard operation](docs/remote-desktop.md).
+
 ## CPU conversion candidate
 
 `deploy/converter-requirements.lock` pins 12 Python 3.11/aarch64 CPU-converter

@@ -2,7 +2,7 @@
 
 [日本語](remote-desktop.ja.md) · [Documentation](README.md) · [System overview](system-overview.md) · [Field procedure](field-network.md)
 
-Current policy, **2026-11-01**: connect Windows App directly to the Jetson's
+Current policy, **2026-11-03**: connect Windows App directly to the Jetson's
 Tailscale IPv4 address on TCP 3389. The former Mac tunnel/profile was removed;
 no Mac tunnel, startup task, routing change or new client is required. The
 operator creates the Windows App entry. Existing Tailscale remains the private
@@ -34,6 +34,74 @@ same research account used over SSH. For the client UI, see
 The address is the node's Tailscale address, not a changing campus Wi-Fi lease;
 see [Tailscale address assignment](https://tailscale.com/docs/concepts/ip-and-dns-addresses).
 No university-portal login is performed by RDP itself.
+
+## Text copy and paste between Mac and Jetson
+
+On 2026-11-03 the reported clipboard failure was traced to our earlier server
+configuration: `allow_channels=false` plus both clipboard restrictions set to
+`all`. This was an explicit setup restriction, not evidence of a client bug.
+The server now allows text in both directions. In `xrdp.ini`,
+`allow_channels=true` and only the `cliprdr` channel is enabled; other channels
+remain disabled. In `sesman.ini`, `RestrictInboundClipboard=file,image` and
+`RestrictOutboundClipboard=file,image` block files/images while allowing text.
+The exact version's [clipboard settings](https://raw.githubusercontent.com/neutrinolabs/xrdp/v0.10.6.1/sesman/sesman.ini.in)
+were checked before applying this change.
+
+To activate and check it yourself:
+
+1. Save work in the Jetson desktop, then **log out of that GUI session**. Merely
+   disconnecting can retain its channel server and old restrictions. SSH can stay open.
+2. In Windows App, edit this PC, open **Devices & Audio**, enable Clipboard or
+   select **Bidirectional**, then Save. These are operator instructions; no Mac
+   preference/profile was changed by the agent. See [Microsoft's redirection guide](https://learn.microsoft.com/en-us/windows-app/device-audio-folder-redirection-teams).
+3. Connect and sign into a new Jetson RDP session. Copy a harmless test string
+   from Mac and paste it into a Jetson text editor, then test the reverse direction.
+4. Use Linux shortcuts inside Jetson: normal editors use Ctrl+C / Ctrl+V; a
+   terminal normally uses **Ctrl+Shift+C / Ctrl+Shift+V**. Mac uses Command+C / Command+V.
+
+The session manager was reloaded without restarting the listener or terminating
+GUI sessions. Settings and service activity were verified, but end-to-end text
+transfer awaits the operator's new-session/client test. Current clipboard contents
+were not inspected. Original ini files are preserved privately under
+`local/editor-setup-01/rdp-config-before`; restoring them requires administrator
+access and a new session. TLS, Tailscale-only binding, firewall and login rules
+were not changed.
+
+## VS Code installed on Jetson
+
+Microsoft's official **ARM64 Debian package, VS Code 1.144.1** was installed on
+2026-11-03. The download matched the official update metadata's SHA256. APT
+simulation and before/after inventories showed exactly one new package, `code`,
+with no other package upgrades/removals. `code --version` reports the expected
+version/commit/ARM64 and `dpkg --audit` is clean. The application was also
+started in the existing RDP GUI and its window showed the Japanese camera-demo
+manual; this did not require a GUI logout. CUDA, JetPack, Python and the
+model containers were not modified. This is a host editor for the GUI, not a
+replacement model environment; use the demo commands from its terminal as before.
+
+From a terminal **inside the Jetson desktop**, open the project:
+
+```bash
+cd ~/Developer/Projects/Robotics/b2/VLN_B2
+code .
+```
+
+If the virtual RDP desktop encounters an Electron/GPU rendering problem, start
+this one instance with GPU rendering disabled:
+
+```bash
+code --disable-gpu .
+```
+
+Do not add `--no-sandbox` as a routine workaround. The packaged sandbox remains
+enabled. The installer was explicitly told not to add Microsoft's APT source;
+no Microsoft repository/key source was added. Later editor updates can use a
+reviewed official package via APT. No extension, account sign-in or Settings Sync
+was configured. This editor does not require installing VS Code on Mac.
+[Microsoft's Linux installation instructions](https://code.visualstudio.com/docs/setup/linux)
+and [the binary license](https://code.visualstudio.com/license) apply; the
+project's MIT license does not relicense this installed application. Package,
+installation and window-check evidence remain in ignored `local/editor-setup-01`.
 
 ## Applied direct-listener configuration
 

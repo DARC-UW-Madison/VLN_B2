@@ -86,6 +86,14 @@ its old profile is backed up. Research-login automatic AC suspend is disabled.
 GUI boot remains enabled. A later controlled software reboot verified automatic
 recovery on the then-active Wi-Fi; see the boot checks below.
 
+
+On 2026-11-03, the requested ARM64 VS Code editor was added as the single
+new host package `code` (1.144.1); no other installed package version changed
+in that transaction. The Microsoft APT source was declined. The RDP server
+was also changed from clipboard-disabled defaults to text-only bidirectional
+transfer, without closing existing sessions. See [the operator procedure](remote-desktop.md).
+Private evidence and configuration backups are in `local/editor-setup-01`.
+
 ## What is isolated
 
 - **Linux login:** separates home files, credentials and ordinary permissions.

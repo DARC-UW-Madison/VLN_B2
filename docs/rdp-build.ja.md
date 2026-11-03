@@ -194,3 +194,7 @@ Tailscale，SSH，両RDPサービス，Dockerが復帰した．SSDのマウン�
 自動eduroam接続，インターネット，管理サービス，SSDのマウント，Docker保存先を確認した．
 Macのトンネル再開後，操作者がWindows Appの表示と入力を確認した．物理的な電源の入れ直しや
 GUI自動ログインの変更は行っていない．
+
+上の初期導入表はclipboard無効だった当時の設定である．2026-11-03にcopy・pasteの依頼を受け，
+hostを文字だけ双方向の`cliprdr`へ変更し，他channelは無効にした．
+[現在のclipboard・editor手順](remote-desktop.ja.md)を参照する．既存GUIは維持し，新session・clientの転送確認が残る．

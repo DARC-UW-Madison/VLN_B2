@@ -87,6 +87,13 @@ tailnetへの登録，ホストされたサービスの条件，研究室のア�
 ユーザー用に導入した．インタープリタのバイナリは再配布しない．[実行環境構築](docs/jetson-runtime.ja.md)を参照する．
 これらの参照の更新確認日：2026-10-27．
 
+
+Microsoft VS Code 1.144.1の公式ARM64 Debian binaryを，操作者の依頼で任意のhost editorとして導入した．
+このレポやモデルimageには同梱しない．[Microsoft binary license](https://code.visualstudio.com/license)と
+[privacy条件](https://privacy.microsoft.com/en-us/privacystatement)が適用され，独自レポやCode OSS sourceのMITで
+配布binaryを再許諾しない．拡張・account・syncの設定はしていない．
+[導入とclipboard操作](docs/remote-desktop.ja.md)を参照する．
+
 ## CPU変換用の候補
 
 `deploy/converter-requirements.lock`で，Python 3.11・aarch64用のCPU変換環境の12パッケージと，

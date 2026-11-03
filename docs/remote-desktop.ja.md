@@ -2,7 +2,7 @@
 
 [English](remote-desktop.md) · [文書一覧](README.ja.md) · [システム全体像](system-overview.ja.md) · [現地手順](field-network.ja.md)
 
-**2026-11-01の現在方針**：Windows Appから，JetsonのTailscale IPv4・TCP 3389へ直接接続する．
+**2026-11-03の現在方針**：Windows Appから，JetsonのTailscale IPv4・TCP 3389へ直接接続する．
 以前のMac用tunnel・profileは除去済みである．Macのtunnel，自動起動，経路変更，新しいclientは不要で，
 Windows Appの接続先は操作者が登録する．既存Tailscaleを管理用の非公開networkとして使う．
 モデル推論・将来の実機制御は，画面接続とは独立してJetson上で動く．
@@ -29,6 +29,57 @@ client画面は[MicrosoftのWindows App手順](https://learn.microsoft.com/en-us
 指定するのは，変化する大学Wi-FiのleaseではなくnodeのTailscale IPである．
 [Tailscaleのアドレス割当](https://tailscale.com/docs/concepts/ip-and-dns-addresses)を参照する．
 RDP自体が大学portalへログインするわけではない．
+
+## MacとJetsonの間で文字をコピー・貼り付けする
+
+2026-11-03のcopy不調は，以前こちらが設定した`allow_channels=false`と，両方向の
+clipboard制限`all`が原因だった．client故障の証拠ではなく，明示的な構築時の制限である．
+現在は文字を双方向に許可した．`xrdp.ini`は`allow_channels=true`とし，channelは
+`cliprdr`だけを有効化し，他は無効のままにした．`sesman.ini`では
+`RestrictInboundClipboard=file,image`と`RestrictOutboundClipboard=file,image`で
+file・画像を禁止し，文字を許可する．対象版の[clipboard設定](https://raw.githubusercontent.com/neutrinolabs/xrdp/v0.10.6.1/sesman/sesman.ini.in)を
+確認してから適用した．
+
+反映と確認は次の順序で行う．
+
+1. Jetson画面の作業を保存し，**GUI sessionからログアウト**する．切断だけではchannel serverと旧制限が残る場合がある．SSHは維持できる．
+2. Windows AppでこのPCを編集し，**Devices & Audio**のClipboardを有効，または**Bidirectional**にして保存する．操作者用の手順であり，エージェントはMacの設定・profileを変更していない．[Microsoftの転送手順](https://learn.microsoft.com/en-us/windows-app/device-audio-folder-redirection-teams)も参照する．
+3. 再接続して新しいJetson RDP sessionへログインする．秘密でない試験用文字列をMacからJetsonのeditorへ貼り付け，逆方向も試す．
+4. JetsonではLinuxのキーを使う．通常editorはCtrl+C／Ctrl+V，端末は通常**Ctrl+Shift+C／Ctrl+Shift+V**である．MacはCommand+C／Command+Vを使う．
+
+session managerだけをreloadし，listener再起動やGUI終了はしていない．設定とservice稼働は確認済みだが，
+双方向の実転送は操作者による新session・clientでの確認が残る．現在のclipboard内容は読んでいない．
+元iniは非公開`local/editor-setup-01/rdp-config-before`へ保存した．復元には管理者権限と新sessionが必要である．
+TLS，Tailscale専用待受，firewall，login規則は変えていない．
+
+## Jetsonに導入したVS Code
+
+2026-11-03にMicrosoft公式の**ARM64 Debian版VS Code 1.144.1**を導入した．
+公式update metadataのSHA256と取得物が一致した．APT模擬実行と前後一覧で，新規`code` 1個だけ，
+他packageの更新・削除なしを確認した．`code --version`は想定版・commit・ARM64で，`dpkg --audit`も正常である．
+既存RDP GUIでアプリを起動し，日本語cameraデモ操作書を開いたwindowも確認した．この起動にGUIログアウトは不要だった．
+CUDA，JetPack，Python，モデルcontainerは変更していない．GUI用のhost editorであって，
+モデル環境の置換ではない．その端末からも従来どおりデモのコマンドを使う．
+
+**Jetsonデスクトップ内**の端末でプロジェクトを開く．
+
+```bash
+cd ~/Developer/Projects/Robotics/b2/VLN_B2
+code .
+```
+
+仮想RDP画面でElectron／GPU描画に問題が出る場合は，その起動だけGPU描画を無効にする．
+
+```bash
+code --disable-gpu .
+```
+
+通常の回避策として`--no-sandbox`を加えない．packageのsandboxは有効のままである．
+installerにはMicrosoft APT sourceを追加しないと明示し，Microsoft repository／key sourceは増えていない．
+今後のeditor更新は確認した公式packageをAPTで導入できる．拡張，account login，Settings Syncは設定していない．
+MacへのVS Code導入も不要である．[MicrosoftのLinux導入手順](https://code.visualstudio.com/docs/setup/linux)と
+[バイナリの利用条件](https://code.visualstudio.com/license)が適用され，このレポのMITでアプリ自体を再許諾しない．
+package，導入，window検査の証拠はGit対象外の`local/editor-setup-01`に残す．
 
 ## 適用した直接接続の設定
 
