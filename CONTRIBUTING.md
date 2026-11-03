@@ -30,7 +30,7 @@ Use `main` for reviewed work. Start a short-lived branch such as
 
 ```sh
 git switch main
-# After a shared remote exists, update with: git pull --ff-only
+# Update with: git pull --ff-only
 git switch -c docs/experiment-guide
 # Edit the relevant English and Japanese documents.
 git diff --check
@@ -44,7 +44,7 @@ Use a short imperative commit subject in English. Explain non-obvious reasons in
 the body. Stage specific files; do not rewrite shared history. Use your own Git
 identity and a GitHub noreply email when publishing.
 
-Once hosted, open a pull request to `main` with the purpose, changes, checks and
+Open a pull request to `main` with the purpose, changes, checks and
 remaining limitations. A team reviewer should review it before merge. Branch
 protection and CI are not configured yet; this is the intended workflow, not a
 claim that GitHub enforces it. Use version tags for releases, not copied folders.

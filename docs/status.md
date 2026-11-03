@@ -46,9 +46,9 @@ serialization checks. See [the cache experiment](asynchronous-runtime.md) and
 
 B2 is still disconnected from the wired interface. Actual B2 state reception,
 real-state asynchronous control integration, command sending, physical stopping and
-navigation evaluation remain unvalidated or unimplemented. The lab destination
-is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); no push has
-been made. The [MIT License](../LICENSE) covers only original code/docs, not
+navigation evaluation remain unvalidated or unimplemented. The source is hosted
+in the lab repository [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2).
+The [MIT License](../LICENSE) covers only original code/docs, not
 upstream code, weights or converted derivatives.
 
 The 2026-11-03 onsite restart restored eduroam/Tailscale. Saved logs show
@@ -157,8 +157,8 @@ No real-time, navigation-quality or physical-safety claim follows from this smok
 ## Continuing the work
 
 Read this page, the relevant guide and Git diff first. Use a bounded branch and
-keep English/Japanese conclusions aligned. Source is locally committed and
-hash-synchronized to the Jetson archive; GitHub publication remains deferred.
+keep English/Japanese conclusions aligned. Source is committed locally, hosted
+in the lab repository and hash-synchronized to the Jetson archive.
 Detailed setup/build/asset/load/inference records stay in ignored `local/` on
 Jetson, including failed attempts. Preserve source revisions, image IDs, hashes,
 inputs, limits and limitations; do not turn this page into a chat transcript.

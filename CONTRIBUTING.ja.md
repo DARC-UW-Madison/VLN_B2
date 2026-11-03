@@ -26,7 +26,7 @@
 
 ```sh
 git switch main
-# After a shared remote exists, update with: git pull --ff-only
+# Update with: git pull --ff-only
 git switch -c docs/experiment-guide
 # Edit the relevant English and Japanese documents.
 git diff --check
@@ -40,7 +40,7 @@ git commit -m "Clarify experiment prerequisites"
 対象ファイルを指定してステージし，共有済みの履歴を書き換えない．
 公開するコミットには本人のGit名義とGitHubのnoreplyメールアドレスを使う．
 
-GitHubで共有を始めたら，目的，変更内容，確認結果，残る制限を記したPRを `main` に向けて作る．
+目的，変更内容，確認結果，残る制限を記したPRを `main` に向けて作る．
 マージ前にチームのレビューを受ける．ブランチ保護とCIはまだ設定していない．
 これは運用方針であり，GitHubが現在強制しているという意味ではない．
 リリースはバージョンタグで管理し，フォルダのコピーを作らない．
