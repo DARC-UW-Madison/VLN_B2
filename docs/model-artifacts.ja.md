@@ -40,7 +40,8 @@ BF16，FlashAttention無効，信頼した独自Pythonコードを使って基�
 次の識別子と想定サイズ・digestは，公式の[TIC-VLA dataset API](https://huggingface.co/api/datasets/handsomeYun/TIC-VLA?blobs=true)と
 [InternVL model API](https://huggingface.co/api/models/OpenGVLab/InternVL3-1B?blobs=true)から得た．
 承認した取得を準備する際は，変化する`main`ではなく固定した版を解決する．LFSの公開digestは
-照合に使う想定値であり，本体を取得していないため，ローカルの本体との一致は確認していない．
+初期のmetadata調査時には照合用の想定値だった．その後の承認済み取得では，
+冒頭に記したとおりローカル本体との一致も検証した．
 
 | リポジトリ・ファイル | 固定候補版 | 想定バイト数 |
 |---|---|---:|

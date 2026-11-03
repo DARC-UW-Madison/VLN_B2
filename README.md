@@ -20,8 +20,9 @@ The repository provides target inventory, synthetic replay, camera/state
 acquisition adapters, paired recording and optional synchronous offline inference.
 **These tools send no motor commands.** Host setup and model-free GPU/import
 checks passed. Approved weights were acquired and CPU-converted separately;
-strict GPU loading and one synthetic-image inference passed. One real ZED RGB capture also passed. B2 integration, asynchronous control and
-physical stopping remain unverified.
+strict GPU loading, real ZED image prediction and standalone path display passed.
+A bounded asynchronous camera shadow trial also ran. B2 state integration,
+motor output and physical stopping remain unverified.
 No weights or third-party model code are included in this repository,
 and no autonomous application is installed. Start with recorded observations,
 then live observation; controlled movement follows only after interface and
@@ -45,7 +46,8 @@ git diff --check
 `replay` evaluates synthetic input. `camera`, `state` and `record` require working
 vendor dependencies and verified hardware/network configuration. `infer` requires
 separately approved local upstream/model assets and a reviewed compatible loader;
-the older candidate runtime is currently restricted to model-free checks.
+the prepared GPU runtime accepts verified derived safetensors, while original
+pickle decoding remains blocked on its older Torch.
 Dependencies and assets are not downloaded automatically. Synthetic/mocked tests
 do not establish hardware performance; example limits are not B2 operating limits.
 

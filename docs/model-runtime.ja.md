@@ -2,6 +2,9 @@
 
 [English](model-runtime.md) · [文書一覧](README.ja.md) · [入力](model-artifacts.ja.md) · [変換](checkpoint-conversion.ja.md) · [進捗](status.ja.md)
 
+本書は読込・profilingの詳細記録である．現在の実行は[カメラから経路表示まで](run-camera-demo.ja.md)，
+後の非同期検査と到達範囲は[マイルストーン](milestone-2026-11-03.ja.md)を参照する．
+
 モデル読込と数値的な推論の確認記録であり，B2のナビゲーション評価ではない．承認したローカル資材と
 既存のJetson GPUイメージをネットワークなしで使い，カメラ，SDK制御client，機体への指令送信部は使わない．
 

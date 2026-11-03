@@ -2,6 +2,11 @@
 
 [日本語](model-runtime.ja.md) · [Documentation](README.md) · [Inputs](model-artifacts.md) · [Conversion](checkpoint-conversion.md) · [Status](status.md)
 
+This is the detailed loading/profiling record. The current executable procedure
+is [the camera-to-path tutorial](run-camera-demo.md); subsequent asynchronous
+checks and the readiness boundary are consolidated in
+[the milestone](milestone-2026-11-03.md).
+
 This is a recorded model-load and numerical-inference check, not a B2 navigation
 evaluation. It uses approved local assets, the existing Jetson GPU image and no
 network. No camera, SDK control client or robot command sender participates.

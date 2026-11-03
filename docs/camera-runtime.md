@@ -2,6 +2,12 @@
 
 [日本語](camera-runtime.ja.md) · [Documentation](README.md) · [Field card](field-card.md)
 
+This page preserves staged camera commissioning evidence. For the current
+operating procedure use [camera prediction and display](run-camera-demo.md);
+for subsequent live-shadow results and remaining limits see
+[the milestone](milestone-2026-11-03.md). Earlier "not validated" statements
+describe their specific check, not the absence of later experiments.
+
 ## Current acceptance
 
 On 2026-10-29, the existing Jetson SDK headers/library reported ZED SDK 4.1.2.

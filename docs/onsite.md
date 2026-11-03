@@ -161,14 +161,16 @@ rules. Use official caches and acquisition tools; do not redistribute weights in
 this repository. The MIT license for original code and documentation does not
 cover these external assets. See [third-party terms](../THIRD_PARTY.md).
 
-When the compatible upstream environment and existing local files are available,
-first resolve the [checkpoint-loading constraint](runtime-compatibility.md#bounded-build-candidate).
-The old-PyTorch build candidate is for model-free checks only;
-`weights_only=True` alone does not resolve its published vulnerabilities.
-Do not use that candidate to load external checkpoints before a reviewed fix or
-alternative loading path is validated. Then
-replace all example paths below. Use a reviewed, pinned upstream checkout. It is
-added to the process import path; it is not copied into this project.
+The approved assets have now been acquired, converted and strictly loaded;
+see [the milestone](milestone-2026-11-03.md). GPU Torch 2.2.2 still must not
+decode the original pickle, even with `weights_only=True`. Use the verified
+derived safetensors. For the **prepared Jetson**, first use
+[the complete container workflow](run-camera-demo.md); the host venv lacks
+Torch/pyzed. The example below describes the `infer` invocation **inside an
+equivalent prepared GPU container**, with the paired observation directory
+additionally mounted. It is not a ready-to-run host command. Replace all paths
+with mounted container paths and verify the derived checkpoint hash before
+execution. Keep upstream source outside this project and mount it read-only.
 
 ```sh
 PYTHONPATH=src python3 -m b2_tic_vla infer \
@@ -176,16 +178,16 @@ PYTHONPATH=src python3 -m b2_tic_vla infer \
   --velocity-frame body \
   --instruction "Walk toward the open doorway." \
   --base-model /path/to/local/InternVL3-1B \
-  --checkpoint /path/to/local/TIC-VLA-model.ckpt \
+  --checkpoint /path/to/local/model.safetensors \
   --upstream-root /path/to/local/TIC-VLA \
   --output local/plan-01.json
 ```
 
-Use the override only when the velocity convention is verified. The adapter uses
-local-only Hugging Face loading and `torch.load(weights_only=True)` with strict
-checkpoint checks; incompatibility is reported rather than silently dropping
-weights or using unrestricted pickle loading. Local upstream/model Python code
-still executes and must be trusted; offline loader flags are not a sandbox.
+Use the override only when the velocity convention is verified. The adapter
+uses local-only Hugging Face loading and tensor-only safetensors with strict key
+checks on this runtime. Incompatibility is reported rather than silently dropping
+weights or retrying unrestricted pickle. Reviewed local upstream/model Python
+still executes; offline flags do not provide a code sandbox.
 
 This is **synchronous offline replay**, not TIC-VLA's asynchronous live system.
 It uses zero delay and zero relative displacement, rebases its host timing for

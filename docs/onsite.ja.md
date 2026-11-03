@@ -150,13 +150,12 @@ PYTHONPATH=src timeout -k 5s 30s python3 -m b2_tic_vla record --interface IFACE 
 このリポジトリで重みを再配布しません．独自コードと文書のMITライセンスは，
 これらの外部資産を対象にしません．[第三者資料の条件](../THIRD_PARTY.ja.md)を参照してください．
 
-対応する上流環境とローカルのファイルが揃っても，先に
-[チェックポイント読込の制約](runtime-compatibility.ja.md#検証範囲を限定したビルド案)を解決します．
-旧PyTorchのビルド候補はモデル不要の確認専用で，`weights_only=True`だけでは公表済みの脆弱性を
-解決できません．修正または代替の読込経路を検証するまで，その候補で外部チェックポイントを
-読み込みません．その後，以下のパスを全て置き換えます．
-内容を確認してリビジョンを固定した上流チェックアウトを使います．プロセスの読み込み先に
-加えますが，このプロジェクトへコピーはしません．
+承認済み資材は取得・変換・厳密読込まで完了し，[マイルストーン](milestone-2026-11-03.ja.md)に記録した．
+GPU Torch 2.2.2で元pickleを復号する経路は`weights_only=True`でも禁止し，検証済み派生safetensorsを使う．
+**準備済みJetson**では[完全なコンテナ手順](run-camera-demo.ja.md)を先に使う．host venvにTorch／pyzedはない．
+以下は観測フォルダも追加マウントした**同等のGPUコンテナ内**での`infer`呼出し例であり，
+そのままhostで動くコマンドではない．全パスをコンテナ内配置に合わせ，実行前に派生重みhashを確認する．
+上流sourceはこのレポの外へ置き，read-onlyで渡す．
 
 ```sh
 PYTHONPATH=src python3 -m b2_tic_vla infer \
@@ -164,16 +163,14 @@ PYTHONPATH=src python3 -m b2_tic_vla infer \
   --velocity-frame body \
   --instruction "Walk toward the open doorway." \
   --base-model /path/to/local/InternVL3-1B \
-  --checkpoint /path/to/local/TIC-VLA-model.ckpt \
+  --checkpoint /path/to/local/model.safetensors \
   --upstream-root /path/to/local/TIC-VLA \
   --output local/plan-01.json
 ```
 
-座標系の上書きは速度の規約を確認した場合だけ使います．Hugging Faceはローカルのみを
-読み込み，`torch.load(weights_only=True)`と厳密な重みの照合を使います．不一致時に重みを
-黙って除外したり，制限のないpickle読み込みへ切り替えたりせず，エラーにします．上流や
-モデルに含まれるローカルPythonコードは実行されるため，信頼性の確認が必要です．
-オフラインの読み込み設定はコードを隔離する仕組みではありません．
+座標系の上書きは速度の規約を確認した場合だけ使う．この環境はHugging Faceをローカル限定で読み，
+tensor専用safetensorsを厳密にkey照合する．不一致時は重みを黙って除外せず，無制限pickleへも
+切り替えずにエラーにする．確認済みの上流・snapshot Pythonは実行され，offline設定自体はコードのsandboxではない．
 
 これは**保存データの同期推論**であり，TIC-VLAの非同期ライブシステムではありません．
 遅延と相対変位をゼロとし，再生用にホスト時刻を取り直します．元の観測メタデータは別に

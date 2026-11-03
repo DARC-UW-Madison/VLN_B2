@@ -10,18 +10,21 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 
 ## Suggested reading order
 
-1. Start with [deployment choices](deployment-design.md) for the role of each
-   computer and why Docker/ROS/sensor placement are separate decisions.
-2. Use [terminology](glossary.md) for unfamiliar words, then read
-   [TIC-VLA explained](ticvla-explained.md) for the model and latency mechanism.
-3. Read [runtime flow](runtime-flow.md) and [build fundamentals](build-fundamentals.md)
-   to connect files, dependencies, GPU execution and eventual robot requests.
-4. Check [the measured baseline](target-baseline.md), [system overview](system-overview.md)
-   and [project status](status.md) before treating any design as implemented.
-5. For the visit, open [the field card](field-card.md), then follow the detailed
-   [Ethernet procedure](field-network.md). Motion remains a later validated stage.
-6. Before collaboration/publication, read [development](development.md),
-   [Contributing](../CONTRIBUTING.md) and [licensing](licensing.md).
+1. For a new Jetson, follow [initial setup](setup-from-scratch.md), in dependency order.
+2. For the prepared Jetson, use [camera image → model → visible path](run-camera-demo.md).
+3. Before connecting B2, read [the milestone](milestone-2026-11-03.md) and
+   [the field card](field-card.md). The next stage is state inspection, not walking.
+4. Learn the mechanisms with deployment choices, terminology, TIC-VLA and build fundamentals below.
+5. Use the engineering records for version decisions, failed attempts and detailed evidence.
+6. Before collaboration/publication, read development, contributing and licensing below.
+
+## Operating tutorials and milestone
+
+| Guide | Purpose |
+|---|---|
+| [Initial setup from an unprepared Jetson](setup-from-scratch.md) | Supported OS, storage, Docker/GPU build, separate source/assets/conversion, camera prerequisites and clean-install gaps |
+| [Run and display a camera prediction](run-camera-demo.md) | Full runnable capture/inference/render commands, output locations and interpretation |
+| [Milestone through 2026-11-03](milestone-2026-11-03.md) | Complete preparation, measured results, incidents, maintenance and readiness boundary |
 
 ## Concepts and design
 
@@ -36,7 +39,7 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 | [Computers and network](network-topology.md) | How do Ethernet/IP, SDK2/DDS, ROS 2 and management links differ? What remains unknown inside B2? |
 | [Offline operation without an AP](offline-operation.md) | Why is Mac optional? How could Jetson provide a local hotspot? What do the B2 remote and link-loss policies need to establish? |
 
-## Verified state and installation
+## Verified state and engineering records
 
 | Guide | Questions answered |
 |---|---|
@@ -51,7 +54,7 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 | [External ZED camera](camera-runtime.md) | Which SDK and binding can be imported, how was first capture verified, and what is isolated? |
 | [Asynchronous cache and observation experiment](asynchronous-runtime.md) | How are exact references, cache expiry, current images and bounded semantic work kept coherent without motor output? |
 | [Unitree state runtime](unitree-runtime.md) | Which SDK/DDS source and native build passed offline checks, and what remains for real B2 state? |
-| [Runtime compatibility](runtime-compatibility.md) | Which candidate versions and model-free checks passed? Why is checkpoint loading still blocked? |
+| [Runtime compatibility](runtime-compatibility.md) | Which candidate versions and model-free checks passed? Why does original-pickle loading remain blocked on old Torch? |
 | [RDP build and commissioning](rdp-build.md) | Why a separately pinned source build? What is exported, configured and tested before a host server is used? |
 | [Remote desktop from Mac](remote-desktop.md) | How do Windows App/RDP/xrdp sessions differ from VNC? What must work before remote GUI can replace routine HDMI? |
 

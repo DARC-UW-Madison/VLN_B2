@@ -2,6 +2,10 @@
 
 [English](jetson-runtime.md) · [進捗](status.ja.md) · [互換性](runtime-compatibility.ja.md)
 
+本書は各初期段階で未導入だったものも残す**構築記録**である．現在の順序付き操作は
+[初期構築](setup-from-scratch.ja.md)と[カメラ推論・表示](run-camera-demo.ja.md)を使う．
+後の資材取得，モデル，カメラ，保守結果は[マイルストーン](milestone-2026-11-03.ja.md)にまとめる．
+
 ホスト側のツールとモデル用コンテナを分けて構築する．既存のUbuntu 20.04／L4T 35.4.1，
 CUDA，ROS，ZEDを維持する．この段階では機体への接続やモデルファイルを必要としない．
 
@@ -110,8 +114,9 @@ superblockには`needs_recovery`がある．[カーネル文書](https://docs.ke
 `/mnt/b2-research/VLN_B2/docker`で，再起動後のNVIDIAランタイム登録とOS側の空き約20 GBを確認した．
 旧保存先は残している．設定のバックアップは`/etc/docker/daemon.json.before-vln-b2`と
 `/etc/fstab.before-vln-b2`，起動時の検査は`/etc/systemd/system/docker.service.d/vln-b2-storage.conf`にある．
-アカウントのグループは変更せず，OSの再起動はしていない．標準の`~/.cache/huggingface`は
-SSDの新しい空のディレクトリへ接続した．モデルは取得していない．
+その保存先整備の段階では，アカウントのグループを変更せず，OS再起動もしていなかった．
+標準の`~/.cache/huggingface`はSSDの新しい空の領域へ接続し，モデルはまだ取得していなかった．
+後の承認済み取得で標準の`hub`へ保存した結果は，冒頭のマイルストーンにまとめている．
 
 ## コンテナのビルドとモデル不要の確認
 

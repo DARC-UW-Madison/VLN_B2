@@ -8,12 +8,20 @@
 
 ## 推奨する読む順序
 
-1. [配置方針](deployment-design.ja.md)で，各計算機の役割と，Docker・ROS・センサー配置が別の選択である理由を読む．
-2. 不慣れな言葉は[用語集](glossary.ja.md)を参照し，[TIC-VLAの仕組み](ticvla-explained.ja.md)でモデルと遅延の処理を理解する．
-3. [実行の流れ](runtime-flow.ja.md)と[ビルドの基礎](build-fundamentals.ja.md)で，ファイル・依存先・GPU実行・将来の機体要求を結び付ける．
-4. 設計を実装済みと扱う前に，[実測構成](target-baseline.ja.md)，[システム全体像](system-overview.ja.md)，[進捗](status.ja.md)を確認する．
-5. 現地では[確認カード](field-card.ja.md)を開き，詳細な[Ethernet手順](field-network.ja.md)に従う．移動は後の検証段階とする．
-6. 共同開発・公開の前に，[開発](development.ja.md)，[共同開発ルール](../CONTRIBUTING.ja.md)，[ライセンス](licensing.ja.md)を読む．
+1. 新規Jetsonでは[初期構築](setup-from-scratch.ja.md)を依存順に進める．
+2. 準備済みJetsonでは[カメラ画像→モデル→経路表示](run-camera-demo.ja.md)を使う．
+3. B2接続前に[マイルストーン](milestone-2026-11-03.ja.md)と[現地カード](field-card.ja.md)を読む．次は状態調査であり，歩行ではない．
+4. 仕組みは下の配置方針，用語，TIC-VLA，ビルドの基礎で学ぶ．
+5. 版の判断，失敗，詳しい証拠は構築・検証記録を参照する．
+6. 共同開発・公開の前に，下の開発，共同開発，ライセンスを読む．
+
+## 操作チュートリアルとマイルストーン
+
+| ガイド | 目的 |
+|---|---|
+| [未準備のJetsonからの初期構築](setup-from-scratch.ja.md) | 対応OS，保存先，Docker／GPU構築，別管理のソース・資材・変換，カメラ前提，新規導入の未確認点 |
+| [カメラ予測の実行と表示](run-camera-demo.ja.md) | 実行可能な撮影・推論・描画コマンド，保存先，結果の読み方 |
+| [2026-11-03までのマイルストーン](milestone-2026-11-03.ja.md) | 準備全体，実測，問題，保守更新，到達範囲 |
 
 ## 概念と設計
 
@@ -28,7 +36,7 @@
 | [計算機とネットワーク](network-topology.ja.md) | Ethernet・IP，SDK2・DDS，ROS 2，管理通信はどう違うか．B2内部の何が未確認か |
 | [別のAPなしのオフライン運用](offline-operation.ja.md) | なぜMacを任意にできるか．Jetsonのホットスポット案，B2リモコン，通信断時の方針に何が必要か |
 
-## 確認済み状態と導入
+## 確認済み状態と構築・検証記録
 
 | ガイド | 答える問い |
 |---|---|

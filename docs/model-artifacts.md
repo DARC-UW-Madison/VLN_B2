@@ -50,7 +50,8 @@ The following identities and expected sizes/digests came from the official
 and [InternVL model API](https://huggingface.co/api/models/OpenGVLab/InternVL3-1B?blobs=true).
 Resolve the pinned revisions, not an unqualified moving `main`, when preparing
 an approved acquisition. Published LFS digests are expected values; they have not
-been compared with local payloads because no payload was downloaded.
+been compared with local payloads at the initial metadata-only review. The
+subsequent approved acquisition verified the actual files as recorded above.
 
 | Repository and file | Pinned candidate revision | Expected bytes |
 |---|---|---:|

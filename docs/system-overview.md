@@ -409,6 +409,15 @@ logout does not prevent console/RDP overlap after a future automatic login.
 
 ## Manual updates and desktop notifications
 
+After the notification-only change described below, a separate operator-authorized
+maintenance transaction on **2026-11-03** refreshed APT indexes and upgraded
+OpenSSH client/server/SFTP from `1:8.2p1-4ubuntu0.12` to `1:8.2p1-4ubuntu0.13`,
+and Chrome from `156.0.8078.47-1` to `156.0.8078.79-1`. No additions/removals
+or other installed version changes occurred; SSH configuration and service
+checks passed. GPU images, JetPack/CUDA and kernel were preserved. Additional
+Ubuntu 20.04 fixes can require the lab's ESM entitlement; no subscription was
+attached. This is not complete security coverage. See [the maintenance record](milestone-2026-11-03.md#6-maintenance-applied-on-2026-11-03).
+
 The external Jetson deliberately retains Ubuntu 20.04, JetPack 5.1.2 / L4T
 35.4.1 and CUDA 11.4 for the measured runtime. Host release/kernel/GPU updates
 need a compatibility and recovery plan; a container does not isolate them from

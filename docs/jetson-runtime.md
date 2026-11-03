@@ -2,6 +2,11 @@
 
 [日本語](jetson-runtime.ja.md) · [Status](status.md) · [Compatibility](runtime-compatibility.md)
 
+This page is the staged **build record**, including what was absent at each
+early check. For the current ordered procedure use [initial setup](setup-from-scratch.md),
+then [camera prediction/display](run-camera-demo.md). Later acquisition/model/camera
+successes and maintenance are consolidated in [the milestone](milestone-2026-11-03.md).
+
 This guide separates the host tools from the model container. The host remains
 Ubuntu 20.04 / L4T 35.4.1 with its existing CUDA, ROS and ZED installation.
 No robot connection or model file is needed for these steps.
@@ -130,7 +135,9 @@ The old store remains intact. Configuration backups are
 `/etc/docker/daemon.json.before-vln-b2` and `/etc/fstab.before-vln-b2`; the guard
 is `/etc/systemd/system/docker.service.d/vln-b2-storage.conf`. No account group
 was changed and no reboot has been performed. The standard
-`~/.cache/huggingface` points to a new empty SSD directory; no model was fetched.
+At that storage-only stage, `~/.cache/huggingface` pointed to a new empty SSD
+directory and no model had yet been fetched. Later approved acquisition populated
+its standard `hub` child; see the milestone linked above.
 
 ## Container build and model-free checks
 

@@ -2,6 +2,10 @@
 
 [English](camera-runtime.md) · [文書一覧](README.ja.md) · [現地カード](field-card.ja.md)
 
+本書は段階ごとのcamera構築証拠を残す．現在の操作は[推論と表示](run-camera-demo.ja.md)，
+後のlive shadow結果と残る制限は[マイルストーン](milestone-2026-11-03.ja.md)を参照する．
+初期の「未検証」はその検査の範囲であり，後続実験が存在しないという意味ではない．
+
 ## 現在の確認結果
 
 2026-10-29に，Jetson既存のheader・libraryからZED SDK 4.1.2を確認した．SDKは既存の研究室用
