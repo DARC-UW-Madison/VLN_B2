@@ -38,8 +38,8 @@ Torch 2.15.0+cpuコンテナで承認済みチェックポイントをsafetensor
 [SDK環境](unitree-runtime.ja.md)に記す．どちらも実機の移動を検証したものではない．
 
 B2は有線インターフェースに未接続である．実際のB2状態の受信，実状態を使う非同期制御の結合，
-指令送信，物理的停止，ナビゲーション評価は未検証または未実装である．研究室の公開先は
-[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)だが，pushはしていない．
+指令送信，物理的停止，ナビゲーション評価は未検証または未実装である．ソースは研究室のリポジトリ
+[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)で公開している．
 [MITライセンス](../LICENSE)は独自のコード・文書だけを対象とし，本家コード，重み，変換物を再ライセンスしない．
 
 2026-11-03の現地再起動後，eduroam・Tailscaleは復帰した．保存ログには，認証情報が存在していても
@@ -131,6 +131,6 @@ allocatorのpeakはCPU RAM，driverの確保，unified memory全体を含まな�
 ## 作業を再開する方法
 
 最初にこのページ，対象の手引き，Git diffを読む．範囲を区切ったbranchで作業し，日英の結論を合わせる．
-ソースはローカルでcommitし，Jetsonのarchiveへhash照合して同期する．GitHub公開は保留中である．
+ソースはローカルでcommitし，研究室のリポジトリで公開し，Jetsonのarchiveへhash照合して同期する．
 詳細な構築・取得・読込・推論の記録は，失敗した試行も含め，JetsonのGit対象外`local/`へ置く．
 ソースの版，image ID，hash，入力，上限，限界を残し，このページをチャットの履歴にしない．
