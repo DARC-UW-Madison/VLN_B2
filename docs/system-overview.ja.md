@@ -6,7 +6,7 @@
 Macのtunnel，自動起動，経路変更，新clientは追加しない．既存Tailscaleと前景の作業用SSHを使い，
 作業SSHは使用後に終了する．Jetsonにはアドレス準備helper，`b2-rdp.service`の再試行drop-in，
 TCP 3389だけのINPUT ruleを加えた．TLS，認証，大学Wi-Fi，機体Ethernetは維持する．
-Macから通信・TLSは通ったが，新経路のGUIログインと変更後の機器全体の再起動は未検証である．
+Macから通信・TLSが通り，2026-11-03に操作者が直接画面の表示を確認した．最新設定での機器全体の再起動は別の確認項目である．
 [直接画面接続](remote-desktop.ja.md)を参照する．
 
 ## 外付けJetsonの確認済み構成
@@ -321,5 +321,58 @@ Mac・Jetsonで通常テスト164件が成功した．一回の再起動復帰�
 残っていたクラッシュファイルは，2026-10-28の古いChrome SIGTRAP報告一つだった．通知自体は，
 現在新たに故障している部品や，Chromeの詳しい停止原因を示さない．報告のupload・ブラウザ報告の削除は行っていない．
 画面の証拠を保存後，操作者の依頼で実機側の研究用GUIだけをログアウトした．遠隔GUI・SSHは維持され，
-その後RDP displayでGNOMEとEWMHのwindow managerが動作した．client側の画面確認は別とする．
+その後RDP displayでGNOMEとEWMHのwindow managerが動作し，操作者もclient側の画面表示を確認した．
 GUI自動ログイン設定は維持したため，一回のログアウトだけで次回起動時の物理GUI・RDP重複を防ぐわけではない．
+
+
+## 手動更新とデスクトップ通知
+
+外付けJetsonは，実測した環境に合わせてUbuntu 20.04，JetPack 5.1.2・L4T 35.4.1，CUDA 11.4を
+意図的に維持する．ホストのrelease・kernel・GPU更新には互換性・復旧の計画が必要で，コンテナでも
+ホストdriver変更の影響は隔離できない．BSP packageの組と対応する更新経路は
+[NVIDIAの35.4.1更新手順](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/SD/SoftwarePackagesAndTheUpdateMechanism.html)に記載されている．
+セキュリティ更新まで全て不要という意味ではない．
+
+2026-11-03の調査では，release通知は既に`never`で，unattended-upgrades serviceは未導入，
+package索引の毎日更新は有効，package holdはなかった．既存のローカル索引による模擬実行では
+143個の更新，追加・削除ゼロが提案された．今回の通知変更ではpackage取引や索引の再取得は行っていない．
+このcache上の提案は，現在の脆弱性監査・互換性承認ではない．索引更新・通知と，packageの自動導入は別である．
+
+導入済み`update-notifier` 3.192.30.19は，`no-show-notifications`の分岐より前にUpdate Managerを
+起動する．対応する[Ubuntu公式source archive](https://ports.ubuntu.com/ubuntu-ports/pool/main/u/update-notifier/update-notifier_3.192.30.19.tar.xz)を
+確認し，そのGSettingsだけでは更新画面の自動表示を止められないと分かった．source archive・hash・
+選んだ設定は非公開で維持し，packageの実行ファイルは改変していない．
+
+操作者は**更新・クラッシュ報告の両GUI通知**を止める方針を明示的に選んだ．研究用アカウントだけの
+`~/.config/autostart/update-notifier.desktop`へsystemのdesktop entryを写し，`Hidden=true`にした．
+動作中の研究用notifierも終了した．ユーザー単位の上書きは[XDG autostart仕様](https://specifications.freedesktop.org/autostart/latest/)に従う．
+desktop fileは，元からのEncoding非推奨警告だけで検証を通り，updater GUI processは残っていない．
+他のアカウントとsystem側autostartファイルは維持した．背景監視，Mac設定，package削除，代わりの更新serviceは加えていない．
+
+クラッシュ収集，`/var/crash`，journal・syslog，手動分析は残る．今後，研究用GUIではこのnotifierによる
+新しいクラッシュの自動通知も出なくなる．RDP，Tailscale，Wi-Fiの通知・認証serviceは別である．
+意図した手動updater起動やAPTを禁止する設定ではなく，索引更新timerも維持する．
+
+[Ubuntuのpackageガイド](https://ubuntu.com/server/docs/how-to/software/package-management/)のとおり，APTは使える．
+`apt update`は索引更新で，導入済みソフトの更新ではない．まず候補を確認し，**選んだ**packageを模擬実行する．
+
+```sh
+sudo apt update
+apt list --upgradable
+sudo apt-get -s install --only-upgrade PACKAGE_NAME
+```
+
+版，依存，service再起動，復旧を確認してから，選んだ取引を実行する．
+
+```sh
+sudo apt install --only-upgrade PACKAGE_NAME
+```
+
+`PACKAGE_NAME`は代入するための雛形で，そのまま実行する名前ではない．未確認の一括`upgrade`・`full-upgrade`，
+一般PC用NVIDIA driver，Ubuntu release更新をJetson保守の代わりに使わない．BSP・CUDA・ROS・ZED変更や
+セキュリティpatchは，対象と確認方法を別途決める．GPU imageとモデル用Python依存は別の版管理対象で，
+ホストAPT更新ではそれらのimageや固定モデル入力は更新されない．
+
+変更前・適用・検証の非公開記録は`local/update-policy-01`にある．戻す場合は，元のユーザーoverrideが
+存在したら復元し，なければ新しく作ったユーザーoverrideだけを取り除いて再ログインする．この対象機に
+以前のoverrideはなかった．systemのファイルを維持し，通知を戻すためにクラッシュログを書き換えない．

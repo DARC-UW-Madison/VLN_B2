@@ -34,7 +34,7 @@
 |---|---|
 | [進捗](status.ja.md) | 完了したこと，障害・未検証事項，次の成果は何か |
 | [Jetsonの実測構成](target-baseline.ja.md) | CPU・GPU，メモリ，保存先，OS，SDK，通信のどの事実を確認したか |
-| [システム全体像と無人起動](system-overview.ja.md) | 何のパス・設定を変えたか．何を分離したか．起動通信，認証情報，共有・返却はどうするか |
+| [システム全体像と無人起動](system-overview.ja.md) | 何のパス・設定を変えたか．何を分離したか．起動通信，認証情報，共有・返却，手動更新とGUI通知はどうするか |
 | [Jetsonの初期設定](jetson-bootstrap.ja.md) | ユーザー，SSH・Tailscale，Python，依存の境界をどう準備するか |
 | [Jetsonの実行環境構築](jetson-runtime.ja.md) | SSD・Docker保存先，ネイティブCUDA，Python，実行環境をどうビルド・復旧したか |
 | [モデル資材と読込計画](model-artifacts.ja.md) | 承認するファイル・版・サイズ・条件は何か．別のCPU変換で古いTorchのpickle読込をどう避けるか |

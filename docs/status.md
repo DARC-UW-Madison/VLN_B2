@@ -47,6 +47,12 @@ that had left its own crash report and archived only that report; Wi-Fi/GDM
 settings were not changed by the agent. See [access incident findings](system-overview.md#diagnosing-access-loss-and-desktop-failures).
 B2 remains disconnected; recovery is not evidence of robot readiness.
 
+The operator subsequently confirmed direct Windows App desktop access. At the
+operator's explicit choice, the research GUI's update/crash notifier autostart
+was suppressed; crash storage and manual APT remain available. No host packages
+were upgraded/removed and no automatic upgrade service was introduced. See
+[manual updates and notifications](system-overview.md#manual-updates-and-desktop-notifications).
+
 ## Target setup
 
 | Component | Confirmed | Remaining work |
@@ -104,9 +110,9 @@ Hardware availability is not sensor or navigation validation. The
   performance comparison proves xrdp is faster. Historical screen-connection
   procedures are in [remote desktop](remote-desktop.md).
 - Direct RDP on the Jetson Tailscale IPv4 is prepared at the operator's request.
-  Mac TCP/RDP/TLS and certificate matching passed; GUI login over the new route
-  and a new whole-device reboot remain untested. The operator creates the Windows
-  App entry. No Mac tunnel/startup job is added; foreground setup SSH closes
+  Mac TCP/RDP/TLS and certificate matching passed; the operator confirmed the
+  direct desktop on 2026-11-03. A whole-device reboot under the latest settings
+  remains a separate check. The operator manages the Windows App entry. No Mac tunnel/startup job is added; foreground setup SSH closes
   after use. The host adds only the scoped RDP guard/drop-in described in the
   [desktop guide](remote-desktop.md).
 - Camera SDK/binding import and dependency checks passed in a separate private

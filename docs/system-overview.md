@@ -8,8 +8,8 @@ change or new client is added. Existing Tailscale and foreground setup SSH are
 retained; setup SSH closes after use. Jetson now has an address-readiness helper,
 a retry drop-in for `b2-rdp.service` and one scoped INPUT rule for TCP 3389.
 TLS, credentials, campus Wi-Fi and robot Ethernet are unchanged. Transport/TLS
-passed from Mac; new-route GUI login and a new whole-device reboot remain
-unverified. See [direct desktop setup](remote-desktop.md).
+passed from Mac; the operator confirmed the direct desktop on 2026-11-03.
+A whole-device reboot under the latest settings remains a separate check. See [direct desktop setup](remote-desktop.md).
 
 ## Verified external Jetson
 
@@ -402,6 +402,77 @@ identify a newly failing component or establish Chrome's detailed crash cause.
 No report was uploaded and the browser report was not deleted. At the operator's
 request, only the physical research GUI session was logged out after saving the
 window evidence. The remote GUI and SSH were preserved; GNOME and an EWMH window
-manager then became available on the RDP display. Client-side visual confirmation
-remains separate. Persistent GUI autologin was left unchanged, so this one-time
+manager then became available on the RDP display. The operator subsequently
+confirmed client-side desktop access. Persistent GUI autologin was left unchanged, so this one-time
 logout does not prevent console/RDP overlap after a future automatic login.
+
+
+## Manual updates and desktop notifications
+
+The external Jetson deliberately retains Ubuntu 20.04, JetPack 5.1.2 / L4T
+35.4.1 and CUDA 11.4 for the measured runtime. Host release/kernel/GPU updates
+need a compatibility and recovery plan; a container does not isolate them from
+host driver changes. NVIDIA documents coupled BSP packages and the release's
+supported update paths in its [35.4.1 update guide](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/SD/SoftwarePackagesAndTheUpdateMechanism.html).
+This is not a claim that all security updates are unnecessary.
+
+Inspection on 2026-11-03 found release prompting already set to `never`, no
+installed unattended-upgrades service, daily package-index refreshing enabled
+and no package holds. A simulation using the existing local index proposed
+143 upgrades, no additions/removals; no package transaction or fresh index
+refresh was executed for this notification change. That cached proposal is not
+a current vulnerability audit or a compatibility approval. Cache refresh and
+notification are different from automatic package installation.
+
+The installed `update-notifier` 3.192.30.19 launches Update Manager before its
+`no-show-notifications` branch. Inspection of the matching
+[official Ubuntu source archive](https://ports.ubuntu.com/ubuntu-ports/pool/main/u/update-notifier/update-notifier_3.192.30.19.tar.xz)
+showed that changing that GSettings key alone would not suppress automatic
+updater windows. Its source archive/hash and selected settings were retained
+privately, without modifying the packaged executable.
+
+The operator explicitly selected suppression of **both update and crash-report
+GUI notifications**. A research-account-only override at
+`~/.config/autostart/update-notifier.desktop` copies the system desktop entry
+and sets `Hidden=true`. The running research-account notifier was stopped.
+The [XDG autostart specification](https://specifications.freedesktop.org/autostart/latest/)
+defines this user-level override. The desktop file validated with only its
+inherited deprecated-Encoding warning; no updater GUI process remained. Other
+accounts and the system autostart file were unchanged. No background monitor,
+Mac setting, package removal or replacement update service was added.
+
+Crash collection, `/var/crash`, journal/syslog and manual analysis remain.
+New crash reports will no longer automatically prompt through this notifier in
+this research GUI. RDP, Tailscale and Wi-Fi notification/authentication services
+are separate. This does not prohibit deliberately launching a manual updater or
+running APT. Existing cache-refresh timers remain unchanged.
+
+APT can still be used, as described in [Ubuntu's package guide](https://ubuntu.com/server/docs/how-to/software/package-management/).
+`apt update` refreshes the index; it does not upgrade installed software. First
+inspect candidates, then simulate and review a **selected** package transaction:
+
+```sh
+sudo apt update
+apt list --upgradable
+sudo apt-get -s install --only-upgrade PACKAGE_NAME
+```
+
+Only after reviewing versions, dependencies, restarts and recovery, apply the
+selected transaction:
+
+```sh
+sudo apt install --only-upgrade PACKAGE_NAME
+```
+
+`PACKAGE_NAME` is a placeholder, not a literal command target. Do not substitute
+an unreviewed bulk `upgrade`, `full-upgrade`, generic desktop NVIDIA driver or
+Ubuntu release upgrade for Jetson maintenance. BSP/CUDA/ROS/ZED changes and
+security patches require their own reviewed scope and appropriate checks.
+Local GPU images and Python model dependencies are separate versioned artifacts;
+updating host APT does not update those images or their pinned model inputs.
+
+Private before/applied/verified records are in `local/update-policy-01`. To undo
+this GUI policy, restore the prior user override if one existed, or remove only
+the newly created user override and log in again. No previous override existed
+on this target. Retain the system file and do not alter crash logs to restore
+notification behavior.

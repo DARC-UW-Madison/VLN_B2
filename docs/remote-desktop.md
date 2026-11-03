@@ -61,8 +61,8 @@ only one dedicated firewall rule existed. A controlled address-readiness failure
 rejected startup; restoring the configuration recovered automatically on retry
 without restarting Wi-Fi/SSH or changing Tailscale enrollment. From Mac, a direct TCP/RDP negotiation
 selected TLS 1.3 and the server certificate SHA256 matched the copy inspected
-through SSH. No password was sent for that transport check. **GUI login over
-this new route and a new whole-device reboot have not yet been tested.** The
+through SSH. No password was sent for that transport check. **The operator confirmed the direct-route desktop on 2026-11-03. A new
+whole-device reboot test remains a separate acceptance item.** The
 same backend previously passed visible desktop/input tests over the old route.
 The 164 ordinary tests passed on Mac and Jetson; mocked guard tests do not
 replace the actual transport check.

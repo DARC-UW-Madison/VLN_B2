@@ -42,7 +42,7 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 |---|---|
 | [Project status](status.md) | What is complete, what is blocked/unverified, and what is the next milestone? |
 | [Measured Jetson baseline](target-baseline.md) | Which CPU/GPU, memory, storage, OS, SDK and network facts were inspected? |
-| [System overview and unattended boot](system-overview.md) | Which paths/settings changed? What is isolated? How do boot networking, credentials, sharing and return work? |
+| [System overview and unattended boot](system-overview.md) | Which paths/settings changed? What is isolated? How do boot networking, credentials, sharing/return, manual updates and GUI notifications work? |
 | [Jetson bootstrap](jetson-bootstrap.md) | How are accounts, SSH/Tailscale, interpreters and dependency boundaries prepared? |
 | [Jetson runtime setup](jetson-runtime.md) | How were SSD/Docker storage, native CUDA, Python and runtime stages built and recovered? |
 | [Model artifacts and loading plan](model-artifacts.md) | Which exact model files, revisions, sizes and terms need approval? How can a separate CPU conversion avoid old-Torch pickle loading? |
