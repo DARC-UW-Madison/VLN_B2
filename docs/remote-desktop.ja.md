@@ -32,8 +32,8 @@ RDP自体が大学portalへログインするわけではない．
 
 ## MacとJetsonの間で文字をコピー・貼り付けする
 
-2026-11-03のcopy不調は，以前こちらが設定した`allow_channels=false`と，両方向の
-clipboard制限`all`が原因だった．client故障の証拠ではなく，明示的な構築時の制限である．
+2026-11-03，以前のserver設定に`allow_channels=false`と両方向のclipboard制限`all`があり，
+文字転送を禁止していたと確認した．解除だけでは一連の転送成功を確認できなかった．
 現在は文字を双方向に許可した．`xrdp.ini`は`allow_channels=true`とし，channelは
 `cliprdr`だけを有効化し，他は無効のままにした．`sesman.ini`では
 `RestrictInboundClipboard=file,image`と`RestrictOutboundClipboard=file,image`で
@@ -48,7 +48,9 @@ file・画像を禁止し，文字を許可する．対象版の[clipboard設定
 4. JetsonではLinuxのキーを使う．通常editorはCtrl+C／Ctrl+V，端末は通常**Ctrl+Shift+C／Ctrl+Shift+V**である．MacはCommand+C／Command+Vを使う．
 
 session managerだけをreloadし，listener再起動やGUI終了はしていない．設定とservice稼働は確認済みだが，
-双方向の実転送は操作者による新session・clientでの確認が残る．現在のclipboard内容は読んでいない．
+操作者はBidirectional選択・client再起動後も転送できないと報告した．GUI全体のログアウト・新session試験は
+未確認である．B2 network調査中は切り分けを保留し，JetsonのVS CodeでMarkdownのガイドを開く方法を使える．
+現在のclipboard内容は読んでいない．
 元iniは非公開`local/editor-setup-01/rdp-config-before`へ保存した．復元には管理者権限と新sessionが必要である．
 TLS，Tailscale専用待受，firewall，login規則は変えていない．
 

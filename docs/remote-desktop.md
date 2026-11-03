@@ -37,9 +37,9 @@ No university-portal login is performed by RDP itself.
 
 ## Text copy and paste between Mac and Jetson
 
-On 2026-11-03 the reported clipboard failure was traced to our earlier server
-configuration: `allow_channels=false` plus both clipboard restrictions set to
-`all`. This was an explicit setup restriction, not evidence of a client bug.
+On 2026-11-03 an earlier server restriction was found:
+`allow_channels=false` plus both clipboard restrictions set to `all` blocked
+text redirection. Removing it did not establish end-to-end success.
 The server now allows text in both directions. In `xrdp.ini`,
 `allow_channels=true` and only the `cliprdr` channel is enabled; other channels
 remain disabled. In `sesman.ini`, `RestrictInboundClipboard=file,image` and
@@ -61,7 +61,10 @@ To activate and check it yourself:
 
 The session manager was reloaded without restarting the listener or terminating
 GUI sessions. Settings and service activity were verified, but end-to-end text
-transfer awaits the operator's new-session/client test. Current clipboard contents
+transfer still fails according to the operator despite Bidirectional being
+selected and the client being restarted. A complete GUI logout/new-session test
+has not been confirmed. Diagnosis is deferred during B2 network work; the operator
+can open the Markdown guides in Jetson VS Code instead. Current clipboard contents
 were not inspected. Original ini files are preserved privately under
 `local/editor-setup-01/rdp-config-before`; restoring them requires administrator
 access and a new session. TLS, Tailscale-only binding, firewall and login rules

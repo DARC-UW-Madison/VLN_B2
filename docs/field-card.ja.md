@@ -2,7 +2,9 @@
 
 [English](field-card.md) · [Ethernetの詳細手順](field-network.ja.md) · [現在の進捗](status.ja.md)
 
-次回は外付けJetsonとB2を接続し，状態を受信する．本ソフトウェアは**移動指令を送らない**．
+初回のUSB接続で内蔵Intel i7開発用PCへ到達し，そのPCで状態を受信した．外付けJetsonのDDS直接受信は未完了である．
+[実測したUSBと機体LANの境界](field-network.ja.md)を参照する．正規の標準LAN用変換ケーブルは付属品から見つからなかった．
+次はその接続を特定するか，B2設定を変更する前に内蔵PCでの明示的な中継を検討する．本ソフトウェアは**移動指令を送らない**．
 外付けカメラの取得・モデル予測は通っているが，ケーブルが通るだけでモデルによる歩行まで完成するわけではない．
 
 ## 出発前
@@ -31,10 +33,11 @@
 | モデル | 固定base・本家source・変換済み重みがローカルにあり，実画像の予測成功 | 追加download，MacのDocker・モデル実行は不要 |
 | GPU環境 | 既存`vln-b2-runtime:jp5`イメージの存在を照合 | ホストvenvではなく，確認したカメラ・モデルmountを使う |
 | 状態環境 | 既存`vln-b2-unitree:jp5`，今回もnetwork隔離した検査に成功 | 確認した機体側interface・DDS domainを設定 |
-| 直接RDP | tailnet専用listenerとMacのTCP・RDP・TLS確認が成功 | 操作者がWindows Appへ登録．新経路のGUI確認は残る |
+| 直接RDP | tailnet専用listenerとMacのTCP・RDP・TLS確認が成功 | 操作者が直接画面操作を確認．clipboardは未解決 |
 
 事前確認では，変換済み重みのSHA256と，固定base snapshot，本家package，カメラbindingの存在を再確認した．
-非公開結果は`local/field-ready-01`に置く．Mac・Jetsonで通常テスト162件が成功する．
+非公開結果は`local/field-ready-01`に置く．その準備時点ではMac・Jetsonで通常テスト162件，
+その後のデモ作業では177件が成功した．
 これらは実B2のfirmware・topic・座標系の互換性を証明しない．
 
 ## 機体の前で
@@ -42,13 +45,15 @@
 1. 該当B2，通常の操作・停止手順，ユーザー向けEthernet端子，ケーブル両端を確認する．内蔵service・firmwareは変更しない．
 2. [Ethernet手順1〜2](field-network.ja.md#1ケーブルを挿す前)を開く．
    **接続前に**外付け側のinterface・経路を保存し，既存profileを確認する．調査時の物理ポートは
-   carrierなしの`eth0`だったが，再確認する．eduroam・Tailscaleを維持し，大学へbridgeしない．
+   `eth0`だった．机上調査ではcarrierなし，USB接続時は1 Gbpsだったため，再確認する．eduroam・Tailscaleを維持し，大学へbridgeしない．
 3. 確認したsubnetと未使用の外付け側IPを使い，carrier，IP，既知serviceへの経路を確認する．
    DHCP・VLAN・bridgeの構成なら，固定IPの雛形ではなく研究室の構成に従う．
+   実測したUSBだけの経路では，この外付け側からserviceへ届く段階は未完了である．標準接続を使うか，
+   明示的な中継を検討する．内蔵側だけの診断を，外付けcontainerの受入確認の代わりにしない．
 4. 確認したinterface・domainで，[準備した状態コンテナ](unitree-runtime.ja.md#準備した受信専用コマンド)を実行する．
    実際の受信・有効件数とsampleを読む．終了コードゼロ・pingだけでは足りない．モデル・移動clientは不要である．
 5. 研究室の正規アクセスで到達できる内蔵計算機を調べ，実際のhost，service，sensor配信，protocol・topic・domain，
-   所有者を残す．一つのEthernet端子から到達できても，動作制御計算機と内蔵ユーザーJetsonを同じhostとして扱わない．
+   所有者を残す．一つのEthernet端子から到達できても，動作制御計算機と到達できる開発用PCを同じhostとして扱わない．
 6. 単位，軸，時刻の意味，世界・機体速度の規約，カメラと機体の取付けを記録する．内蔵stream・Mid-360配線は，
    動いている外付けUSBカメラと別に調べる．確立前のframe・時計は未検証のままにする．
 7. 結論・次の作業を保存する．その後，実状態をモデル入力へ結合し，cache更新待ちの空白，保護した送信部を扱い，

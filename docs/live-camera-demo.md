@@ -246,3 +246,8 @@ A separate Ctrl+C test during an active run reported `stopped_by_operator`,
 empty cleanup errors, no remaining containers and no refresh tag in the final
 page. Container exit 137 in that interruption test reflects intentional forced
 removal, not successful prediction completion or a diagnosed model crash.
+
+The operator confirmed camera-image and predicted-path display on 2026-11-03,
+and then reported attaching the powered B2. This confirms the viewer workflow,
+not navigation quality, camera-motion compensation or real-state integration.
+See [current first-connection findings](status.md).

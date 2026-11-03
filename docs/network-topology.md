@@ -2,15 +2,14 @@
 
 [日本語](network-topology.ja.md) · [Home](../README.md) · [Onsite guide](onsite.md)
 
-The immediate goal is to establish who runs each service and how the external
-Jetson reaches it. Do this before adding ROS 2 packages, containers, network
-bridges, or model inference. The **external Jetson** is operating separately
-from the robot. Direct display/keyboard access is available, and Mac-to-Jetson
-SSH over Tailscale has now been independently verified. The wired port has no
-carrier or address; no B2 connection has been demonstrated. See the
-[measured baseline](target-baseline.md).
-The operator also reports an onboard Jetson and believes a separate motion-control computer
-is present. Their exact identities, service placement, and wiring remain unverified.
+The external AGX Orin now reaches an onboard **Intel i7 development PC** through
+the B2 USB-C/Anker Ethernet hub. That PC's native Ethernet receives actual robot
+state in DDS domain 0; the USB interface is separate and unbridged. Direct DDS
+from the external Jetson remains unvalidated. Mac management over existing
+Wi-Fi/Tailscale is independent. See [the current measured wiring](field-network.md)
+and [the initial external baseline](target-baseline.md).
+An additional onboard Jetson and the complete motion-control hardware remain
+unverified. Do not treat the accessible i7 as the locomotion controller.
 
 ## What the external Jetson can control
 
@@ -38,7 +37,7 @@ as a working inventory, not proof of the complete internal architecture.
 |---|---|---|
 | Mac | Edit files, transfer code, optionally SSH to external Jetson, inspect results | Actual management connection; it need not participate in DDS |
 | External Jetson | Camera input, TIC-VLA inference, tracking and eventually one command sender | OS/L4T, memory, interfaces, reachable SDK services and GPU runtime |
-| Onboard Jetson | Preserve existing services; possible sensor/localization provider | Module identity, actual running services, interfaces, sensor ownership |
+| Onboard development PC / possible additional Jetson | Preserve existing services; possible sensor/localization provider | Intel i7 measured and onboard state received; sensor ownership and additional Jetson remain unverified |
 | Motion-control system | Preserve existing walking, balance, and actuator control | Manufacturer/lab interface description, service endpoint and operating procedure |
 
 A host can have several IP addresses, aliases, containers, or virtual interfaces.
@@ -98,8 +97,9 @@ The Python [channel factory](https://github.com/unitreerobotics/unitree_sdk2_pyt
 takes a domain ID and interface explicitly and initializes a process-global DDS
 factory. `ROS_DOMAIN_ID` configures ROS processes; changing it does not rewrite
 the argument passed by a separate SDK process. Our probe defaults to domain 0
-but accepts `--domain-id`; **0 is not a measured B2 setting**. Identify the intended
-service's domain from a working lab setup or manufacturer documentation instead
+but accepts `--domain-id`. Domain **0 was observed on this B2's native network**
+and onboard ROS state reception passed there. This does not establish external
+reachability. For another setup, identify the intended service's domain instead
 of cycling through values or copying a reseller's configuration.
 
 Inspect the installed SDK's initialization code and any patches before deciding
@@ -158,7 +158,8 @@ management/internet route, avoid overlapping subnets, and identify the robot
 interface explicitly. Configure the robot-side address from the actual lab or
 manufacturer specification; do not add an unnecessary default route through B2.
 The physical destination is the supported B2-side Ethernet network, not necessarily
-a direct connection to the onboard Jetson's application. Its internal path remains
+a direct connection to an onboard application's host. The measured USB path is
+separate from the native robot LAN; other internal wiring remains
 to be mapped.
 
 Proceed with host inventory -> account and local SSH -> optional VPN -> GPU and

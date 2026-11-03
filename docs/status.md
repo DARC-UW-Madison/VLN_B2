@@ -4,6 +4,28 @@
 
 ## Current stage
 
+The operator confirmed camera/path display and VS Code use. The first powered
+B2 attachment was inspected on **2026-11-03**. The USB-C/Anker Ethernet hub reaches
+an onboard **Intel Core i7-1265U user-development PC**, not an identified Jetson
+or motion controller. Existing authorized credentials worked over scoped IPv6;
+no motion-controller SSH login was attempted. The onboard PC has 12 logical CPUs,
+about 15.22 GiB Linux-visible RAM, a 512 GB-class NVMe and Ubuntu 20.04.6 with an
+RT kernel. An additional onboard Jetson remains unverified.
+
+On that PC's native robot-facing Ethernet, domain **0** was observed in RTPS
+discovery. A 12-second receive-only ROS 2 check then received **5,994**
+`/sportmodestate` and **240** `/lf/sportmodestate` samples; all checked position,
+velocity, yaw-rate and attitude values were finite. This is **onboard state
+reception**, not direct external-Jetson SDK reception or model-state integration.
+The USB Ethernet adapter is a separate, unbridged interface with overlapping
+IPv4 routes. The external link negotiated 1 Gbps full duplex, but a bounded
+direct IPv4 test did not reach the native robot service. A native-network profile
+was tested only on the external Jetson, then the original active profile was
+restored; Wi-Fi remained the default route. The new profile is saved with
+autoconnect disabled. B2 configuration, packages and firmware were unchanged;
+no motor request was sent. Private evidence is under `local/b2-connection-01`.
+See [the measured topology and next connection step](field-network.md).
+
 The [short operator demo](live-camera-demo.md) now provides check/start/view/stop
 commands. A real-camera run captured 60 frames and completed five exact-input
 predictions after one model load; both containers exited cleanly. It uses
@@ -14,7 +36,8 @@ Use [initial setup](setup-from-scratch.md) or [the runnable camera/path tutorial
 for operations. The new end-to-end demo captured a fresh ZED image, predicted
 30 XY points in 13.290 s after a 13.109 s load, and rendered/visually checked
 a standalone HTML report. All robot state was explicitly assumed stationary;
-B2 remains disconnected. Ready for Ethernet/state inspection, not walking.
+B2 was disconnected for that recording. Subsequent onboard state reception is
+described above; walking remains unimplemented.
 
 Updated **2026-11-03**. TIC-VLA now loads on the external Jetson GPU and completes
 one synthetic-image inference offline. Strict loading accepted 1,324 tensor keys,
@@ -44,11 +67,12 @@ state-only SDK/DDS image passed offline source/native-library and synthetic
 serialization checks. See [the cache experiment](asynchronous-runtime.md) and
 [SDK environment](unitree-runtime.md). Neither result validates robot motion.
 
-B2 is still disconnected from the wired interface. Actual B2 state reception,
+Onboard state reception passed, but direct external-Jetson state reception,
 real-state asynchronous control integration, command sending, physical stopping and
-navigation evaluation remain unvalidated or unimplemented. The lab destination
-is [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2); no push has
-been made. The [MIT License](../LICENSE) covers only original code/docs, not
+navigation evaluation remain unvalidated or unimplemented. The source is hosted at
+[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2);
+this connection inspection has not been pushed. The [MIT License](../LICENSE)
+covers only original code/docs, not
 upstream code, weights or converted derivatives.
 
 The 2026-11-03 onsite restart restored eduroam/Tailscale. Saved logs show
@@ -57,12 +81,13 @@ AP/authenticator/client cause remains unresolved. Desktop initialization warning
 are a separate investigation. The agent fixed an expected RDP-readiness exception
 that had left its own crash report and archived only that report; Wi-Fi/GDM
 settings were not changed by the agent. See [access incident findings](system-overview.md#diagnosing-access-loss-and-desktop-failures).
-B2 remains disconnected; recovery is not evidence of robot readiness.
+That management-recovery check was not evidence of robot readiness.
 
 The operator subsequently confirmed direct Windows App desktop access. At the
 operator's explicit choice, the research GUI's update/crash notifier autostart
-was suppressed; crash storage and manual APT remain available. No host packages
-were upgraded/removed and no automatic upgrade service was introduced. See
+was suppressed; crash storage and manual APT remain available. That notification-only
+step upgraded no packages and introduced no automatic upgrade service. Subsequent
+bounded SSH/Chrome maintenance and the editor install are separately recorded. See
 [manual updates and notifications](system-overview.md#manual-updates-and-desktop-notifications).
 
 ## Target setup
@@ -71,7 +96,7 @@ were upgraded/removed and no automatic upgrade service was introduced. See
 |---|---|---|
 | Robot | Unitree B2 without wheels, reported by the operator | Firmware, actual computers/services, authority and stopping |
 | External Jetson | AGX Orin 64 GB class, native CUDA and container GPU operations; real model load, recorded-image profiling and bounded camera shadow inference | Real B2 state, time/frame alignment, continuous cache availability and longer operation |
-| Onboard Jetson | Separate unit reported | Type, services, sensor connections and network reachability |
+| Onboard development PC | Intel i7-1265U x86_64, 12 logical CPUs, about 15.22 GiB visible RAM, 512 GB-class NVMe; native ROS 2 state reception passed | Sensor ownership and a reviewed external DDS path; additional Jetson unverified |
 | Motion controller | Separate computer suspected | Actual device, public control interface and ownership |
 | Camera | ZED 2i, USB 5 Gbps; SDK/binding and one 1280×720 left RGB capture passed | Mounted view, sustained capture and source-clock alignment |
 | LiDAR | Livox Mid-360 reported | Existing driver/network and defined use outside RGB model input |
@@ -89,9 +114,9 @@ Hardware availability is not sensor or navigation validation. The
 | CPU conversion | Verified for the actual checkpoint | 1,324 names retained; 3,773,492,276-byte output and readback manifest |
 | GPU model loading | Passed | Exact keys/shapes, parameter/device checks, no original pickle input |
 | Offline numerical inference | One generated image and two recorded-camera calls passed | 30 finite points per call; real-image state was assumed, not received from B2 |
-| Live camera/state observation | 275 JPEGs in a bounded camera trial; B2 state unverified | Mounted view, longer capture, state, clocks, frames and paired recording need checks |
+| Live camera/state observation | 275 JPEGs in a bounded camera trial; separate onboard B2 state reception passed | Mounted view, longer capture, state, clocks, frames and paired recording need checks |
 | Atomic cache and asynchronous observer | Experimental shadow trial passed | 35 actions; assumed stationary state, unverified capture clock, substantial cache gaps |
-| Unitree state-only environment | Build/offline verifier passed | Fixed SDK/DDS, 202 source hashes, 516-byte synthetic round trip; no actual B2 traffic |
+| External Unitree state-only environment | Build/offline verifier passed | Fixed SDK/DDS, 202 source hashes, 516-byte synthetic round trip; external-container B2 reception remains unvalidated |
 | Motion sender | Not implemented | Real-state integration, independent command expiry, watchdog and control authority |
 | Physical stopping and B2 evaluation | Not validated | Review and execute staged field tests before movement |
 

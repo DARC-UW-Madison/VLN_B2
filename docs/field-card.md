@@ -2,8 +2,12 @@
 
 [日本語](field-card.ja.md) · [Detailed Ethernet procedure](field-network.md) · [Current status](status.md)
 
-The next visit establishes the external Jetson's connection to B2 and receives
-state. Our software sends **no motion commands**. External-camera capture and
+The first USB attachment reached an onboard Intel i7 development PC and
+received state there. Direct external-Jetson DDS is still pending; see the
+[measured USB/network boundary](field-network.md). A supported native-network
+breakout was not found among the available accessories. Next identify that
+connection or review an explicit onboard relay before changing B2 settings.
+Our software sends **no motion commands**. External-camera capture and
 model prediction already passed; a successful cable connection is not yet a
 model-driven walking system.
 
@@ -40,12 +44,13 @@ model-driven walking system.
 | Model | Local fixed base/upstream and converted checkpoint; real-image prediction passed | No new download, Mac Docker or model execution required |
 | GPU runtime | Existing `vln-b2-runtime:jp5` image checked | Use reviewed camera/model mounts, not host venv |
 | State runtime | Existing `vln-b2-unitree:jp5`; fresh network-isolated verifier passed | Set the confirmed robot-facing interface and DDS domain |
-| Direct RDP | Tailnet-only listener and Mac TCP/RDP/TLS check passed | Operator registers Windows App; GUI over new route remains to confirm |
+| Direct RDP | Tailnet-only listener and Mac TCP/RDP/TLS check passed | Operator confirmed direct desktop use; clipboard remains unresolved |
 
 The field readiness check revalidated the converted checkpoint SHA256 and the
 presence of the pinned base snapshot, upstream package and camera binding.
-Private results are under `local/field-ready-01`. The 162 ordinary tests pass on
-Mac/Jetson. Those facts do not establish real B2 firmware/topic/frame compatibility.
+Private results are under `local/field-ready-01`. That preparation passed 162
+ordinary tests on Mac/Jetson; subsequent demo work passed 177. Those facts do not
+establish real B2 firmware/topic/frame compatibility.
 
 ## At the robot
 
@@ -53,18 +58,22 @@ Mac/Jetson. Those facts do not establish real B2 firmware/topic/frame compatibil
    Ethernet port and cable endpoints. Do not change onboard services or firmware.
 2. Open [Ethernet steps 1–2](field-network.md#1-before-connecting-the-cable).
    Save external interfaces/routes **before** attachment and inspect existing
-   profiles. The inspected physical interface was `eth0` without carrier; verify
-   it again. Keep eduroam/Tailscale management and do not bridge to campus.
+   profiles. The external interface was `eth0`; carrier was absent during the
+   initial desk survey and 1 Gbps during the USB attachment. Verify it again.
+   Keep eduroam/Tailscale management and do not bridge to campus.
 3. Use the confirmed subnet and an unused external-client IP. Check carrier,
    address and route to the known robot service. If DHCP/VLAN/bridge topology is
    in use, follow that lab setup rather than the static-IP template.
+   With the measured USB-only path, this external-service step is still incomplete;
+   use the native connection or review an explicit relay. The separate onboard
+   diagnostic does not satisfy the external container's acceptance check.
 4. Run the [prepared state-container command](unitree-runtime.md#prepared-receive-only-command)
    with the verified interface/domain. Read actual received/valid counts and
    samples; exit code zero or ping alone is insufficient. No model or motion
    client is needed for this check.
 5. Inspect accessible onboard computers using authorized lab access. Record
    actual hosts, services, sensor exporters, protocol/topic/domain and ownership.
-   The motion controller and onboard user Jetson must not be treated as one host
+   The motion controller and accessible user-development PC must not be treated as one host
    merely because one Ethernet port reaches both.
 6. Record units, axes, timestamp meaning, world/body velocity convention and the
    camera/body mount. Built-in streams and Mid-360 wiring are separate from the

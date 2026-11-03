@@ -2,10 +2,71 @@
 
 [日本語](field-network.ja.md) · [Field card](field-card.md) · [Network concepts](network-topology.md)
 
-This is a prepared procedure, not a record of a completed robot connection.
-No network setting below has been applied. The external Jetson is still separate
-from B2. Use the lab's existing handling/stop procedure and leave our motion
-sender absent. Obtain a recovery terminal before changing a link used for access.
+The first physical attachment was inspected on **2026-11-03**. Onboard state
+reception passed; direct external-Jetson DDS and motion remain unvalidated.
+The numbered sections are operating procedures, not proof that every step has
+been completed. Use the lab's handling/stop procedure and preserve recovery access.
+
+## Measured USB connection and its boundary
+
+```text
+Mac -- existing Wi-Fi/Tailscale SSH --> external AGX Orin
+                                        |
+                                  Ethernet (1 Gbps)
+                                        |
+                             Anker USB Ethernet hub
+                                        |
+                                B2 USB-C host port
+                                        |
+                            onboard i7 development PC
+                       USB Ethernet       native Ethernet
+                             |                   |
+                     separate interface   robot service network
+                     no bridge found      state DDS domain 0
+```
+
+This diagram describes this attachment, not every B2 configuration. The accessible
+PC is **Intel Core i7-1265U, x86_64, 12 logical CPUs**, about **15.22 GiB** visible
+RAM and a **512,110,190,592-byte NVMe**. It runs Ubuntu 20.04.6 and kernel
+5.15.76-rt53. PCI inspection listed Intel graphics; no NVIDIA GPU was listed on
+this host. This does not survey other computers inside B2. The manufacturer's
+[B2 hardware description](https://support.unitree.com/home/en/B2_developer/About%20B2)
+distinguishes platform and user-development computers and optional Orin modules.
+This i7 is consistent with a user-development role; it is not identified as the
+motion controller. No controller SSH access was attempted.
+
+Scoped IPv6 reached this USB peer and existing authorized credentials worked.
+The USB adapter and another adapter on the i7 had the same IPv4 address/subnet,
+with different route metrics. Neither was bridged to native Ethernet. IP forwarding
+being enabled does not create a working DDS path: return routes, discovery
+locators and multicast transport must also work. We did not change those settings.
+
+Only the external Jetson was temporarily assigned a documented native-LAN client
+address using a new `b2-research-link` profile. Address-conflict probes received
+no reply, but do not rule out an offline duplicate. The direct native-service
+IPv4 test failed over this USB path. The original active wired profile was then
+restored; the new profile remains saved with autoconnect disabled. Wi-Fi stayed
+the default route. Never activate an unrelated saved profile merely because its
+subnet resembles a manufacturer example.
+
+On the i7's native Ethernet, the documented service address answered ping and
+RTPS discovery advertised domain **0**. A 12-second receive-only check using the
+existing Foxy/Cyclone DDS installation received **5,994** `/sportmodestate` and
+**240** `/lf/sportmodestate` messages of type `unitree_go/msg/SportModeState`.
+All checked position, velocity, yaw-rate and attitude values were finite.
+This proves onboard reception only. It does not establish coordinate conventions,
+source-clock alignment, navigation quality, external reception or command acceptance.
+Discovered camera/odometry topic names alone do not validate their payloads or ownership.
+Raw inventories and state evidence remain private under `local/b2-connection-01`.
+
+For direct external SDK use, identify the supported **Network/Ethernet/GbE
+breakout** that reaches the native robot network. The operator could not locate
+one among the available accessories. The USB hub alone is not a substitute.
+Alternatively, a separately reviewed program/router on the i7 could relay data
+and requests; that changes the deployment and is not installed. Do not enable
+bridging, NAT or a command relay as an automatic workaround. The manufacturer
+prohibits hot-swapping aviation connectors; follow the lab's powered-down handling
+procedure when changing that kind of connector. The diagram does not map motor buses.
 
 ## 1. Before connecting the cable
 
@@ -173,6 +234,76 @@ endpoint, running service, producer/consumer, protocol/topic/domain and evidence
 Keep suspected roles explicitly suspected. Learn how the published walking
 service reaches locomotion from existing lab/manufacturer documentation; do not
 infer an internal motor bus from external IP reachability.
+
+### Repeat the onboard receive-only check
+
+This optional diagnostic runs **inside the authorized i7 SSH terminal**, not on
+Mac or the external Jetson. It uses existing packages and a child shell; do not
+install ROS or run a robot launch file. First verify the workspace setup file
+and the native robot-facing interface from the private inventory. Replace both
+placeholders below. Domain 0 was measured on this unit; recheck it for another
+unit. Explicit interface selection keeps discovery off the campus Wi-Fi.
+The system Python 3.8 matches Foxy's bindings; the existing conda Python 3.11
+does not establish ABI compatibility.
+
+```sh
+bash --noprofile --norc <<'SH'
+set -e
+export PATH=/usr/bin:/bin:/opt/ros/foxy/bin
+UNITREE_ROS_SETUP='VERIFIED_WORKSPACE/install/setup.bash'
+ROBOT_IFACE='VERIFIED_NATIVE_ROBOT_INTERFACE'
+source /opt/ros/foxy/setup.bash
+source "$UNITREE_ROS_SETUP"
+export ROS_DOMAIN_ID=0 ROS_LOCALHOST_ONLY=0 RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export CYCLONEDDS_URI="<CycloneDDS><Domain><General><NetworkInterfaceAddress>${ROBOT_IFACE}</NetworkInterfaceAddress><AllowMulticast>true</AllowMulticast></General></Domain></CycloneDDS>"
+/usr/bin/python3 - <<'PY'
+import json
+import math
+import time
+import rclpy
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+from unitree_go.msg import SportModeState
+
+rclpy.init(args=['--ros-args', '--disable-rosout-logs', '--disable-external-lib-logs'])
+node = rclpy.create_node('b2_read_only_state_check', enable_rosout=False,
+                         start_parameter_services=False)
+report = {'received': {}, 'finite': {}}
+qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT,
+                 durability=DurabilityPolicy.VOLATILE)
+
+def receive(message, topic):
+    values = [float(v) for v in message.position]
+    values += [float(v) for v in message.velocity]
+    values += [float(v) for v in message.imu_state.rpy]
+    values += [float(message.yaw_speed)]
+    report['received'][topic] = report['received'].get(topic, 0) + 1
+    report['finite'][topic] = report['finite'].get(topic, 0) + int(
+        all(math.isfinite(v) for v in values))
+
+subscriptions = []
+try:
+    for topic in ['/sportmodestate', '/lf/sportmodestate']:
+        subscriptions.append(node.create_subscription(
+            SportModeState, topic, lambda msg, t=topic: receive(msg, t), qos))
+    deadline = time.monotonic() + 12
+    while time.monotonic() < deadline:
+        rclpy.spin_once(node, timeout_sec=0.2)
+    print(json.dumps(report, allow_nan=False))
+finally:
+    node.destroy_node()
+    rclpy.shutdown()
+PY
+SH
+```
+
+Expected output has positive `received` counts with matching `finite` counts
+for each received topic. Empty counts mean no messages were received, even if
+the process exits successfully. This creates only subscriptions and DDS discovery
+traffic, with no command publisher, ROS daemon or motor service call. It does
+not save a state stream, synchronize clocks or connect the model to live state.
+The inspected Cyclone DDS accepted `NetworkInterfaceAddress` with a deprecation
+warning; do not replace the existing installation to remove that warning.
+Closing the child shell discards its environment settings. Keep the result private.
 
 ## 5. Map sensor paths
 

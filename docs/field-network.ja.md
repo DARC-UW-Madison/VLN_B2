@@ -2,9 +2,58 @@
 
 [English](field-network.md) · [確認カード](field-card.ja.md) · [ネットワークの考え方](network-topology.ja.md)
 
-これは準備した手順であり，ロボットへの接続実績ではない．以下のネットワーク設定は適用していない．
-外付けJetsonはB2と別に置かれている．研究室の既存の取扱い・停止手順を使い，本プロジェクトの
-移動指令の送信部は入れない．アクセスに使う接続を変更する前に，復旧できる端末を用意する．
+**2026-11-03**に初回の物理接続を調査した．内蔵PCでの状態受信は成功したが，外付けJetsonからの
+DDS直接通信と移動は未検証である．番号付きの節は操作手順であり，全項目の完了記録ではない．
+研究室の取扱い・停止手順を使い，復旧用アクセスを維持する．
+
+## 実測したUSB接続とその境界
+
+```text
+Mac -- existing Wi-Fi/Tailscale SSH --> external AGX Orin
+                                        |
+                                  Ethernet (1 Gbps)
+                                        |
+                             Anker USB Ethernet hub
+                                        |
+                                B2 USB-C host port
+                                        |
+                            onboard i7 development PC
+                       USB Ethernet       native Ethernet
+                             |                   |
+                     separate interface   robot service network
+                     no bridge found      state DDS domain 0
+```
+
+この図は今回の配線であり，全B2共通の構成図ではない．到達したPCは**Intel Core i7-1265U，x86_64，
+論理CPU 12個**，Linuxから見えるRAM約**15.22 GiB**，**512,110,190,592バイトのNVMe**だった．
+Ubuntu 20.04.6，kernel 5.15.76-rt53である．このhostのPCI検査にはIntel graphicsがあり，NVIDIA GPUは
+表示されなかった．B2内部の他の計算機まで調べた結果ではない．公式の
+[B2ハードウェア説明](https://support.unitree.com/home/en/B2_developer/About%20B2)は，機体機能用・利用者開発用の
+計算機と追加のOrinを区別する．今回のi7は開発用の役割に整合するが，動作制御器と同定したものではない．
+制御器へのSSHは試していない．
+
+scope付きIPv6でUSB側の相手へ届き，許可された既存の認証でログインできた．i7のUSB adapterと別のadapterには，
+同じIPv4アドレス・subnetと異なる経路metricが設定されていた．標準Ethernetとのbridgeはなかった．
+IP forwardingが有効なだけではDDS経路は完成しない．返信経路，発見情報のlocator，multicastも通る必要がある．
+これらの内蔵設定は変更していない．
+
+外付けJetsonだけに，新しい`b2-research-link`で資料の標準LAN用client IPを一時設定した．重複検査には応答が
+なかったが，停止中の重複機器まで否定できない．このUSB経路では標準serviceのIPv4試験が失敗した．最後に元の
+有効な有線profileへ戻し，新profileは自動接続を無効にして保存した．Wi-Fiはdefault routeを維持した．
+資料と似たsubnetだからという理由だけで，別の保存済みprofileを有効にしない．
+
+i7の標準Ethernetからは資料のservice IPへpingが通り，RTPSの発見情報でdomain **0**を観測した．
+既存のFoxy／Cyclone DDSによる12秒の受信専用検査で，`unitree_go/msg/SportModeState`型の
+`/sportmodestate`を**5,994件**，`/lf/sportmodestate`を**240件**受信した．検査した位置・速度・yaw速度・姿勢は
+全件で有限だった．証明したのは内蔵PCでの受信であり，座標規約，取得元の時計との対応，経路品質，
+外付け側の受信，指令の受理は別である．カメラ・odometryのtopic名の発見だけでは中身や所有関係を確認できない．
+生の構成・状態の証拠は非公開`local/b2-connection-01`へ置く．
+
+外付けSDKを直接使うには，標準の機体LANへつながる正規の**Network／Ethernet／GbE変換ケーブル**を特定する．
+操作者は現在の付属品から見つけられなかった．USB hubだけでは代用できない．別案として，i7上の明示的な
+プログラム・routerで状態や要求を中継できるが，構成変更として別途検討するものであり，まだ導入していない．
+bridge，NAT，指令中継を自動的な対処として有効にしない．公式資料は航空コネクターの通電中の抜き差しを禁止する．
+その種の端子を変更する場合は研究室の電源を切った取扱い手順に従う．この図は内部のモーターバスを表していない．
 
 ## 1．ケーブルを挿す前
 
@@ -152,6 +201,70 @@ systemctl list-units --type=service --state=running --no-pager
 プロトコル・トピック・ドメイン，根拠の表を作る．推定の役割は推定として残す．
 公開された歩行サービスから実際の歩行制御までの接続は，研究室・メーカーの資料で調べる．
 外側のIPへ到達したことから，内部モーターのバスを推定で決めない．
+
+### 内蔵PCで受信専用の検査を再現する
+
+これは**許可されたi7へのSSH端末の中**で行う任意の診断である．Macや外付けJetsonで実行しない．
+既存packageと子shellを使い，ROSの新規導入や機体launchの起動はしない．先に非公開の構成記録で
+workspaceのsetupファイルと標準の機体側interfaceを確認し，以下の二つのplaceholderを置き換える．
+domain 0は今回の個体で測定した値なので，別個体では再確認する．interfaceを明示して大学Wi-Fiでの探索を避ける．
+system Python 3.8がFoxy bindingに対応する．既存conda Python 3.11とのABI互換性を仮定しない．
+
+```sh
+bash --noprofile --norc <<'SH'
+set -e
+export PATH=/usr/bin:/bin:/opt/ros/foxy/bin
+UNITREE_ROS_SETUP='VERIFIED_WORKSPACE/install/setup.bash'
+ROBOT_IFACE='VERIFIED_NATIVE_ROBOT_INTERFACE'
+source /opt/ros/foxy/setup.bash
+source "$UNITREE_ROS_SETUP"
+export ROS_DOMAIN_ID=0 ROS_LOCALHOST_ONLY=0 RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export CYCLONEDDS_URI="<CycloneDDS><Domain><General><NetworkInterfaceAddress>${ROBOT_IFACE}</NetworkInterfaceAddress><AllowMulticast>true</AllowMulticast></General></Domain></CycloneDDS>"
+/usr/bin/python3 - <<'PY'
+import json
+import math
+import time
+import rclpy
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+from unitree_go.msg import SportModeState
+
+rclpy.init(args=['--ros-args', '--disable-rosout-logs', '--disable-external-lib-logs'])
+node = rclpy.create_node('b2_read_only_state_check', enable_rosout=False,
+                         start_parameter_services=False)
+report = {'received': {}, 'finite': {}}
+qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT,
+                 durability=DurabilityPolicy.VOLATILE)
+
+def receive(message, topic):
+    values = [float(v) for v in message.position]
+    values += [float(v) for v in message.velocity]
+    values += [float(v) for v in message.imu_state.rpy]
+    values += [float(message.yaw_speed)]
+    report['received'][topic] = report['received'].get(topic, 0) + 1
+    report['finite'][topic] = report['finite'].get(topic, 0) + int(
+        all(math.isfinite(v) for v in values))
+
+subscriptions = []
+try:
+    for topic in ['/sportmodestate', '/lf/sportmodestate']:
+        subscriptions.append(node.create_subscription(
+            SportModeState, topic, lambda msg, t=topic: receive(msg, t), qos))
+    deadline = time.monotonic() + 12
+    while time.monotonic() < deadline:
+        rclpy.spin_once(node, timeout_sec=0.2)
+    print(json.dumps(report, allow_nan=False))
+finally:
+    node.destroy_node()
+    rclpy.shutdown()
+PY
+SH
+```
+
+受信した各topicで`received`が正数になり，`finite`と一致することを確認する．空の件数は受信なしを意味し，
+正常終了だけでは成功としない．作るのは購読とDDS発見通信だけで，指令publisher，ROS daemon，モーターservice呼出しはない．
+状態streamの保存，時計同期，モデルへの実状態の結合は行わない．調べたCyclone DDSは
+`NetworkInterfaceAddress`を非推奨の警告付きで受理した．警告を消すために既存の導入を交換しない．
+子shellを閉じるとその環境設定は失われる．結果は非公開にする．
 
 ## 5．センサーの経路を記録する
 
