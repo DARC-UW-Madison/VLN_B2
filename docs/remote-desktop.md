@@ -248,6 +248,12 @@ The installed NoMachine and working RDP configuration are retained unchanged.
 
 ## Session and graphics constraints
 
+On 2026-11-03, simultaneous physical and RDP research-account GUI sessions
+were observed. At the operator's request the physical session alone was logged
+out, preserving RDP/SSH. GNOME and the window manager then started on the RDP
+display; reopen the client connection to inspect it. This is a one-time logout,
+not a change to automatic GUI login, and not proof of the earlier freeze cause.
+
 The [xrdp FAQ](https://github.com/neutrinolabs/xrdp/wiki/Tips-and-FAQ) describes
 conflicts when the same user logs into the console and xrdp concurrently on
 systemd systems. Plan to log the research account out of its physical GUI

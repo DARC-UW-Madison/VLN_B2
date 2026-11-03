@@ -203,6 +203,11 @@ Tailscale自体が暗号化したプライベートネットワークを提供�
 
 ## セッションと描画の制約
 
+2026-11-03に，研究用アカウントの物理GUI・RDP GUIが同時に存在した．操作者の依頼で物理側だけを
+ログアウトし，RDP・SSHを維持すると，RDP displayでGNOME・window managerが起動した．
+clientの接続を開き直して画面を確認する．これは一回のログアウトで，自動GUIログイン設定の変更でも，
+以前のフリーズ原因の証明でもない．
+
 [xrdpのFAQ](https://github.com/neutrinolabs/xrdp/wiki/Tips-and-FAQ)には，systemdを使う環境で，
 同じユーザーが実機の画面とxrdpへ同時にログインすると競合する問題が説明されている．
 研究用アカウントでRDPへ入る前に，そのアカウントの実機GUIからログアウトする方針にする．

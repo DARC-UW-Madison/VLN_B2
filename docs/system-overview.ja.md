@@ -315,3 +315,11 @@ networkパスワードの表示は行わない．実際のactive connectionとse
 [本家XRDPの議論](https://github.com/neutrinolabs/xrdp/issues/2027)は関連するGNOME・FIFO事例で，
 この個体も同じ原因という証明ではない．想定失敗の処理・導入済みhelperの検査は通り，
 Mac・Jetsonで通常テスト164件が成功した．一回の再起動復帰で，次のeduroam認証停止からの自動復旧は証明しない．
+
+
+同日，実際の画面を取得し，汎用の`update-notifier`のシステム障害通知であることを確認した．
+残っていたクラッシュファイルは，2026-10-28の古いChrome SIGTRAP報告一つだった．通知自体は，
+現在新たに故障している部品や，Chromeの詳しい停止原因を示さない．報告のupload・ブラウザ報告の削除は行っていない．
+画面の証拠を保存後，操作者の依頼で実機側の研究用GUIだけをログアウトした．遠隔GUI・SSHは維持され，
+その後RDP displayでGNOMEとEWMHのwindow managerが動作した．client側の画面確認は別とする．
+GUI自動ログイン設定は維持したため，一回のログアウトだけで次回起動時の物理GUI・RDP重複を防ぐわけではない．

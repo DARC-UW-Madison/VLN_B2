@@ -393,3 +393,15 @@ is a related GNOME/FIFO case, not proof that this device has the same cause.
 The expected-failure handler and installed-helper check passed, with all 164
 ordinary tests passing on Mac and Jetson. Recovery after one restart does not
 establish automatic recovery from a future eduroam authentication stall.
+
+
+A later screen inspection on the same day captured the actual generic
+`update-notifier` system-program-problem dialog. The sole remaining crash file
+was an older Chrome SIGTRAP report dated 2026-10-28. The dialog itself did not
+identify a newly failing component or establish Chrome's detailed crash cause.
+No report was uploaded and the browser report was not deleted. At the operator's
+request, only the physical research GUI session was logged out after saving the
+window evidence. The remote GUI and SSH were preserved; GNOME and an EWMH window
+manager then became available on the RDP display. Client-side visual confirmation
+remains separate. Persistent GUI autologin was left unchanged, so this one-time
+logout does not prevent console/RDP overlap after a future automatic login.
