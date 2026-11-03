@@ -147,7 +147,9 @@ Before the first public source push or a later artifact release:
 4. Resolve applicable permissions and required notices for those exact artifacts
    and recipients. Unresolved material stays out of that release.
 5. Record the reviewed revisions, terms and release decision. Obtain the user's
-   publication instruction before pushing; GitHub hosting is still pending.
+   publication instruction before pushing. The initial source release to the
+   lab repository has been made; repeat this procedure for each later artifact
+   release.
 
 The current repository keeps upstream code and weights outside public source.
 The MIT scope remains original code and documentation. No new custom license,

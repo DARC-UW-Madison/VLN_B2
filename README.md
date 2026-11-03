@@ -53,10 +53,9 @@ do not establish hardware performance; example limits are not B2 operating limit
 
 ## Collaboration and license
 
-The intended lab destination is
+The source is hosted in the lab repository
 [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2).
-Initial source publication is pending the user's instruction. GitHub hosting is
-not a runtime dependency. Development uses reviewed source changes, bilingual
+GitHub hosting is not a runtime dependency. Development uses reviewed source changes, bilingual
 documentation and separate machine-local environments/artifacts.
 
 Original code and documentation use the [MIT License](LICENSE), with

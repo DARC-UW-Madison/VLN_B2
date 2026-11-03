@@ -43,8 +43,8 @@ git diff --check
 
 ## 共同開発とライセンス
 
-研究室の共有先は[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)である．
-最初の公開はユーザーの指示を待つ．GitHubは実行中の依存先ではない．レビューしたソース変更，
+ソースは研究室のリポジトリ[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)で公開している．
+GitHubは実行中の依存先ではない．レビューしたソース変更，
 日英の文書，各計算機で分けた環境・成果物を使って開発する．
 
 独自コードと文書には[MITライセンス](LICENSE)を適用し，
