@@ -22,9 +22,9 @@ Wi-Fi認証，アドレス，ホスト鍵，アカウント設定は公開しま
 
 ## 2．確認済みソースを配置し，ストレージを調べる
 
-この時点の最新ソースはローカルでコミット済みですが，研究室GitHubへは**未push**です．
-URLをcloneしても現状を再現できません．管理者から確認済み`git archive`とコミット・ハッシュを受け取り，
-`~/Developer/Projects/Robotics/b2/VLN_B2`へ展開します．公開承認後は公開済み固定コミットをcloneします．
+ソースは研究室のリポジトリ[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)で公開しています．
+確認済みの固定コミットを`~/Developer/Projects/Robotics/b2/VLN_B2`へcloneし，動き続けるブランチではなくそのコミットをcheckoutします．
+機器がGitHubへ接続できない場合は，管理者から確認済み`git archive`とコミット・ハッシュを受け取り，同じ場所へ展開します．
 Macのvenv，生の研究記録，SSH認証，上流コード，モデルキャッシュをアーカイブに混ぜません．
 配置したソースのコミットを機器側の非公開記録に残します．
 
