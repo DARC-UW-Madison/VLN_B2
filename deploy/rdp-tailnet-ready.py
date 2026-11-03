@@ -10,6 +10,7 @@ import ipaddress
 import json
 from pathlib import Path
 import subprocess
+import sys
 
 
 ADDRESS_FILE = Path('/opt/b2-remote/etc/xrdp/tailnet-address')
@@ -44,5 +45,15 @@ def prepare(address_text, command=run):
     print('Tailscale RDP address and ingress restriction are ready')
 
 
+def main():
+    try:
+        prepare(ADDRESS_FILE.read_text())
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        # Readiness failure is a service retry, not an unhandled Python crash.
+        print('RDP startup deferred: ' + str(error), file=sys.stderr)
+        return 1
+    return 0
+
+
 if __name__ == '__main__':
-    prepare(ADDRESS_FILE.read_text())
+    raise SystemExit(main())

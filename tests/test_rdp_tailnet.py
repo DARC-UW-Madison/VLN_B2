@@ -2,10 +2,11 @@
 
 import importlib.util
 import json
+import io
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 SPEC = importlib.util.spec_from_file_location(
     'rdp_tailnet_ready', Path(__file__).resolve().parents[1] / 'deploy/rdp-tailnet-ready.py')
@@ -62,6 +63,24 @@ class TailnetReadinessTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             helper.prepare(ADDRESS, command)
         self.assertEqual(command.call_count, 3)
+
+    def test_readiness_failure_exits_for_systemd_retry_without_unhandled_crash(self):
+        for error in [RuntimeError('Address is not ready'), FileNotFoundError('Address file'),
+                      ValueError('Invalid address'),
+                      helper.subprocess.TimeoutExpired('tailscale', 10)]:
+            with self.subTest(error=type(error).__name__), \
+                 patch.object(helper.ADDRESS_FILE.__class__, 'read_text', return_value=ADDRESS), \
+                 patch.object(helper, 'prepare', side_effect=error), \
+                 patch('sys.stderr', new_callable=io.StringIO) as output:
+                self.assertEqual(helper.main(), 1)
+                self.assertIn('RDP startup deferred:', output.getvalue())
+                self.assertNotIn('Traceback', output.getvalue())
+
+    def test_ready_entrypoint_returns_success(self):
+        with patch.object(helper.ADDRESS_FILE.__class__, 'read_text', return_value=ADDRESS), \
+             patch.object(helper, 'prepare') as prepare:
+            self.assertEqual(helper.main(), 0)
+            prepare.assert_called_once_with(ADDRESS)
 
 
 if __name__ == '__main__':
