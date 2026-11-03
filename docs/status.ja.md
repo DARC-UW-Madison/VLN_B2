@@ -4,6 +4,10 @@
 
 ## 現在の段階
 
+[短い操作デモ](live-camera-demo.ja.md)に確認・起動・表示・終了コマンドを用意した．
+実cameraで60枚を取得し，model load 1回で入力画像対応の予測5回が完了し，両containerも正常終了した．
+状態は静止仮定，Webサーバーなし，robot指令なしである．
+
 全体の固定記録は[2026-11-03マイルストーン](milestone-2026-11-03.ja.md)にある．
 操作には[初期構築](setup-from-scratch.ja.md)と[カメラ・経路表示の実行手順](run-camera-demo.ja.md)を使う．
 新しい一連の試験でZED画像を撮影し，load 13.109秒後に13.290秒でXY 30点を予測し，
@@ -25,7 +29,7 @@ horizon 30，action 3層を厳密に照合した．生成画像の1回の処理�
 ホストはAGX Orinの64 GBクラス，Ubuntu 20.04，L4T 35.4.1，CUDA 11.4のままである．
 既存のGPUコンテナはPython 3.11.18，Torch 2.2.2，Transformers 4.44.2を使う．別の
 Torch 2.15.0+cpuコンテナで承認済みチェックポイントをsafetensorsへ変換し，古いGPU環境へ
-元のpickleを復元させていない．**Mac・Jetsonで全170件のテストが成功**した．
+元のpickleを復元させていない．**Mac・Jetsonで全177件のテストが成功**した．
 [モデル資材と読込](model-artifacts.ja.md)と[変換](checkpoint-conversion.ja.md)に手順，証拠，限界を記す．
 
 時間制限付きの実カメラ非同期shadow試験は，仮定した静止状態で35回の行動予測を完了した．

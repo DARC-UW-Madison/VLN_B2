@@ -280,3 +280,6 @@ remain necessary before implementing or enabling a motor-command sender.
 
 For the frozen record of what was actually executed, including gaps in a truly
 fresh-machine reproduction, read [the 2026-11-03 milestone](milestone-2026-11-03.md).
+
+After the single-image acceptance, [the short operator demo](live-camera-demo.md)
+provides check/start/view/stop commands for repeated camera predictions.

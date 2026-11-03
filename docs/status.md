@@ -4,6 +4,11 @@
 
 ## Current stage
 
+The [short operator demo](live-camera-demo.md) now provides check/start/view/stop
+commands. A real-camera run captured 60 frames and completed five exact-input
+predictions after one model load; both containers exited cleanly. It uses
+assumed stationary state, no web server and no robot commands.
+
 The complete frozen account is [the 2026-11-03 milestone](milestone-2026-11-03.md).
 Use [initial setup](setup-from-scratch.md) or [the runnable camera/path tutorial](run-camera-demo.md)
 for operations. The new end-to-end demo captured a fresh ZED image, predicted
@@ -30,7 +35,7 @@ The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-All **170 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+All **177 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
 A bounded real-camera asynchronous shadow trial completed 35 actions with

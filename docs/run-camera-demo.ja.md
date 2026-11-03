@@ -2,6 +2,9 @@
 
 [English](run-camera-demo.md) · [ドキュメント](README.ja.md) · [初期構築](setup-from-scratch.ja.md)
 
+操作しながらカメラと経路の更新を見る場合は[短いデモの操作書](live-camera-demo.ja.md)を使う．
+本書は撮影・推論・描画を分けて切り分ける一枚の手順を維持する．
+
 ## 1．この実習で行うこと
 
 ZED 2iを**外付けJetsonのUSB 3ポート**に接続します．画像を1枚保存し，

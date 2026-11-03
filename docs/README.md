@@ -11,7 +11,8 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 ## Suggested reading order
 
 1. For a new Jetson, follow [initial setup](setup-from-scratch.md), in dependency order.
-2. For the prepared Jetson, use [camera image → model → visible path](run-camera-demo.md).
+2. For the prepared Jetson, start with [the short updating camera/path demo](live-camera-demo.md).
+   Use [one recorded-image prediction](run-camera-demo.md) to inspect each step separately.
 3. Before connecting B2, read [the milestone](milestone-2026-11-03.md) and
    [the field card](field-card.md). The next stage is state inspection, not walking.
 4. Learn the mechanisms with deployment choices, terminology, TIC-VLA and build fundamentals below.
@@ -23,6 +24,7 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 | Guide | Purpose |
 |---|---|
 | [Initial setup from an unprepared Jetson](setup-from-scratch.md) | Supported OS, storage, Docker/GPU build, separate source/assets/conversion, camera prerequisites and clean-install gaps |
+| [Short camera/path demo](live-camera-demo.md) | Check, start, display, move the camera, compare exact prediction inputs and stop; no robot commands |
 | [Run and display a camera prediction](run-camera-demo.md) | Full runnable capture/inference/render commands, output locations and interpretation |
 | [Milestone through 2026-11-03](milestone-2026-11-03.md) | Complete preparation, measured results, incidents, maintenance and readiness boundary |
 

@@ -117,6 +117,7 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | `tools/acquire_model_assets.py` | 既定は計画表示のみ．明示的に承認したHub資材の版・容量・digestを照合して取得 |
 | `tools/verify_checkpoint_conversion.py`，`tools/verify_tensor_loading.py` | 生成fixtureによるCPU変換と旧環境のtensor専用読戻し |
 | `tools/verify_model_load.py` | 厳密なオフラインGPU読込．生成画像の推論には明示的なflagが必要 |
+| `tools/camera_demo.py` | 前面の限定時間デモ．ZED 1台を識別，2個のoffline containerを監督，load 1回と入力画像付き反復予測，local HTMLを原子的に更新，終了時に後片付け |
 | `tools/predict_image.py`，`tools/render_prediction.py` | 保存画像・明示的な静止仮定での予測レポートと，一致する画像を内包した単独HTML経路表示．robot I/Oなし |
 | `tools/profile_model_runtime.py` | 保存画像・仮定した状態を明示した段階別計測．機体の入出力なし |
 | `deploy/checkpoint-converter.Dockerfile`，`deploy/converter-requirements.lock` | GPU環境を維持した，hash固定の独立したCPUソフトウェア環境 |

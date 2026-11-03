@@ -2,6 +2,10 @@
 
 [日本語](run-camera-demo.ja.md) · [Documentation](README.md) · [Initial setup](setup-from-scratch.md)
 
+For an operator-driven updating camera/path demonstration, use
+[the short demo tutorial](live-camera-demo.md). This page keeps the single-image
+steps for isolating capture, prediction and rendering.
+
 ## 1. What this exercise does
 
 Connect a ZED 2i to the **external Jetson's USB 3 port**. Capture one image,
