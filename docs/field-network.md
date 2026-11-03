@@ -68,6 +68,46 @@ bridging, NAT or a command relay as an automatic workaround. The manufacturer
 prohibits hot-swapping aviation connectors; follow the lab's powered-down handling
 procedure when changing that kind of connector. The diagram does not map motor buses.
 
+## Addresses and profiles: how to read this connection
+
+An IP address belongs to an interface, not to a connection direction. The
+external Jetson's client address identifies Jetson for both sending and receiving.
+An onboard PC can have a different address on each Ethernet interface. Its
+native-network address and USB-adapter address identify different attachment
+points of the same PC. Assigning the native subnet to Jetson's USB cable does
+not connect that cable to the native switch.
+
+For illustration only, suppose Jetson has `192.0.2.10/24`, the i7's native
+interface has `192.0.2.20/24`, and its USB interface has `198.51.100.20/24`.
+The first two share a subnet on paper, but still need a physical/forwarding path.
+The USB attachment does not provide that path by sharing a host with native LAN.
+Actual unit addresses are retained privately, not in these examples.
+
+Scoped IPv6 link-local access can reach the directly attached user PC without
+changing its IPv4 configuration. In `fe80::…%INTERFACE`, the suffix selects the
+**client's** outgoing interface. This is link-local access, not an address to
+route from Mac through campus. A later check reached another existing IPv6
+address of the same i7, verified with the previously pinned SSH host key and
+existing authentication. The old address remained assigned; why reachability
+differed is unverified. Do not infer a different computer from an address alone.
+
+A NetworkManager **profile** is a saved configuration recipe; `eth0` is an
+interface. Multiple saved profiles do not create multiple ports or IP paths.
+Before cleanup there were three saved Ethernet recipes, including two old
+automatic candidates. The inactive legacy recipes were backed up and removed
+with the operator's authorization. The only remaining Ethernet recipe is
+`b2-research-link`, active with autoconnect enabled, a static native-subnet client
+IPv4 address, IPv6 link-local and no default gateway. Wi-Fi remains the default
+route. This describes the later review; the first test below had temporarily
+restored the original recipe. No onboard addresses or routing were changed.
+
+Leave this single profile active for now. USB management currently uses IPv6;
+the saved native-subnet IPv4 does not establish direct SDK reachability. A native
+robot connection or a reviewed relay is still needed. Recovery keyfiles and a
+manifest are private in `local/network-profile-cleanup-01`; an administrator can
+load an archived keyfile with `nmcli connection load` and review its autoconnect
+before activation. Do not load both legacy recipes during ordinary startup.
+
 ## 1. Before connecting the cable
 
 Identify B2's designated user Ethernet port and the cable's other endpoint. It

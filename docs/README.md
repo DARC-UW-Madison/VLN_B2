@@ -34,7 +34,7 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 |---|---|
 | [Deployment choices](deployment-design.md) | What does each computer do? Does Mac need source, weights or Docker? Why containers? Where can ROS and sensors run? Can containers communicate? |
 | [Terminology](glossary.md) | What are PyTorch, HF, wheel, pyenv, venv, CUDA, checkpoint, image, SDK, DDS and watchdog? |
-| [Understanding TIC-VLA](ticvla-explained.md) | How do language/image reasoning, action prediction, training and delay compensation relate? |
+| [Understanding TIC-VLA](ticvla-explained.md) | A chapter from pixels and CoT/KV features to metric paths, frames, latency, tracking equations and the remaining B2 configuration; includes a guided reading exercise for the viewer |
 | [From files to motion](runtime-flow.md) | How do this repository, separate upstream/model inputs, container processes and communications connect? |
 | [Build fundamentals](build-fundamentals.md) | What are compilation, linking, wheels, CUDA compilation, image layers and rebuilds? |
 | [Architecture](architecture.md) | What are the proposed timing, coordinate frames, plan tracking and control boundaries? |

@@ -21,8 +21,10 @@ The USB Ethernet adapter is a separate, unbridged interface with overlapping
 IPv4 routes. The external link negotiated 1 Gbps full duplex, but a bounded
 direct IPv4 test did not reach the native robot service. A native-network profile
 was tested only on the external Jetson, then the original active profile was
-restored; Wi-Fi remained the default route. The new profile is saved with
-autoconnect disabled. B2 configuration, packages and firmware were unchanged;
+restored; Wi-Fi remained the default route. A subsequent review found the new
+profile active with autoconnect enabled. At the operator's request, the two old
+inactive Ethernet profiles were archived and removed, leaving only
+`b2-research-link`; Wi-Fi remains the default route. B2 configuration, packages and firmware were unchanged;
 no motor request was sent. Private evidence is under `local/b2-connection-01`.
 See [the measured topology and next connection step](field-network.md).
 
@@ -30,6 +32,14 @@ The [short operator demo](live-camera-demo.md) now provides check/start/view/sto
 commands. A real-camera run captured 60 frames and completed five exact-input
 predictions after one model load; both containers exited cleanly. It uses
 assumed stationary state, no web server and no robot commands.
+
+The [model explanation](ticvla-explained.md) now develops pixels, CoT/KV features,
+the two waypoint outputs, metric frames, latency, tracking equations and B2
+commissioning requirements. New reports retain the same call's VLM text and
+display it with endpoint/path distances. A network-isolated recorded-image
+check returned 30 points and 412 response characters: load 11.158 s, inference
+11.384 s. Prompts and generation settings were unchanged. No live state or
+motion was involved; evidence is private in `local/model-response-validation-01`.
 
 The complete frozen account is [the 2026-11-03 milestone](milestone-2026-11-03.md).
 Use [initial setup](setup-from-scratch.md) or [the runnable camera/path tutorial](run-camera-demo.md)
@@ -58,7 +68,7 @@ The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-All **177 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+All **180 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
 A bounded real-camera asynchronous shadow trial completed 35 actions with

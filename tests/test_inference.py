@@ -60,6 +60,7 @@ class InferenceTests(unittest.TestCase):
         self.predict_kwargs = None
         self.predict_offline = None
         self.lazy_predict_load = False
+        self.generated_response = "reasoning"
         self.stale_device = None
         self.strict = None
         self.loader_calls = []
@@ -95,7 +96,7 @@ class InferenceTests(unittest.TestCase):
                 test.predict_offline = os.environ.get("HF_HUB_OFFLINE")
                 if test.lazy_predict_load:
                     test.transformers.AutoProcessor.from_pretrained("already-cached-processor")
-                return "reasoning", test.output, "prompt"
+                return test.generated_response, test.output, "prompt"
 
         self.torch = ModuleType("torch")
         self.torch.__version__ = "2.10.0+cpu"
@@ -129,6 +130,19 @@ class InferenceTests(unittest.TestCase):
 
     def predictor(self):
         return TicVlaPredictor(self.base, self.checkpoint_path)
+
+    def test_generated_text_stays_paired_with_each_successful_prediction(self):
+        predictor = self.predictor().load()
+        self.assertIsNone(predictor.describe()['vlm_response'])
+        self.predict(predictor)
+        self.assertEqual(predictor.describe()['vlm_response'], 'reasoning')
+        self.generated_response = 'Different scene response'
+        self.predict(predictor)
+        self.assertEqual(predictor.describe()['vlm_response'], 'Different scene response')
+        self.generated_response = {'unexpected': 'object'}
+        with self.assertRaisesRegex(ValueError, 'response to be text'):
+            self.predict(predictor)
+        self.assertIsNone(predictor.describe()['vlm_response'])
 
     def predict(self, predictor, instruction="Go to the door"):
         return predictor.predict([str(self.image)], instruction, self.state, time.monotonic())

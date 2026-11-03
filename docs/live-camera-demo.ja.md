@@ -47,7 +47,7 @@ USB番号は前日のものを流用せず毎回識別します．対応camera�
 
 ```bash
 python3 tools/camera_demo.py run \
-  --output local/live-camera-demo-01 \
+  --output local/live-camera-demo-03 \
   --duration 60 \
   --instruction "Move straight ahead."
 ```
@@ -72,12 +72,27 @@ supervisorの125秒上限もあり，これは所要時間の見込み値では�
 
 ```bash
 cd ~/Developer/Projects/Robotics/b2/VLN_B2
-xdg-open "$PWD/local/live-camera-demo-01/index.html"
+xdg-open "$PWD/local/live-camera-demo-03/index.html"
 ```
 
 または端末Aのアドレスを**Jetsonの**ブラウザへ貼り付けます．通常のSSH端末にはGUI sessionがなく，
 そこで`xdg-open`が動くとは限りません．Macの設定，トンネル，port公開，Webサーバーは不要です．
 local fileをsupervisor実行中は2秒ごとに読み直します．
+
+更新後の予測には**Generated VLM response**，終点座標，終点までの直線距離，点列の経路長も表示します．
+返答は`model.vlm_response`へ保存し，青いaction経路を文章から読み取って描くことはありません．
+埋込み枠内をscrollするか，完全レポートを開いて読みます．更新後は新しい出力先を使ってください．
+古い報告から捨てた文章を復元することはできません．読解演習は[TIC-VLAの仕組み](ticvla-explained.ja.md)にあります．
+
+準備済みJetsonでは，GUI内の端末から完成済みの保存画像の例も開けます．モデルの再読込は不要です．
+
+```bash
+cd ~/Developer/Projects/Robotics/b2/VLN_B2
+xdg-open "$PWD/local/model-response-validation-01/results/prediction.html"
+```
+
+これは準備済み対象機だけにある任意の例です．新規構築では自分で報告を生成します．この手順のライブコマンドは
+新しい`03`フォルダを使います．既に存在する場合は別の未使用番号を選んでください．
 
 画面は次を示します．
 
@@ -120,8 +135,8 @@ supervisorは自分の2コンテナだけを削除し，client processの終了�
 必要なら終了記録とコンテナ一覧を確認します．
 
 ```bash
-python3 -m json.tool local/live-camera-demo-01/summary.json
-python3 -m json.tool local/live-camera-demo-01/predictions/status.json
+python3 -m json.tool local/live-camera-demo-03/summary.json
+python3 -m json.tool local/live-camera-demo-03/predictions/status.json
 sudo docker ps --format '{{.Names}}'
 ```
 

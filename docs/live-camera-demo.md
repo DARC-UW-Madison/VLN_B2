@@ -57,7 +57,7 @@ Use a **new** output directory; existing experiment folders are never reused:
 
 ```bash
 python3 tools/camera_demo.py run \
-  --output local/live-camera-demo-01 \
+  --output local/live-camera-demo-03 \
   --duration 60 \
   --instruction "Move straight ahead."
 ```
@@ -87,7 +87,7 @@ Open a second terminal **inside the Jetson GUI**, then run:
 
 ```bash
 cd ~/Developer/Projects/Robotics/b2/VLN_B2
-xdg-open "$PWD/local/live-camera-demo-01/index.html"
+xdg-open "$PWD/local/live-camera-demo-03/index.html"
 ```
 
 Alternatively paste the address printed in terminal A into the **Jetson's**
@@ -95,6 +95,25 @@ browser. A normal SSH shell may lack a desktop display session, so `xdg-open`
 there need not work. You do not need to configure Mac, run a tunnel, expose a
 port or enable a web server. The page is a local file that refreshes every two
 seconds while the supervisor is running.
+
+Updated predictions also show **Generated VLM response**, endpoint coordinates,
+straight-line endpoint distance and sampled path length. The returned text is
+stored in `model.vlm_response`; it is not parsed to draw the blue action path.
+Scroll within the embedded report or open the full report to read it. Start a
+new output directory after updating: old reports cannot reconstruct discarded
+text. For a guided reading exercise, use [Understanding TIC-VLA](ticvla-explained.md).
+
+On the prepared Jetson, the completed recorded-image example can also be opened
+from a GUI terminal, without loading the model again:
+
+```bash
+cd ~/Developer/Projects/Robotics/b2/VLN_B2
+xdg-open "$PWD/local/model-response-validation-01/results/prediction.html"
+```
+
+This optional example exists on the prepared target; a fresh installation must
+generate its own report. The live commands in this tutorial use a new `03`
+directory. If that directory already exists, select another unused number.
 
 The page presents:
 
@@ -152,8 +171,8 @@ than claiming that everything stopped.
 Inspect the completion record and running-container list if needed:
 
 ```bash
-python3 -m json.tool local/live-camera-demo-01/summary.json
-python3 -m json.tool local/live-camera-demo-01/predictions/status.json
+python3 -m json.tool local/live-camera-demo-03/summary.json
+python3 -m json.tool local/live-camera-demo-03/predictions/status.json
 sudo docker ps --format '{{.Names}}'
 ```
 

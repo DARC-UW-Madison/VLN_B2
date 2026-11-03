@@ -129,6 +129,7 @@ class TicVlaPredictor:
         self._horizon = None
         self._layers = None
         self._last_runtime_seconds = None
+        self._last_vlm_response = None
 
     def load(self):
         """Load reviewed local tensors or a version-gated restricted checkpoint."""
@@ -211,16 +212,19 @@ class TicVlaPredictor:
         if self._model is None:
             raise RuntimeError("Call load() before predict().")
         started = time.monotonic()
+        self._last_vlm_response = None
         # The upstream method may lazily construct a processor or other model.
         # Keep ordinary Hugging Face resolution local during inference as well.
         with _offline_loaders(), self._torch.inference_mode():
-            _, output, _ = self._model.predict(
+            response, output, _ = self._model.predict(
                 delayed_image_paths=paths,
                 current_image_path=paths[-1],
                 instruction=instruction.strip(),
                 robot_state=self._torch.tensor(velocities + [0.0, 0.0], device=self.device, dtype=self._torch.bfloat16),
                 time_delay=0.0,
             )
+        if not isinstance(response, str):
+            raise ValueError("Expected the upstream VLM response to be text.")
         shape = tuple(getattr(output, "shape", ()))
         if shape != (1, self._horizon, 2):
             raise ValueError(f"Expected waypoint shape (1, {self._horizon}, 2), got {shape}.")
@@ -228,6 +232,7 @@ class TicVlaPredictor:
         if not all(math.isfinite(value) for row in rows for value in row):
             raise ValueError("Model returned nonfinite waypoint coordinates.")
         self._last_runtime_seconds = time.monotonic() - started
+        self._last_vlm_response = response
         points = tuple(Waypoint(float(x), float(y), (index + 1) * 0.1) for index, (x, y) in enumerate(rows))
         return Plan(
             points=points,
@@ -249,6 +254,8 @@ class TicVlaPredictor:
             "output": "XY positions relative to the current robot frame; no cumulative sum",
             "cache_delay_seconds": 0.0,
             "last_runtime_seconds": self._last_runtime_seconds,
+            "vlm_response": self._last_vlm_response,
+            "vlm_response_note": "Generated text from the same synchronous prediction; verify against its input image. It is not an exhaustive account of internal model computation.",
             "timing": "observation_at and created_at use the host monotonic clock; recorded capture times remain separate source metadata, not verified host timestamps",
             "limitations": "Trusted local model code executes through upstream trust_remote_code; Hugging Face offline settings are not a sandbox for arbitrary Python code. Synchronous package smoke only; no asynchronous cache, controller, clearance verification, or real-time performance claim.",
         }

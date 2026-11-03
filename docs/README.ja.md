@@ -31,7 +31,7 @@
 |---|---|
 | [配置方針](deployment-design.ja.md) | 各計算機の役割は何か．Macにソース・重み・Dockerが必要か．コンテナの理由，ROS・センサーの配置，コンテナ間通信はどうするか |
 | [用語集](glossary.ja.md) | PyTorch，HF，wheel，pyenv，venv，CUDA，checkpoint，image，SDK，DDS，watchdogとは何か |
-| [TIC-VLAの仕組み](ticvla-explained.ja.md) | 言語・画像の推論，行動予測，学習，遅延補償はどう関係するか |
+| [TIC-VLAの仕組み](ticvla-explained.ja.md) | 画素・CoT・KV特徴から，metreの経路，座標，遅延，追従式，残るB2設定まで学ぶ章．viewerを使った読解演習も含む |
 | [ファイルから動作まで](runtime-flow.ja.md) | 独自レポ，本家・モデルの別入力，コンテナのプロセス，通信はどう結び付くか |
 | [ビルドの基礎](build-fundamentals.ja.md) | コンパイル，結合，wheel，CUDAコンパイル，イメージレイヤ，再ビルドとは何か |
 | [構成と仕組み](architecture.ja.md) | 時刻，座標系，経路追従，制御境界の提案は何か |

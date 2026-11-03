@@ -15,13 +15,19 @@ Jetsonや動作制御器と同定したわけではない．許可された既�
 全件で有限だった．これは**内蔵PCでの状態受信**であり，外付けJetsonのSDK直接受信やモデル入力との結合ではない．
 USB Ethernetはブリッジされていない別interfaceで，IPv4経路にも重複があった．外付け側linkは1 Gbps full duplexだが，
 回数を制限したIPv4試験では標準の機体serviceへ届かなかった．外付けJetsonだけで標準LAN用profileを試し，
-最後に元の有効profileへ戻した．Wi-Fiはdefault routeを維持し，新profileは自動接続を無効にして保存した．
+初回試験の最後に元の有効profileへ戻した．後の再確認では新profileが有効・自動接続ありだった．操作者の依頼に従い，
+現在使っていない古い有線設定二つを退避して削除し，`b2-research-link`だけを残した．Wi-Fiはdefault routeを維持する．
 B2側の設定・package・firmwareは変更せず，モーター要求は送っていない．非公開の証拠は`local/b2-connection-01`に置く．
 [実測構成と次の接続手順](field-network.ja.md)を参照する．
 
 [短い操作デモ](live-camera-demo.ja.md)に確認・起動・表示・終了コマンドを用意した．
 実cameraで60枚を取得し，model load 1回で入力画像対応の予測5回が完了し，両containerも正常終了した．
 状態は静止仮定，Webサーバーなし，robot指令なしである．
+
+[モデルの解説](ticvla-explained.ja.md)は，画素，CoT・KV特徴，二種類の目標点，metreの座標，遅延，追従式，
+B2で検証する項目まで順に説明する．新しい報告は同じ呼出しのVLM文章を残し，終点・経路の距離とともに表示する．
+network隔離した保存画像の試験は30点と返答412文字を返し，load 11.158秒，推論11.384秒だった．
+prompt・生成設定は変更せず，実状態や移動は使っていない．証拠は非公開`local/model-response-validation-01`に置く．
 
 全体の固定記録は[2026-11-03マイルストーン](milestone-2026-11-03.ja.md)にある．
 操作には[初期構築](setup-from-scratch.ja.md)と[カメラ・経路表示の実行手順](run-camera-demo.ja.md)を使う．
@@ -44,7 +50,7 @@ horizon 30，action 3層を厳密に照合した．生成画像の1回の処理�
 ホストはAGX Orinの64 GBクラス，Ubuntu 20.04，L4T 35.4.1，CUDA 11.4のままである．
 既存のGPUコンテナはPython 3.11.18，Torch 2.2.2，Transformers 4.44.2を使う．別の
 Torch 2.15.0+cpuコンテナで承認済みチェックポイントをsafetensorsへ変換し，古いGPU環境へ
-元のpickleを復元させていない．**Mac・Jetsonで全177件のテストが成功**した．
+元のpickleを復元させていない．**Mac・Jetsonで全180件のテストが成功**した．
 [モデル資材と読込](model-artifacts.ja.md)と[変換](checkpoint-conversion.ja.md)に手順，証拠，限界を記す．
 
 時間制限付きの実カメラ非同期shadow試験は，仮定した静止状態で35回の行動予測を完了した．

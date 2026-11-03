@@ -284,8 +284,8 @@ def publish_view(work, instruction, running, outcome=None):
             raise ValueError('Invalid prediction report filename')
         result = ('<p>Completed: %d. Input: %s. Inference: %.2f s. '
                   'This path belongs to that saved input, not the changing preview.</p>'
-                  '<p><a target="_blank" href="predictions/%s">Open full prediction and coordinates</a></p>'
-                  '<iframe title="Exact prediction input and model path" src="predictions/%s#prediction-panels"></iframe>' %
+                  '<p><a target="_blank" href="predictions/%s">Open full prediction, VLM response and coordinates</a></p>'
+                  '<iframe title="Exact prediction input, VLM response and model path" src="predictions/%s#prediction-panels"></iframe>' %
                   (completed, html.escape(status['last_input']), status['inference_seconds'], report, report))
     state = status.get('stage', 'starting') if running else (outcome or 'stopped')
     error = '<p role="alert">%s</p>' % html.escape(status.get('error', ''))
