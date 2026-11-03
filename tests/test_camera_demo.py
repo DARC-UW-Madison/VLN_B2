@@ -56,7 +56,7 @@ class CameraDemoTests(unittest.TestCase):
         self.assertIn('&lt;script&gt;', page)
         self.assertNotIn('<script>', page)
         self.assertNotIn('src="http', page)
-        self.assertIn('predictions/prediction-001.html', page)
+        self.assertIn('predictions/prediction-001.html#prediction-panels', page)
         demo.publish_view(self.root, 'Go.', False, 'stopped_by_operator')
         page = (self.root / 'index.html').read_text()
         self.assertNotIn('http-equiv="refresh"', page)

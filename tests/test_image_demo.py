@@ -85,6 +85,7 @@ class ImageDemoTests(unittest.TestCase):
         page = renderer.render(self.report(), self.image.read_bytes())
         self.assertIn('data:image/jpeg;base64,', page)
         self.assertIn('viewBox="0 0 600 600"', page)
+        self.assertIn('id="prediction-panels"', page)
         self.assertIn('Assumed stationary state. No robot commands.', page)
         self.assertIn('&lt;script&gt;', page)
         self.assertNotIn('<script>', page)

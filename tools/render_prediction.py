@@ -74,7 +74,7 @@ th,td{padding:8px;text-align:right;border-bottom:1px solid #d6dee8}code{overflow
 <main><h1>TIC-VLA recorded-image prediction</h1><p class="notice"><strong>Assumed stationary state. No robot commands.</strong><br>
 This is an offline numerical prediction, not validated navigation or obstacle clearance.</p>
 <p><strong>Instruction:</strong> %s</p><p class="muted">State source: %s</p>
-<div class="panels"><section><h2>Input camera image</h2><img alt="Exact recorded model input" src="data:%s;base64,%s">
+<div class="panels" id="prediction-panels"><section><h2>Input camera image</h2><img alt="Exact recorded model input" src="data:%s;base64,%s">
 <p class="muted">The photo is not a calibrated path overlay.</p></section><section><h2>Predicted path: model top view</h2>
 <svg role="img" aria-label="Model-relative trajectory; forward x points up and left y points left" viewBox="0 0 600 600">
 <path d="M 80,565 L 80,515 M 80,565 L 30,565" stroke="#45556a" stroke-width="2" fill="none"/>

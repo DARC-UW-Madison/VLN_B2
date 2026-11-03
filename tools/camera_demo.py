@@ -285,23 +285,25 @@ def publish_view(work, instruction, running, outcome=None):
         result = ('<p>Completed: %d. Input: %s. Inference: %.2f s. '
                   'This path belongs to that saved input, not the changing preview.</p>'
                   '<p><a target="_blank" href="predictions/%s">Open full prediction and coordinates</a></p>'
-                  '<iframe title="Exact prediction input and model path" src="predictions/%s"></iframe>' %
+                  '<iframe title="Exact prediction input and model path" src="predictions/%s#prediction-panels"></iframe>' %
                   (completed, html.escape(status['last_input']), status['inference_seconds'], report, report))
     state = status.get('stage', 'starting') if running else (outcome or 'stopped')
     error = '<p role="alert">%s</p>' % html.escape(status.get('error', ''))
     document = '''<!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">%s
 <title>TIC-VLA camera demo</title><style>
-body{font:16px/1.6 system-ui;background:#f3f6fa;color:#18283a;margin:0}main{max-width:1200px;margin:auto;padding:24px}
+body{font:16px/1.6 system-ui;background:#f3f6fa;color:#18283a;margin:0}main{max-width:1400px;margin:auto;padding:24px}
 section{background:white;border-radius:12px;padding:20px;margin:20px 0}.notice{padding:16px;background:#fff0ce}
-img{width:100%%;max-width:800px;height:auto}iframe{width:100%%;height:1250px;border:1px solid #d6dee8}
+img{width:100%%;height:auto}iframe{width:100%%;height:820px;border:1px solid #d6dee8}
+.demo-panels{display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px}section{min-width:0}
+@media(max-width:1100px){.demo-panels{grid-template-columns:1fr}img{max-width:600px}}
 code{overflow-wrap:anywhere}</style><main><h1>TIC-VLA camera demo</h1>
 <p class="notice"><strong>Assumed stationary state. No robot commands.</strong><br>
 Moving the camera changes the image but supplies no measured robot motion.
 Paths are unvalidated numerical predictions, not obstacle clearance.</p>
 <p><strong>Stage:</strong> %s · <strong>Instruction:</strong> %s</p>%s
-<section><h2>1. Current camera preview (target 1 image/s)</h2>%s</section>
-<section><h2>2. Last completed prediction and its exact input</h2>%s</section>
+<div class="demo-panels"><section><h2>1. Current camera preview (target 1 image/s)</h2>%s</section>
+<section><h2>2. Last completed prediction and its exact input</h2>%s</section></div>
 <p>%s</p></main></html>''' % (
         '<meta http-equiv="refresh" content="2">' if running else '',
         html.escape(state), html.escape(instruction), error, preview, result,
