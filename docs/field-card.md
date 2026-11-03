@@ -52,6 +52,43 @@ Private results are under `local/field-ready-01`. That preparation passed 162
 ordinary tests on Mac/Jetson; subsequent demo work passed 177. Those facts do not
 establish real B2 firmware/topic/frame compatibility.
 
+## First-motion boundary
+
+The operator requested stand, a small forward/back movement and lie down, but
+reported insufficient room for a fall or a larger-than-intended movement.
+**No physical trial was performed.** The current site supports observation and
+communication diagnosis, not commissioning locomotion. A short distance request
+does not bound leg sweep, body movement, tracking error or a fall.
+
+The currently linked official [B2 remote manual](https://marketing.unitree.com/article/en/B2/Remote_Control.html),
+page 8, lists **hold L2 + click B** for damping and **hold L2 + click A** for
+standing-lock/lying transition. Do not certify L1+A from another manual/version
+for this unit. Match the actual remote/firmware and the lab's procedure before
+movement. Damping can remove support
+and lower/drop the body. It is different from holding a stable standing pose.
+
+For a later suitable site, proceed through separate observed stages:
+
+1. Establish a reliable state and read-only service response over the selected
+   external path. A native i7 API-version response already passed; direct external
+   DDS currently returns zero samples. An SSH-triggered onboard client would be
+   a different deployment requiring explicit review.
+2. Confirm local stopping, controller priority and command-loss behavior under
+   the lab's procedure, with appropriate clearance and an onsite operator.
+3. Review a posture-only trial first; observe stable standing and controlled
+   return to lying before considering translation. Do not queue a whole sequence.
+4. Define displacement, speed, duration, independent expiry and abort criteria
+   for a later forward/back trial. SDK `Move` takes velocities, not a number of
+   footsteps; speed times duration is only nominal travel, not a guaranteed bound.
+5. Keep this a model-free SDK test. TIC-VLA prediction quality is a separate
+   experiment after communication, execution and physical stopping are validated.
+
+The [B2 SDK](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/b2/sport/sport_client.py)
+has separate StopMove, StandDown and Damp requests; names/return codes alone do
+not validate physical behavior. This repository has no commissioned motion
+sender or automatic posture/movement sequence. Do not use a generic example's
+default movement speed as a small-space test.
+
 ## At the robot
 
 1. Confirm the correct B2, normal operator control/stop procedure, intended user

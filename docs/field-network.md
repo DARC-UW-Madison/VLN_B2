@@ -83,6 +83,12 @@ The first two share a subnet on paper, but still need a physical/forwarding path
 The USB attachment does not provide that path by sharing a host with native LAN.
 Actual unit addresses are retained privately, not in these examples.
 
+IPv4 and IPv6 are two IP addressing/protocol systems that can use the same
+Ethernet cable. Addresses such as `192.0.2.10` are IPv4; `fe80::…` identifies
+an IPv6 link-local address. IPv6 here does not require internet, Wi-Fi or a VPN.
+Physical Ethernet connectivity alone does not establish the intended IP path:
+the source address, destination interface, return route and filtering all matter.
+
 Scoped IPv6 link-local access can reach the directly attached user PC without
 changing its IPv4 configuration. In `fe80::…%INTERFACE`, the suffix selects the
 **client's** outgoing interface. This is link-local access, not an address to
@@ -107,6 +113,24 @@ robot connection or a reviewed relay is still needed. Recovery keyfiles and a
 manifest are private in `local/network-profile-cleanup-01`; an administrator can
 load an archived keyfile with `nmcli connection load` and review its autoconnect
 before activation. Do not load both legacy recipes during ordinary startup.
+
+The subsequent pre-motion inspection confirmed a concrete return-path problem:
+the i7 selects its **native robot-facing Ethernet** when replying to the external
+Jetson's native-subnet IPv4, although the cable arrives at USB Ethernet. An ARP
+reply can still identify a MAC without establishing usable round-trip IP traffic.
+The direct IPv4 ping failed, and a three-second external state-container probe
+received **zero** samples on both sport-state topics. No motion request was sent.
+Do not interpret these results as a functioning SDK connection.
+
+Over scoped SSH to the i7, a temporary native-interface ROS 2 diagnostic received
+162 finite state samples and sent exactly one read-only sport-service API-version
+request. The service replied with status 0 and API version `1.0.0.1`. The request
+used ID 1, as defined by the pinned [SDK internal API](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/internal.py)
+and [version-query implementation](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/client.py).
+This establishes an onboard request/response path, not external direct DDS,
+firmware version, motion acceptance or stopping behavior. No lease, mode,
+posture, movement or stop request was sent; onboard configuration was unchanged.
+Evidence is private in `local/b2-pre-motion-01`. The temporary clients exited.
 
 ## 1. Before connecting the cable
 
@@ -215,8 +239,9 @@ sudo nmcli connection down b2-research-link
 ## 3. Subscribe to B2 state
 
 Use the already built [state-only image](unitree-runtime.md), not the host
-venv that lacks SDK/DDS dependencies. Offline import/serialization passed; the
-following real robot subscription has **not** been run. Use the confirmed
+venv that lacks SDK/DDS dependencies. Offline import/serialization passed. A first
+external subscription over the measured USB path returned zero samples; repeat
+this template after establishing the intended network path. Use the confirmed
 interface/domain and the fresh private directory created above. Host networking
 is needed here to reach the selected robot-facing interface, unlike the offline
 verifier's `--network none`. This shares networking, not the host filesystem or

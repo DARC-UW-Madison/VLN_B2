@@ -4,6 +4,17 @@
 
 ## Current stage
 
+The requested first posture/forward/back trial was deferred because the operator
+reported insufficient clearance. No motion request was sent. A new three-second
+external SDK state probe received zero samples. On the native i7 path, a
+read-only API-version query succeeded (status 0, API `1.0.0.1`) alongside 162
+finite state samples. These establish onboard service availability, not physical
+control readiness. The i7's IPv4 reply route selects native Ethernet rather than
+the attached USB path. The [field card](field-card.md) records the first-motion
+stages and the currently linked official remote manual's L2+B damping operation.
+Actual unit stopping/override remains unverified. Private evidence is under
+`local/b2-pre-motion-01`.
+
 The operator confirmed camera/path display and VS Code use. The first powered
 B2 attachment was inspected on **2026-11-03**. The USB-C/Anker Ethernet hub reaches
 an onboard **Intel Core i7-1265U user-development PC**, not an identified Jetson

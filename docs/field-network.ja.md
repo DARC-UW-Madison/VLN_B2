@@ -65,6 +65,10 @@ USBケーブル側のJetsonへ標準LANのsubnetを設定しても，そのケ�
 最初の二つは数値上同じsubnetでも，実際の配線・転送経路が必要である．USBと標準LANが同じhostにあるだけでは通らない．
 ここは例示であり，個体の実アドレスは非公開の記録に置く．
 
+IPv4とIPv6は，同じEthernetケーブルで使える二種類のIPアドレス・通信の仕組みである．`192.0.2.10`のような形式はIPv4で，
+`fe80::…`はIPv6のlink-localである．今回のIPv6にinternet・Wi-Fi・VPNは必要ない．物理的につながるだけでは目的のIP経路は
+完成しない．送信元IP，宛先のinterface，返信経路，filterも関係する．
+
 scope付きIPv6 link-localなら，内蔵側のIPv4設定を変更せず直結の開発PCへ届く場合がある．
 `fe80::…%INTERFACE`の末尾は，**接続元**の出口を指定する．直結区間の通信であり，Macから大学経由でrouteするIPではない．
 後の確認では，同じi7が既に持つ別のIPv6へ，保存済みSSH host keyと既存認証を照合して接続できた．
@@ -80,6 +84,18 @@ default gatewayなしである．Wi-Fiはdefault routeを維持する．これ�
 証明しない．標準の機体接続か，検証した中継が引き続き必要である．復元用keyfileとmanifestは非公開
 `local/network-profile-cleanup-01`に残す．管理者は`nmcli connection load`で戻し，自動接続を確認してから有効にできる．
 通常起動で古い二つを両方読み戻さない．
+
+その後の移動前調査では，具体的な返信経路の問題を確認した．ケーブルはUSB Ethernetへ入るが，i7は外付けJetsonの
+標準subnetのIPv4へ返す際に**機体側の標準Ethernet**を選ぶ．ARPでMACが分かっても，IPで正常に往復できるとは限らない．
+直接のIPv4 pingは失敗し，外付け状態containerの3秒の検査も両sport状態topicで受信**0件**だった．移動要求は送っていない．
+SDK接続が完成した結果と扱わない．
+
+scope付きSSHでi7へ入り，一時的な標準interfaceのROS 2診断で有限な状態162件を受信した．sport serviceへ版情報だけを
+読む要求を一回送り，status 0，API版`1.0.0.1`の返答を得た．ID 1は固定版の[SDK内部API](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/internal.py)と
+[版情報の照会実装](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/client.py)に基づく．
+内蔵側の要求・応答が通る根拠であり，外付け直接DDS，firmware版，移動の受理，停止挙動の確認ではない．
+lease・mode・姿勢・移動・停止の要求は送らず，内蔵設定も変更していない．証拠は非公開`local/b2-pre-motion-01`に置く．
+一時的なclientは終了した．
 
 ## 1．ケーブルを挿す前
 
@@ -176,7 +192,8 @@ sudo nmcli connection down b2-research-link
 ## 3．B2の状態を購読する
 
 準備済みの[状態専用イメージ](unitree-runtime.ja.md)を使い，SDK・DDS依存のないホストvenvは使わない．
-オフラインのimport・符号化は通ったが，以下の実機購読は**未実行**である．確認したinterface・domainと，
+オフラインのimport・符号化は通った．実測したUSB経路での外付け初回購読は0件だったため，目的の経路を確立してから
+以下のひな形を再実行する．確認したinterface・domainと，
 上で作った新しい非公開フォルダを使う．オフライン検査の`--network none`と違い，選んだ機体側interfaceへ
 到達するためhost networkingを使う．networkを共有する設定であり，ホストのファイル・認証情報の共有やbridgeではない．
 
