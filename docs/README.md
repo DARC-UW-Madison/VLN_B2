@@ -69,6 +69,7 @@ reachability or an actual TIC-VLA/robot performance result.
 | Guide | Questions answered |
 |---|---|
 | [First-visit card](field-card.md) | In what order should the operator proceed at the robot? |
+| [Built-in sensor reception](built-in-sensors.md) | Saved front/back images, passive recapture, IMU/joint/state results and the boundary before model integration |
 | [Ethernet/onboard procedure](field-network.md) | How should cable endpoints, addresses, routes, DDS and internal service ownership be checked? |
 | [Onsite preparation](onsite.md) | How are camera/state observations, paired recordings and optional offline inference invoked and interpreted? |
 | [Deployment information](deployment-intake.md) | Which facts must come from the lab/unit instead of guessed defaults? |

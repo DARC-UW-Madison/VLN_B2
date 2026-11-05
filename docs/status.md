@@ -4,8 +4,35 @@
 
 ## Current stage
 
+Updated **2026-11-04**. B2 has been shut down by the operator; no further
+robot requests are planned in this session. The latest changes remain on Mac:
+external Jetson SSH requested renewed Tailscale authentication, so source sync
+and the target test rerun are pending. The previously synchronized archive is
+`de26854`; the private capture files already reside on Jetson.
+
+After the earlier version-only check, exactly **one Damp request (API 1001)**
+was acknowledged with status 0 while the robot was already damped. Fresh state
+was checked before sending; 61 samples before and 61 after stayed at mode 7,
+error 0. The operator confirmed **no change; remained damped**, with no
+unexpected motion reported. No stand-up, recovery or translation request was
+sent. The measured API round trip was **1.34 ms on the i7**, excluding the
+Jetson SSH path; it is not physical transition/stopping latency. The request
+route was external Jetson → SSH → i7 → native ROS 2/DDS → B2 service. The pinned [B2 API definition](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/b2/sport/sport_api.py)
+identifies Damp as 1001; the official [ROS 2 state description](https://github.com/unitreerobotics/unitree_ros2)
+identifies mode 7 as damping. The temporary
+client exited and no persistent motion sender was installed. Evidence remains
+private under `local/b2-damping-sensors-01` on Jetson.
+
+Separate passive subscriptions decoded front/back built-in images at 1280×720
+and 640×360 in the final attempt, and received IMU/joint and sport/odometry state.
+Panorama, wireless-controller and LIO streams produced no messages in that
+window; usable point-cloud reception remains unconfirmed. See [sensor results,
+saved-image viewing and recapture](built-in-sensors.md). These images have not
+been substituted into TIC-VLA. Direct external DDS remains unresolved.
+
 The requested first posture/forward/back trial was deferred because the operator
-reported insufficient clearance. No motion request was sent. A new three-second
+reported insufficient clearance. No actuator request was sent during that
+earlier pre-motion check; the subsequent single Damp check is described above. A new three-second
 external SDK state probe received zero samples. On the native i7 path, a
 read-only API-version query succeeded (status 0, API `1.0.0.1`) alongside 162
 finite state samples. These establish onboard service availability, not physical
@@ -36,7 +63,7 @@ restored; Wi-Fi remained the default route. A subsequent review found the new
 profile active with autoconnect enabled. At the operator's request, the two old
 inactive Ethernet profiles were archived and removed, leaving only
 `b2-research-link`; Wi-Fi remains the default route. B2 configuration, packages and firmware were unchanged;
-no motor request was sent. Private evidence is under `local/b2-connection-01`.
+no motor request was sent during that initial inspection. Private evidence is under `local/b2-connection-01`.
 See [the measured topology and next connection step](field-network.md).
 
 The [short operator demo](live-camera-demo.md) now provides check/start/view/stop
@@ -79,7 +106,8 @@ The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-All **180 tests** pass on Mac and Jetson. See [model inputs and loading](model-artifacts.md)
+The previous **180 tests** passed on Mac and Jetson. The expanded **184-test**
+suite passed on Mac; its Jetson rerun is pending renewed management access. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
 A bounded real-camera asynchronous shadow trial completed 35 actions with
@@ -89,7 +117,7 @@ serialization checks. See [the cache experiment](asynchronous-runtime.md) and
 [SDK environment](unitree-runtime.md). Neither result validates robot motion.
 
 Onboard state reception passed, but direct external-Jetson state reception,
-real-state asynchronous control integration, command sending, physical stopping and
+real-state asynchronous control integration, continuous command sending, physical stopping and
 navigation evaluation remain unvalidated or unimplemented. The source is hosted at
 [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2);
 this connection inspection has not been pushed. The [MIT License](../LICENSE)
@@ -179,7 +207,9 @@ Hardware availability is not sensor or navigation validation. The
 
 ## Next deliverable
 
-1. Follow the [field card](field-card.md) and [Ethernet runbook](field-network.md)
+1. Restore authorized management access and synchronize the reviewed source;
+   B2 can stay powered off for this work. At the next powered visit, follow
+   the [field card](field-card.md) and [Ethernet runbook](field-network.md)
    to map the actual B2 network, computers, sensors and receive-only SDK path.
    Preserve management Wi-Fi and keep the robot LAN separate from campus.
    Required images/local model inputs were rechecked, the converted checkpoint
@@ -203,8 +233,9 @@ No real-time, navigation-quality or physical-safety claim follows from this smok
 ## Continuing the work
 
 Read this page, the relevant guide and Git diff first. Use a bounded branch and
-keep English/Japanese conclusions aligned. Source is locally committed and
-hash-synchronized to the Jetson archive; GitHub publication remains deferred.
+keep English/Japanese conclusions aligned. Before target use, commit reviewed source and hash-synchronize it to the Jetson
+archive. The current pending-sync boundary is recorded above; GitHub publication
+remains deferred.
 Detailed setup/build/asset/load/inference records stay in ignored `local/` on
 Jetson, including failed attempts. Preserve source revisions, image IDs, hashes,
 inputs, limits and limitations; do not turn this page into a chat transcript.

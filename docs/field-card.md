@@ -7,7 +7,9 @@ received state there. Direct external-Jetson DDS is still pending; see the
 [measured USB/network boundary](field-network.md). A supported native-network
 breakout was not found among the available accessories. Next identify that
 connection or review an explicit onboard relay before changing B2 settings.
-Our software sends **no motion commands**. External-camera capture and
+Repository tools send **no actuator requests**. A separately guarded one-shot
+Damp check subsequently acknowledged the already-damped state; no standing or
+translation was attempted. See [the recorded result](status.md). External-camera capture and
 model prediction already passed; a successful cable connection is not yet a
 model-driven walking system.
 
@@ -56,7 +58,9 @@ establish real B2 firmware/topic/frame compatibility.
 
 The operator requested stand, a small forward/back movement and lie down, but
 reported insufficient room for a fall or a larger-than-intended movement.
-**No physical trial was performed.** The current site supports observation and
+**No standing or translation trial was performed.** A later single Damp
+request was sent only after confirming the robot was already damped. The operator
+reported no change or unexpected motion; this did not test a posture transition. The current site supports observation and
 communication diagnosis, not commissioning locomotion. A short distance request
 does not bound leg sweep, body movement, tracking error or a fall.
 
@@ -71,8 +75,9 @@ For a later suitable site, proceed through separate observed stages:
 
 1. Establish a reliable state and read-only service response over the selected
    external path. A native i7 API-version response already passed; direct external
-   DDS currently returns zero samples. An SSH-triggered onboard client would be
-   a different deployment requiring explicit review.
+   DDS currently returns zero samples. An SSH-triggered temporary onboard client was used only for the
+   guarded single Damp request and separate passive sensor checks. A persistent
+   relay/control deployment still needs review and validation.
 2. Confirm local stopping, controller priority and command-loss behavior under
    the lab's procedure, with appropriate clearance and an onsite operator.
 3. Review a posture-only trial first; observe stable standing and controlled

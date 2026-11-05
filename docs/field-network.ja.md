@@ -2,8 +2,8 @@
 
 [English](field-network.md) · [確認カード](field-card.ja.md) · [ネットワークの考え方](network-topology.ja.md)
 
-**2026-11-03**に初回の物理接続を調査した．内蔵PCでの状態受信は成功したが，外付けJetsonからの
-DDS直接通信と移動は未検証である．番号付きの節は操作手順であり，全項目の完了記録ではない．
+**2026-11-03**に初回の物理接続を調査した．内蔵PCでの状態受信は成功した．後に既にダンピング中のDamp応答と前後画像の復号も成功したが，
+外付けJetsonへの直接DDS受信，姿勢遷移，歩行は未検証である．番号付きの節は操作手順であり，全項目の完了記録ではない．
 研究室の取扱い・停止手順を使い，復旧用アクセスを維持する．
 
 ## 実測したUSB接続とその境界
@@ -94,7 +94,7 @@ scope付きSSHでi7へ入り，一時的な標準interfaceのROS 2診断で有�
 読む要求を一回送り，status 0，API版`1.0.0.1`の返答を得た．ID 1は固定版の[SDK内部API](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/internal.py)と
 [版情報の照会実装](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/client.py)に基づく．
 内蔵側の要求・応答が通る根拠であり，外付け直接DDS，firmware版，移動の受理，停止挙動の確認ではない．
-lease・mode・姿勢・移動・停止の要求は送らず，内蔵設定も変更していない．証拠は非公開`local/b2-pre-motion-01`に置く．
+その版照会だけの検査では，lease・mode・姿勢・移動・停止の要求は送らず，内蔵設定も変更していない．証拠は非公開`local/b2-pre-motion-01`に置く．
 一時的なclientは終了した．
 
 ## 1．ケーブルを挿す前
@@ -310,6 +310,10 @@ SH
 子shellを閉じるとその環境設定は失われる．結果は非公開にする．
 
 ## 5．センサーの経路を記録する
+
+その後の受信専用検査で，i7上の内蔵前後映像を復号し，IMU・関節・sport・odometry状態を受信した．
+[センサー結果と表示コマンド](built-in-sensors.ja.md)を参照する．モデルデモのZED入力は変更せず，
+取得元の時計や利用可能なLiDAR受信は未検証である．
 
 外付けZED 2iは，外付けJetsonへUSB接続できると操作者が確認している．
 B2内蔵のカメラ・センサーは，今回の構成では外付けJetsonへ直接USB接続できない．別の取得経路として扱う．

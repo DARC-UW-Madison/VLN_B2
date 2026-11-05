@@ -4,7 +4,25 @@
 
 ## 現在の段階
 
-希望された最初の姿勢・前後移動試験は，操作者が十分な空間を確保できないと確認したため保留した．移動要求は送っていない．
+更新日：**2026-11-04**．操作者がB2をシャットダウンしたため，このsessionで追加の実機要求は行わない．
+最新の変更はMac上にある．外付けJetsonのSSHがTailscaleの再本人確認を要求したため，ソース同期と対象機での
+テスト再実行は保留した．前回同期したarchiveは`de26854`で，非公開の取得ファイルは既にJetsonにある．
+
+先の版照会の後，既にダンピング中の機体へ**Damp要求（API 1001）を一回だけ**送り，status 0の応答を得た．
+送信前に新しい状態を確認し，前後61件ずつの状態はmode 7，error 0を維持した．操作者は**変化なし・ダンピングのまま**，
+予期しない動きなしと確認した．立上がり・復帰・移動は要求していない．**i7上のAPI往復は1.34 ms**で，
+JetsonからのSSH経路を含まず，姿勢変化・停止に要する時間でもない．要求は外付けJetson → SSH → i7 →
+native ROS 2・DDS → B2 serviceを通った．固定版の[B2 API定義](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/b2/sport/sport_api.py)がDampを1001，
+公式[ROS 2状態の説明](https://github.com/unitreerobotics/unitree_ros2)がmode 7をダンピングと定義する．一時clientは終了し，常駐する移動送信部は配置していない．
+証拠はJetsonの非公開`local/b2-damping-sensors-01`にある．
+
+別の受信専用購読で，最後の試行では内蔵の前後画像を1280×720・640×360へ復号し，IMU・関節・sport・odometry状態を
+受信した．その区間でpanorama・wireless controller・LIOは受信なし，利用可能な点群は未確認である．
+[センサー結果・保存画像の表示・再取得](built-in-sensors.ja.md)を参照する．内蔵画像をTIC-VLA入力にはまだ使っていない．
+外付けからの直接DDSは未解決である．
+
+希望された最初の姿勢・前後移動試験は，操作者が十分な空間を確保できないと確認したため保留した．その移動前調査では作動要求を送っていない．
+その後の単発Damp検査は上記に記す．
 新しい3秒の外付けSDK状態検査は受信0件だった．標準LANのi7側では，版情報だけの照会が成功し，status 0，API版
 `1.0.0.1`を返し，同時に有限な状態162件を受信した．内蔵側のservice応答を確認した結果であり，物理的な制御準備の完了ではない．
 i7はIPv4返信にUSB経路ではなく標準Ethernetを選んでいた．[現地カード](field-card.ja.md)に最初の移動の段階と，
@@ -24,7 +42,7 @@ USB Ethernetはブリッジされていない別interfaceで，IPv4経路にも�
 回数を制限したIPv4試験では標準の機体serviceへ届かなかった．外付けJetsonだけで標準LAN用profileを試し，
 初回試験の最後に元の有効profileへ戻した．後の再確認では新profileが有効・自動接続ありだった．操作者の依頼に従い，
 現在使っていない古い有線設定二つを退避して削除し，`b2-research-link`だけを残した．Wi-Fiはdefault routeを維持する．
-B2側の設定・package・firmwareは変更せず，モーター要求は送っていない．非公開の証拠は`local/b2-connection-01`に置く．
+B2側の設定・package・firmwareは変更せず，その初回調査ではモーター要求は送っていない．非公開の証拠は`local/b2-connection-01`に置く．
 [実測構成と次の接続手順](field-network.ja.md)を参照する．
 
 [短い操作デモ](live-camera-demo.ja.md)に確認・起動・表示・終了コマンドを用意した．
@@ -57,7 +75,8 @@ horizon 30，action 3層を厳密に照合した．生成画像の1回の処理�
 ホストはAGX Orinの64 GBクラス，Ubuntu 20.04，L4T 35.4.1，CUDA 11.4のままである．
 既存のGPUコンテナはPython 3.11.18，Torch 2.2.2，Transformers 4.44.2を使う．別の
 Torch 2.15.0+cpuコンテナで承認済みチェックポイントをsafetensorsへ変換し，古いGPU環境へ
-元のpickleを復元させていない．**Mac・Jetsonで全180件のテストが成功**した．
+元のpickleを復元させていない．従来の**180件はMac・Jetsonで成功**した．追加後の**184件はMacで成功**し，
+Jetsonでの再実行は管理接続の再認証待ちである．
 [モデル資材と読込](model-artifacts.ja.md)と[変換](checkpoint-conversion.ja.md)に手順，証拠，限界を記す．
 
 時間制限付きの実カメラ非同期shadow試験は，仮定した静止状態で35回の行動予測を完了した．
@@ -66,7 +85,7 @@ Torch 2.15.0+cpuコンテナで承認済みチェックポイントをsafetensor
 [SDK環境](unitree-runtime.ja.md)に記す．どちらも実機の移動を検証したものではない．
 
 内蔵PCでの状態受信は成功したが，外付けJetsonへの直接受信，実状態を使う非同期制御の結合，
-指令送信，物理的停止，ナビゲーション評価は未検証または未実装である．ソースは研究室の
+継続的な指令送信，物理的停止，ナビゲーション評価は未検証または未実装である．ソースは研究室の
 [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)に置かれている．
 今回の接続調査の変更はpushしていない．
 [MITライセンス](../LICENSE)は独自のコード・文書だけを対象とし，本家コード，重み，変換物を再ライセンスしない．
@@ -141,7 +160,8 @@ Wi-Fi・GDM設定はエージェントから変更していない．[接続障�
 
 ## 次の成果物
 
-1. [現地カード](field-card.ja.md)と[Ethernet手順](field-network.ja.md)で，B2の実際のnetwork，計算機，
+1. 正規の管理接続を復旧し，確認済みソースを同期する．ここはB2を停止したまま進められる．
+   次の起動時に[現地カード](field-card.ja.md)と[Ethernet手順](field-network.ja.md)で，B2の実際のnetwork，計算機，
    センサー，受信専用SDK経路を調べる．管理用Wi-Fiを維持し，機体LANと大学を分ける．
    必要イメージ・ローカル資材を再確認し，変換重みのSHA256一致と新しいオフラインSDK検査も通った．
    [訪問カード](field-card.ja.md)にケーブル・電源・リモコンと，状態コンテナの実行経路を記す．
@@ -160,6 +180,7 @@ allocatorのpeakはCPU RAM，driverの確保，unified memory全体を含まな�
 ## 作業を再開する方法
 
 最初にこのページ，対象の手引き，Git diffを読む．範囲を区切ったbranchで作業し，日英の結論を合わせる．
-ソースはローカルでcommitし，Jetsonのarchiveへhash照合して同期する．GitHub公開は保留中である．
+対象機で使う前に，確認したソースをローカルでcommitし，Jetsonのarchiveへhash照合して同期する．
+今回の同期待ちの範囲は上記に記す．GitHub公開は保留中である．
 詳細な構築・取得・読込・推論の記録は，失敗した試行も含め，JetsonのGit対象外`local/`へ置く．
 ソースの版，image ID，hash，入力，上限，限界を残し，このページをチャットの履歴にしない．

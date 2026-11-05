@@ -3,7 +3,9 @@
 [日本語](field-network.ja.md) · [Field card](field-card.md) · [Network concepts](network-topology.md)
 
 The first physical attachment was inspected on **2026-11-03**. Onboard state
-reception passed; direct external-Jetson DDS and motion remain unvalidated.
+reception passed; a subsequent already-damped Damp acknowledgement and
+front/back image decoding also passed. Direct external-Jetson DDS, posture
+transitions and locomotion remain unvalidated.
 The numbered sections are operating procedures, not proof that every step has
 been completed. Use the lab's handling/stop procedure and preserve recovery access.
 
@@ -128,7 +130,7 @@ request. The service replied with status 0 and API version `1.0.0.1`. The reques
 used ID 1, as defined by the pinned [SDK internal API](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/internal.py)
 and [version-query implementation](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/client.py).
 This establishes an onboard request/response path, not external direct DDS,
-firmware version, motion acceptance or stopping behavior. No lease, mode,
+firmware version, motion acceptance or stopping behavior. During that version-only check, no lease, mode,
 posture, movement or stop request was sent; onboard configuration was unchanged.
 Evidence is private in `local/b2-pre-motion-01`. The temporary clients exited.
 
@@ -371,6 +373,11 @@ warning; do not replace the existing installation to remove that warning.
 Closing the child shell discards its environment settings. Keep the result private.
 
 ## 5. Map sensor paths
+
+Subsequent passive checks decoded front/back built-in video and received
+IMU/joint and sport/odometry state on the i7. See [sensor results and viewing
+commands](built-in-sensors.md). This did not change the model demo from ZED to
+built-in video, establish source clocks, or validate usable LiDAR reception.
 
 The operator confirms that the external ZED 2i can connect to the external
 Jetson by USB. B2's built-in cameras/sensors cannot be connected directly to that
