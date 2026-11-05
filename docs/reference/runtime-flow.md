@@ -28,9 +28,10 @@ The Jetson project at `~/Developer/Projects/Robotics/b2/VLN_B2` is a reviewed
 source archive transferred from the Mac. Its tracked source files are intended
 to match the selected Mac commit. The Jetson currently has no `.git` directory;
 `local/source-revision.txt` records the transferred revision. Editing either
-machine does not update the other automatically. The lab GitHub destination has
-not received this source. After an approved first push, using a clone and
-explicit commits on both machines can replace archive transfer.
+machine does not update the other automatically. The lab GitHub repository now
+hosts this source, so a clone and explicit commits on both machines can replace
+archive transfer. Switching the Jetson to a clone is a separate step and is not
+recorded here.
 
 | Shared project material | Purpose |
 |---|---|

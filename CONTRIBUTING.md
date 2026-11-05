@@ -30,7 +30,7 @@ Use `main` for reviewed work. Start a short-lived branch such as
 
 ```sh
 git switch main
-# After a shared remote exists, update with: git pull --ff-only
+# Update with: git pull --ff-only
 git switch -c docs/experiment-guide
 # Edit the relevant English and Japanese documents.
 git diff --check
@@ -44,7 +44,7 @@ Use a short imperative commit subject in English. Explain non-obvious reasons in
 the body. Stage specific files; do not rewrite shared history. Use your own Git
 identity and a GitHub noreply email when publishing.
 
-Once hosted, open a pull request to `main` with the purpose, changes, checks and
+Open a pull request to `main` with the purpose, changes, checks and
 remaining limitations. A team reviewer should review it before merge. Branch
 protection and CI are not configured yet; this is the intended workflow, not a
 claim that GitHub enforces it. Use version tags for releases, not copied folders.
@@ -73,6 +73,14 @@ in the relevant guide; create a separate decision record only when needed.
 - `docs/reference/`: provide settings, data formats, code responsibilities and build requirements for lookup.
 - `docs/records/`: preserve dates, revisions, execution locations, methods, results and open questions. Identify the event explicitly rather than referring to a chat or an unspecified earlier incident.
 - `docs/status.md`: summarize current implementation and next work without duplicating the history or hardware inventory.
+
+Define a specialist term before its first use and state prerequisites explicitly.
+Explanations must connect inputs, intermediate steps and outputs, with reasons
+and concrete examples; a glossary link does not replace that explanation.
+Procedures must explain the purpose of non-obvious steps and how to verify their
+result. Records must state the objective, why the method was chosen, what was
+executed, the conditions, results, interpretation and remaining uncertainty.
+No page may require the reader to reconstruct a chat.
 
 Create a linked record instead of appending experiment history to an explanation or procedure. Keep one authoritative location for inventories and measurements. Register pages in the appropriate index and check both translations and all links when relocating files.
 

@@ -27,13 +27,14 @@ Do not publish Wi-Fi credentials, addresses, host keys or account configuration.
 
 ## 2. Place reviewed source and inspect storage
 
-At this milestone, the newest source is committed locally but **not pushed** to
-the lab GitHub repository. Cloning that URL does not yet reproduce this source.
-Have the maintainer supply a reviewed `git archive` plus its commit/digest, then
-extract it under `~/Developer/Projects/Robotics/b2/VLN_B2`. Once publication is
-authorized, clone the exact published commit there instead. Never transfer a
-Mac venv, raw lab records, SSH credentials, upstream code or model cache inside
-that source archive. Record the source commit privately on the target.
+The source is hosted in the lab repository
+[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2). Clone the
+exact reviewed commit into `~/Developer/Projects/Robotics/b2/VLN_B2` and check
+out that commit rather than following a moving branch. If the target cannot
+reach GitHub, have the maintainer supply a reviewed `git archive` plus its
+commit/digest and extract it there instead. Never transfer a Mac venv, raw lab
+records, SSH credentials, upstream code or model cache inside such an archive.
+Record the source commit privately on the target.
 
 ```bash
 umask 077

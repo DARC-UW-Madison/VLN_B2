@@ -19,7 +19,8 @@
 | 実際のフィードバック・停止・走行 | 未検証 | [開発手順](reference/development.ja.md) |
 
 既存の通常テスト184件は，この文書だけの再編前にMac・Jetsonで成功した．実機の動作を測るテストではない．
-配置したソースの版は非公開の`local/source-revision.txt`に記録する．GitHub公開は保留中である．
+配置したソースの版は非公開の`local/source-revision.txt`に記録する．ソースは研究室の公開リポジトリ[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)で共有している．
+公開済みの`main`，作業ブランチ，Jetsonへ配置した版は別に確認する．
 重み，画像，生ログ，実際のnetwork識別子はGitへ入れない．
 
 ## 次の作業

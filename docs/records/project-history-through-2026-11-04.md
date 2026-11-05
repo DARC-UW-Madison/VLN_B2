@@ -4,6 +4,8 @@
 
 > **Historical snapshot**. Conclusions and decisions preserved from source `b981bab`, before documentation separation. Its next-step statements describe that snapshot; use [current status](../status.md) for active work.
 
+> Hosting correction, 2026-11-04: this snapshot retained incorrect statements that publication was deferred. The lab repository was already public, and the hosting/clone corrections were merged in GitHub PRs #1 and #2. The original narrative below is retained as history; use current status for repository state.
+
 ## Current stage
 
 Updated **2026-11-04**. The operator shut down B2 after the inspection.

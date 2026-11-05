@@ -22,7 +22,9 @@ was shut down by the operator; documentation work has not changed its settings.
 The existing 184 ordinary tests passed on Mac and Jetson before this
 documentation-only restructuring. They do not measure robot execution.
 The deployed source revision is recorded privately in `local/source-revision.txt`.
-GitHub publication remains deferred. Models, images, raw logs and real network
+Source is shared in the public lab repository
+[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2).
+Check published `main`, the working branch and the Jetson deployment revision separately. Models, images, raw logs and real network
 identifiers stay outside Git.
 
 ## Next work
