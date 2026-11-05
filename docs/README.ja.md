@@ -12,21 +12,26 @@
 
 ## 初めて読む順序
 
-1. [計算機間の通信](explanations/network-topology.ja.md)：SSH，IP，DDS，SDK，ROS 2，ネットワークをつなぐ方法．
-2. [モデルの仕組み](explanations/ticvla-explained.ja.md)：画像・指示から意味情報と予測位置ができるまで．
-3. [位置予測から機体制御へ](explanations/control-loop.ja.md)：距離の尺度，状態入力，速度・旋回，フィードバック，遅い推論への対応．
-4. [短いカメラデモ](how-to/live-camera-demo.ja.md)：準備済みJetsonで実行する．新規導入なら[初期構築](how-to/setup-from-scratch.ja.md)を先に行う．
+1. [モデル内部](explanations/ticvla-explained.ja.md)：画素と指示のトークンから，文章生成，数値の意味特徴，30個の予測位置まで追う．
+2. [学習の仕組み](explanations/ticvla-training.ja.md)：お手本，ラベル，文章の教師学習，遅延付き模倣学習，強化学習を，実行時と区別する．
+3. [経路からB2の動作へ](explanations/control-loop.ja.md)：一点から速度・旋回を計算し，要求の符号化，通信，測定の戻り，Go2とB2の違いを追う．
+4. [計算機間の通信](explanations/network-topology.ja.md)：SSH，IPv4・IPv6，DDS，ネットワーク転送の選択肢をさらに詳しく読む．
+5. [短いカメラデモ](how-to/live-camera-demo.ja.md)：準備済みJetsonで実行する．新規導入なら[初期構築](how-to/setup-from-scratch.ja.md)を先に行う．
+
+最初の三章は起動コマンドではなく，仕組みを説明する．具体例を使い，論文，固定した公開版，この実装，設計案のどれを述べているか区別する．
+表示された経路を機体指令と解釈する前に，順に読む．
 
 ## 仕組みを学ぶ
 
 | 文書 |
 |---|
 | [ビルドで何を作り，どう実行するか](explanations/build-fundamentals.ja.md) |
-| [予測した位置から継続的な機体制御へ](explanations/control-loop.ja.md) |
+| [予測経路からB2が動くまで](explanations/control-loop.ja.md) |
 | [配置方針：計算機，コンテナ，ROS，センサー](explanations/deployment-design.ja.md) |
 | [用語：Pythonパッケージからロボットまで](explanations/glossary.ja.md) |
 | [ケーブル接続からロボットへの要求まで](explanations/network-topology.ja.md) |
-| [TIC-VLAを理解する：一枚の画像から実際の移動まで](explanations/ticvla-explained.ja.md) |
+| [TIC-VLAの中で画像と指示が経路になるまで](explanations/ticvla-explained.ja.md) |
+| [TIC-VLAはどうやってナビゲーションを学習するのか](explanations/ticvla-training.ja.md) |
 | [遠隔操作の画面・ログイン・通信](explanations/remote-access.ja.md) |
 
 ## 操作する

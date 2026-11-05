@@ -82,6 +82,13 @@ result. Records must state the objective, why the method was chosen, what was
 executed, the conditions, results, interpretation and remaining uncertainty.
 No page may require the reader to reconstruct a chat.
 
+Do not impose a uniform file length or shorten a mechanism to fit an arbitrary
+word budget. A paragraph naming components is not an explanation of their
+connection. Trace one concrete example through intermediate representations,
+units, timing, execution location and communication. Split chapters by learning
+objective and document role, not to make every page equally short. Clearly mark
+educational examples, source discrepancies and unknown implementation details.
+
 Create a linked record instead of appending experiment history to an explanation or procedure. Keep one authoritative location for inventories and measurements. Register pages in the appropriate index and check both translations and all links when relocating files.
 
 ## AI and parallel work

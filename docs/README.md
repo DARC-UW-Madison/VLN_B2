@@ -12,21 +12,28 @@
 
 ## First reading sequence
 
-1. [Communication between computers](explanations/network-topology.md): SSH, IP, DDS, SDK, ROS 2 and forwarding alternatives.
-2. [How the model works](explanations/ticvla-explained.md): images/instructions, semantic features and predicted positions.
-3. [From positions to robot control](explanations/control-loop.md): metric scale, state, speed/steering, feedback and slow inference.
-4. [Short camera demo](how-to/live-camera-demo.md) on the prepared Jetson; for a new installation, start with [initial setup](how-to/setup-from-scratch.md).
+1. [Inside the model](explanations/ticvla-explained.md): follow pixels and instruction tokens through language generation, numerical semantic features and 30 predicted positions.
+2. [How it learns](explanations/ticvla-training.md): demonstrations, labels, language supervision, delayed imitation and reinforcement learning; distinguish training from deployment.
+3. [From a path to B2 movement](explanations/control-loop.md): calculate speed/turn from a point, encode a request, trace its communication, return measurements, and examine Go2-to-B2 differences.
+4. [Communication between computers](explanations/network-topology.md): further detail on SSH, IPv4/IPv6, DDS and forwarding alternatives.
+5. [Short camera demo](how-to/live-camera-demo.md) on the prepared Jetson; for a new installation, start with [initial setup](how-to/setup-from-scratch.md).
+
+The first three chapters develop mechanisms rather than provide launch commands.
+They use worked examples and identify which statements describe the paper,
+the pinned release, our implementation or a proposed design. Read them in sequence
+before interpreting a displayed path as a robot command.
 
 ## Learn the mechanisms
 
 | Document |
 |---|
 | [What a build makes and how the result runs](explanations/build-fundamentals.md) |
-| [From predicted positions to continuous robot control](explanations/control-loop.md) |
+| [From a predicted path to B2 movement](explanations/control-loop.md) |
 | [Deployment choices: computers, containers, ROS and sensors](explanations/deployment-design.md) |
 | [Terminology: from Python packages to a robot](explanations/glossary.md) |
 | [From an Ethernet cable to a robot request](explanations/network-topology.md) |
-| [Understanding TIC-VLA: from an image to movement](explanations/ticvla-explained.md) |
+| [How TIC-VLA turns images and instructions into a path](explanations/ticvla-explained.md) |
+| [How TIC-VLA learns navigation](explanations/ticvla-training.md) |
 | [Remote access: screen, login and transport](explanations/remote-access.md) |
 
 ## Perform a task

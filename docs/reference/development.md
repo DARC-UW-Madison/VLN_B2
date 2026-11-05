@@ -4,11 +4,10 @@
 
 > Document type: **Reference**.
 
-This guide defines the route to a reproducible B2 experiment. Preparation tools
-are implemented. External-host inventory, strict GPU model loading and one synthetic-image
-inference are verified; one ZED RGB capture also passed. Sustained sensing, B2 state and robot motion
-remain unvalidated. Use [onsite preparation](../how-to/onsite.md) for the current commands; the
-stages below describe what evidence is needed before advancing.
+This reference defines acceptance stages for reproducible B2 experiments.
+Use [current status](../status.md) for completed capabilities and
+[the next-visit procedure](../how-to/next-visit.md) for the prepared field commands.
+The stages below explain what evidence is needed before advancing.
 
 ## Run local checks first
 
@@ -27,65 +26,6 @@ means the configured software checks passed, not that a path is clear or safe
 for the B2. The example limits need separate approval and measurement before
 any real use. Tests exercise local logic with synthetic data and mocked vendor
 interfaces; they do not validate the actual drivers or trained model.
-
-### Preparation verification
-
-On **2026-10-27**, the local macOS host with Python 3.14.7 passed **85
-standard-library tests**, synthetic CLI replay, and Ruff 0.17.3's configured
-lint rules. Python syntax is checked against 3.10 for the package/tests and 3.8
-for the standalone inspector; parsing is not execution on those interpreters.
-
-The publication review at `0dcf950` covered 53 tracked files, 14 English/Japanese
-Markdown pairs, and every reachable Git revision. Review checks include rendered
-Markdown, links/fragments, matching command examples and citations, private-data
-and secret scans, and exclusion of local records and model artifacts. A local
-wheel builds and includes the MIT license; the Docker context and copy rules
-include license/provenance notices. No container build was performed.
-
-Real external-Jetson SSH inspection ran the inspector under Python 3.8.10 and
-verified a CUDA driver/device query and privileged Docker metadata. See the
-[baseline](../records/target-baseline.md). Those initial checks did not validate container
-GPU computation, model loading, ZED capture or B2 operation; subsequent milestones
-are recorded below. The
-[runtime review](../records/runtime-compatibility.md) records the unresolved checkpoint-loading
-constraint. Subsequent [runtime setup](../records/jetson-runtime.md) installed Python
-3.11.18 and a project venv on the Jetson; all 85 tests and synthetic replay also
-passed there. The native CUDA arithmetic check passed independently of Torch.
-Source/publication checks do not establish hardware readiness or
-permission to redistribute third-party assets.
-
-The unattended-network helper adds eight tests. They check retained trust and
-identity, reports without personal data, omitted defaults, mismatched inputs
-without writes, unsupported profiles and bounded GDM changes. All **93 tests** passed
-locally and in the Jetson venv; read-only NetworkManager inspection also ran
-under the target system Python 3.8. Saving an operator-entered Wi-Fi password,
-actual reconnect, and cold-boot recovery remain separate operator checks.
-The later Mac tunnel helper adds 12 lifecycle and ownership tests, including
-read-only status, option validation, busy-port protection and separate control
-masters. All **109 tests** passed locally. The actual background tunnel was
-started and checked in a separate invocation; the operator confirmed RDP input
-after the headless software reboot. This does not prove physical power-cycle
-recovery or the inactive eduroam profile. See the [system overview](system-overview.md).
-
-Four additional tests cover exact unique saved-profile selection, inactive
-profile saving without activation or secret output, rejection before password
-entry and separate retained backups. These bring the suite to 109 tests.
-
-The tensor-only adapter adds four contract tests: version-gated checkpoint
-loading, safetensors on older Torch, malformed input without pickle fallback,
-and enforced local/safetensors base loading. All **113 tests** passed locally and
-on Jetson.
-The real generated-tensor probe is `tools/verify_tensor_loading.py`; it does not
-construct a model, use a GPU or read external weights. It is distinct from a
-model-conversion test, strict full-model loading and recorded-image inference.
-
-The CPU-conversion module adds eight tests for pinned provenance, source
-checksums, regular files, input/output budgets, non-overwrite behavior, complete
-alias names, supported CPU tensors and omission of unrelated training metadata.
-All **121 tests** passed locally and on Jetson. The separate CPU container also
-passed real generated-checkpoint conversion and old-runtime tensor readback;
-see [the conversion guide](checkpoint-conversion.md). Strict actual-model GPU loading and one synthetic inference subsequently
-passed; real observations and asynchronous control remain unvalidated.
 
 ## 1. Understand the system
 
