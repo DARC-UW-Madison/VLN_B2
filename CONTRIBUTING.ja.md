@@ -31,7 +31,7 @@ git switch -c docs/experiment-guide
 # Edit the relevant English and Japanese documents.
 git diff --check
 git diff
-git add docs/development.md docs/development.ja.md
+git add docs/reference/development.md docs/reference/development.ja.md
 git diff --cached
 git commit -m "Clarify experiment prerequisites"
 ```
@@ -57,6 +57,18 @@ GitHubで共有を始めたら，目的，変更内容，確認結果，残る�
 期待する観測，失敗時の対応，制限を説明する．相対リンク，環境を限定しないコマンド，SI単位，
 定義した記号を使い，一次資料を示す．未実行のコマンドや論文の結果を，このプロジェクトでの検証結果として書かない．
 重要な設計判断は理由と代替案を該当する手引きに残し，必要になったときだけ独立した判断記録を作る．
+
+
+### 文書の役割と保存先
+
+- `docs/explanations/`：仕組みを最初から説明する．専門語は使用前に定義し，式には変数・単位・具体例を付ける．作業履歴を挟まない．
+- `docs/how-to/`：一つの操作を完了する手順を書く．実行場所・前提・コマンド・期待結果・終了／復旧を揃える．
+- `docs/reference/`：設定値，データ形式，コードの担当，構築条件を調べる資料とする．
+- `docs/records/`：日付・版・実行場所・方法・結果・未確認点を残す．会話への参照や，相対的な「以前の」では対象を特定しない．
+- `docs/status.ja.md`：現在の実装範囲と次の作業だけをまとめる．履歴とhardware一覧を複製しない．
+
+試験結果を説明・手順へ追記して文書種別を変えず，記録を作ってリンクする．機器構成や実測値を複数ページへ繰り返し転載しない．
+新しい文書は種別ごとの目次へ登録し，移動時は全リンクと日英双方を検査する．
 
 ## AIと並行作業
 

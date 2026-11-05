@@ -70,7 +70,7 @@ LGPL-2.1条件のテスト専用ビルド依存で，書き出すRDP実行環境
 
 既存のNoMachine 8.20.1-5を対象機で発見したが，本プロジェクトで導入・改変・同梱していない．
 メーカーの商用・利用条件は本ソースリポジトリとは別であり，パッケージの存在から
-ライセンスやクライアント接続の権利を推定しない．[RDPビルドの詳細](docs/rdp-build.ja.md)を参照する．
+ライセンスやクライアント接続の権利を推定しない．[RDPビルドの詳細](docs/records/rdp-build.ja.md)を参照する．
 
 ## 任意のホスト管理・Pythonツール
 
@@ -84,7 +84,7 @@ tailnetへの登録，ホストされたサービスの条件，研究室のア�
 ホスト構築では，公式pyenvの`v2.8.14`，コミット`3fb25668b463ad38ac2db6092dbf476ef744c0ca`をGit管理外で使う．
 [CPython 3.11.18](https://www.python.org/downloads/release/python-31118/)を，
 [PSF License Agreementと同梱の表示事項](https://github.com/python/cpython/blob/v3.11.18/LICENSE)に従って
-ユーザー用に導入した．インタープリタのバイナリは再配布しない．[実行環境構築](docs/jetson-runtime.ja.md)を参照する．
+ユーザー用に導入した．インタープリタのバイナリは再配布しない．[実行環境構築](docs/records/jetson-runtime.ja.md)を参照する．
 これらの参照の更新確認日：2026-10-27．
 
 
@@ -92,7 +92,7 @@ Microsoft VS Code 1.144.1の公式ARM64 Debian binaryを，操作者の依頼で
 このレポやモデルimageには同梱しない．[Microsoft binary license](https://code.visualstudio.com/license)と
 [privacy条件](https://privacy.microsoft.com/en-us/privacystatement)が適用され，独自レポやCode OSS sourceのMITで
 配布binaryを再許諾しない．拡張・account・syncの設定はしていない．
-[導入とclipboard操作](docs/remote-desktop.ja.md)を参照する．
+[導入とclipboard操作](docs/how-to/remote-desktop.ja.md)を参照する．
 
 ## CPU変換用の候補
 
@@ -121,4 +121,4 @@ EPL-2.0またはEDL-1.0を選べるため，ローカルbuildではEDL-1.0を選
 hash固定lockにはソフト・build入力12個を記録する．CMakeはbuild専用環境へ分ける．
 SDK source・setup・licenseのhashを維持し，SDK wheelは導入せず，NumPy・OpenCVを含む全宣言依存を
 満たしていないと明記する．狭い状態経路はオフラインの合成符号化を通った．他のSDK機能と実B2互換性は別途確認する．
-本家source，wheel，作ったバイナリイメージは配布しない．[buildの来歴と限界](docs/unitree-runtime.ja.md)を参照する．
+本家source，wheel，作ったバイナリイメージは配布しない．[buildの来歴と限界](docs/reference/unitree-runtime.ja.md)を参照する．

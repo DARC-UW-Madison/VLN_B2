@@ -2,101 +2,67 @@
 
 [日本語](README.ja.md) · [Project](../README.md)
 
-This manual explains the research goal, the software/hardware mechanisms, what
-has actually been done, and what to do next. It is organized by learning and
-operating task rather than by chat history. Commands marked as proposals or
-templates are not records of execution. Keep private measurements in approved
-local storage and promote reviewed conclusions into the relevant paired guide.
+## Choose by purpose
 
-## Suggested reading order
+- Understand a mechanism: read an **explanation**, which defines terms and follows inputs to outputs.
+- Carry out a task: use a **procedure**, with prerequisites, execution location, commands, expected results and recovery.
+- Look up an implementation or setting: use a **reference**, containing responsibilities, data contracts and configuration requirements.
+- Find what was executed and observed: read the [experiment/build records](records/README.md), with dates, revisions, methods, results and limits.
+- Check the current boundary and next work: read [status](status.md), not a historical snapshot.
 
-1. For a new Jetson, follow [initial setup](setup-from-scratch.md), in dependency order.
-2. For the prepared Jetson, start with [the short updating camera/path demo](live-camera-demo.md).
-   Use [one recorded-image prediction](run-camera-demo.md) to inspect each step separately.
-3. To understand B2, read [how the computers and connections work](network-topology.md).
-   Then use [the field card](field-card.md) and connection commands at the robot.
-   [The milestone](milestone-2026-11-03.md) is a historical preparation record.
-4. Learn the mechanisms with deployment choices, terminology, TIC-VLA and build fundamentals below.
-5. Use the engineering records for version decisions, failed attempts and detailed evidence.
-6. Before collaboration/publication, read development, contributing and licensing below.
+## First reading sequence
 
-## Operating tutorials and milestone
+1. [Communication between computers](explanations/network-topology.md): SSH, IP, DDS, SDK, ROS 2 and forwarding alternatives.
+2. [How the model works](explanations/ticvla-explained.md): images/instructions, semantic features and predicted positions.
+3. [From positions to robot control](explanations/control-loop.md): metric scale, state, speed/steering, feedback and slow inference.
+4. [Short camera demo](how-to/live-camera-demo.md) on the prepared Jetson; for a new installation, start with [initial setup](how-to/setup-from-scratch.md).
 
-| Guide | Purpose |
-|---|---|
-| [Initial setup from an unprepared Jetson](setup-from-scratch.md) | Supported OS, storage, Docker/GPU build, separate source/assets/conversion, camera prerequisites and clean-install gaps |
-| [Short camera/path demo](live-camera-demo.md) | Check, start, display, move the camera, compare exact prediction inputs and stop; no robot commands |
-| [Run and display a camera prediction](run-camera-demo.md) | Full runnable capture/inference/render commands, output locations and interpretation |
-| [Milestone through 2026-11-03](milestone-2026-11-03.md) | Complete preparation, measured results, incidents, maintenance and readiness boundary |
+## Learn the mechanisms
 
-## Concepts and design
+| Document |
+|---|
+| [What a build makes and how the result runs](explanations/build-fundamentals.md) |
+| [From predicted positions to continuous robot control](explanations/control-loop.md) |
+| [Deployment choices: computers, containers, ROS and sensors](explanations/deployment-design.md) |
+| [Terminology: from Python packages to a robot](explanations/glossary.md) |
+| [From an Ethernet cable to a robot request](explanations/network-topology.md) |
+| [Understanding TIC-VLA: from an image to movement](explanations/ticvla-explained.md) |
 
-| Guide | Questions answered |
-|---|---|
-| [Deployment choices](deployment-design.md) | What does each computer do? Does Mac need source, weights or Docker? Why containers? Where can ROS and sensors run? Can containers communicate? |
-| [Terminology](glossary.md) | What are PyTorch, HF, wheel, pyenv, venv, CUDA, checkpoint, image, SDK, DDS and watchdog? |
-| [Understanding TIC-VLA](ticvla-explained.md) | A chapter from pixels and CoT/KV features to metric paths, frames, latency, tracking equations and the remaining B2 configuration; includes a guided reading exercise for the viewer |
-| [From files to motion](runtime-flow.md) | How do this repository, separate upstream/model inputs, container processes and communications connect? |
-| [Build fundamentals](build-fundamentals.md) | What are compilation, linking, wheels, CUDA compilation, image layers and rebuilds? |
-| [Architecture](architecture.md) | What are the proposed timing, coordinate frames, plan tracking and control boundaries? |
-| [Computers and connections, step by step](network-topology.md) | Follow the actual cable, IP/SSH login, i7 program and robot request; explain SDK/ROS 2/DDS, versions and Docker filtering |
-| [Offline operation without an AP](offline-operation.md) | Why is Mac optional? How could Jetson provide a local hotspot? What do the B2 remote and link-loss policies need to establish? |
+| [Remote access: screen, login and transport](explanations/remote-access.md) |
 
-## Verified state and engineering records
+## Perform a task
 
-| Guide | Questions answered |
-|---|---|
-| [Project status](status.md) | What is complete, what is blocked/unverified, and what is the next milestone? |
-| [Measured Jetson baseline](target-baseline.md) | Which CPU/GPU, memory, storage, OS, SDK and network facts were inspected? |
-| [System overview and unattended boot](system-overview.md) | Which paths/settings changed? What is isolated? How do boot networking, credentials, sharing/return, manual updates and GUI notifications work? |
-| [Jetson bootstrap](jetson-bootstrap.md) | How are accounts, SSH/Tailscale, interpreters and dependency boundaries prepared? |
-| [Jetson runtime setup](jetson-runtime.md) | How were SSD/Docker storage, native CUDA, Python and runtime stages built and recovered? |
-| [Model artifacts and loading plan](model-artifacts.md) | Which exact model files, revisions, sizes and terms need approval? How can a separate CPU conversion avoid old-Torch pickle loading? |
-| [Local checkpoint conversion](checkpoint-conversion.md) | How is the separate CPU environment built, bounded, verified and kept apart from GPU inference? |
-| [Offline model checks](model-runtime.md) | Which approved files, conversion, GPU permissions and isolated load/inference actually passed? What remains before movement? |
-| [External ZED camera](camera-runtime.md) | Which SDK and binding can be imported, how was first capture verified, and what is isolated? |
-| [Asynchronous cache and observation experiment](asynchronous-runtime.md) | How are exact references, cache expiry, current images and bounded semantic work kept coherent without motor output? |
-| [Unitree state runtime](unitree-runtime.md) | Which SDK/DDS source and native build passed offline checks, and what remains for real B2 state? |
-| [Runtime compatibility](runtime-compatibility.md) | Which candidate versions and model-free checks passed? Why does original-pickle loading remain blocked on old Torch? |
-| [RDP build and commissioning](rdp-build.md) | Why a separately pinned source build? What is exported, configured and tested before a host server is used? |
-| [Remote desktop from Mac](remote-desktop.md) | How do Windows App/RDP/xrdp sessions differ from VNC? What must work before remote GUI can replace routine HDMI? |
+| Document |
+|---|
+| [View and capture built-in sensor images](how-to/built-in-sensors.md) |
+| [B2 connection visit: field card](how-to/field-card.md) |
+| [Field visit: Ethernet, onboard computers and independent operation](how-to/field-network.md) |
+| [Jetson account, Tailscale SSH, and isolated workspaces](how-to/jetson-bootstrap.md) |
+| [Operator tutorial: a short camera and predicted-path demo](how-to/live-camera-demo.md) |
+| [Offline operation without a separate access point](how-to/offline-operation.md) |
+| [Onsite quick start](how-to/onsite.md) |
+| [Remote desktop from Mac](how-to/remote-desktop.md) |
+| [Run a ZED image through TIC-VLA and inspect the path](how-to/run-camera-demo.md) |
+| [Set up a Jetson for local TIC-VLA inference](how-to/setup-from-scratch.md) |
 
-Historical inspection dates are not automatic claims about the current device.
-A successful past SSH or GPU check is evidence for that check, not permanent
-reachability or an actual TIC-VLA/robot performance result.
+## Look up contracts and configuration
 
-## Field work and experiment procedure
+| Document |
+|---|
+| [Architecture](reference/architecture.md) |
+| [Asynchronous inference: references before workers](reference/asynchronous-runtime.md) |
+| [Preparing the external ZED camera](reference/camera-runtime.md) |
+| [Local checkpoint conversion](reference/checkpoint-conversion.md) |
+| [Deployment information to collect](reference/deployment-intake.md) |
+| [Development and experiments](reference/development.md) |
+| [Licensing original work and upstream research software](reference/licensing.md) |
+| [Model artifacts and verified loading path](reference/model-artifacts.md) |
+| [From repository files to robot motion](reference/runtime-flow.md) |
+| [System overview and unattended access](reference/system-overview.md) |
+| [Isolated Unitree state-receive environment](reference/unitree-runtime.md) |
 
-| Guide | Questions answered |
-|---|---|
-| [First-visit card](field-card.md) | In what order should the operator proceed at the robot? |
-| [Built-in sensor reception](built-in-sensors.md) | Saved front/back images, passive recapture, IMU/joint/state results and the boundary before model integration |
-| [Ethernet/onboard procedure](field-network.md) | How should cable endpoints, addresses, routes, DDS and internal service ownership be checked? |
-| [Onsite preparation](onsite.md) | How are camera/state observations, paired recordings and optional offline inference invoked and interpreted? |
-| [Deployment information](deployment-intake.md) | Which facts must come from the lab/unit instead of guessed defaults? |
-| [Development and experiment guide](development.md) | How are tools run, validations staged, failures recorded and experiments made reproducible? |
+## Records and collaboration
 
-Use these source templates only after copying to ignored local storage:
-[blank visit notes](../examples/onsite-notes.json),
-[commissioning example](../examples/commissioning.json) and
-[synthetic replay input](../examples/replay.json).
-Their values do not authorize physical operation or establish B2 limits.
+[Experiment/build record index](records/README.md) · [Contributing](../CONTRIBUTING.md) · [Third-party sources and terms](../THIRD_PARTY.md)
 
-## Collaboration, licensing and source navigation
-
-| Guide or source | Purpose |
-|---|---|
-| [Contributing](../CONTRIBUTING.md) | Git branches/commits/review, bilingual docs, AI review and bounded parallel work |
-| [Licensing explained](licensing.md) | Why original MIT code can coexist with separately restricted upstream requirements; copies/derivatives, future research and artifact release |
-| [Third-party inventory](../THIRD_PARTY.md) | Exact reviewed sources, conditions, provenance and outstanding permission questions |
-| [Original-work license](../LICENSE) | Actual MIT permission text for this project's original material |
-| [Python package](../src/b2_tic_vla/) | Independent adapters, CLI, inference validation, replay and candidate tracking |
-| [Tools](../tools/) | Target inventory and operator-driven Wi-Fi helper |
-| [Deployment recipes](../deploy/) | Candidate environment definitions and model-free checks |
-| [Tests](../tests/) | Synthetic/mocked behavior checks; not physical robot validation |
-
-English is the public base language; Japanese companions use `.ja.md` and `，`/`．`.
-Update both versions together, including prerequisites, commands, uncertainty and
-limitations. Add new guides to this index rather than expanding the project
-README into a second directory. Keep each mechanism's detailed explanation in
-its responsible guide and link related topics; do not copy a growing chat log.
+English is the public base language; maintain the Japanese counterpart together. Follow the document-type rules in Contributing.
