@@ -252,35 +252,15 @@ root用バックアップ，サーバー側のアクセス登録は消えない�
 
 ソースの同期，本家・モデルとの境界，レイヤごとの通信経路は[実行の流れ](runtime-flow.ja.md)を参照する．
 
-## 4台の担当と次の段取り
+## 計算機と現在の接続
 
-```text
-Mac -- Wi-Fi/internet + Tailscale/SSH --> External AGX Orin
-                                                |
-                                    planned robot Ethernet
-                                                |
-                                   B2 internal network (unknown)
-                                      /                 \
-                           reported onboard Jetson   motion-control system
-                           sensor/localization?       existing walking/balance
-```
+通った経路は，Mac → 外付けJetson → USB Ethernet → 内蔵Intel i7である．i7には別の内部Ethernetがあり，
+一時的なROS 2プログラムで状態・映像を受信し，既にダンピング中の一回の要求に応答を得た．外付けからの直接DDSは未解決で，
+モデル推論は外付けJetsonで動かす．[順を追った説明](network-topology.ja.md)で，この実測経路と，公式の標準i5・i7構成，
+追加Jetsonの未確認を区別する．IPアドレス，SDK・ROS 2・DDS，版，以前のDocker転送問題もその章で説明する．
 
-確認済みの接続はMacと外付けJetsonの間だけで，内部の計算機，サービス，ケーブルの行き先は未確認である．
-[UnitreeのB2仕様](https://www.unitree.com/b2/)にはIntelのプラットフォーム・開発用計算機と，
-Orin NXの選択肢があるが，研究室の納入構成を確定する資料ではない．
-[公開されたB2 SDK](https://github.com/unitreerobotics/unitree_sdk2/blob/main/include/unitree/robot/b2/sport/sport_client.hpp)は
-想定する上位指令の経路を裏付けるもので，この機体で制御に成功したという意味ではない．
-
-外付けJetsonで認識・計画を行い，B2の既存の歩行制御を利用する構成を目指す．状態・センサー・移動の
-サービスに到達できれば，変更するソフトウェアを外付け側に集約できる可能性があるが，機体の全機能への
-アクセスが保証されるものではない．機体へのEthernetはローカルな配線で，大学の有線LAN設備とは別である．
-大学に有線設備がなくても，機体との有線接続は構成できる．SDK2はDDSを使い，外付けホストのROS 2は任意である．
-[ネットワーク設計](network-topology.ja.md)を参照する．
-
-GPU環境の検査と無人アクセス試験を終え，モデルの対象・読込方法を確認する．実際の内蔵計算機と
-センサー配線を特定し，指令を送らずに画像・状態を取得する．制御権と独立した停止方法を検証してから，
-管理された走行試験へ進む．内部ソフトウェアは，役割とインターフェースを理解するまで維持する．
-
+次回のコマンドは[現地手順](field-network.ja.md)にある．実際のnetwork接続口と，未調査のソフト・firewall情報を確認してから，
+SDK直接通信かアプリケーション中継を選ぶ．
 
 ## 接続断とデスクトップ不調の切り分け
 

@@ -1,101 +1,25 @@
 # 現地作業：Ethernet・内蔵計算機・独立した運用
 
-[English](field-network.md) · [確認カード](field-card.ja.md) · [ネットワークの考え方](network-topology.ja.md)
+[English](field-network.md) · [確認カード](field-card.ja.md) · [接続の仕組み](network-topology.ja.md)
 
-**2026-11-03**に初回の物理接続を調査した．内蔵PCでの状態受信は成功した．後に既にダンピング中のDamp応答と前後画像の復号も成功したが，
-外付けJetsonへの直接DDS受信，姿勢遷移，歩行は未検証である．番号付きの節は操作手順であり，全項目の完了記録ではない．
-研究室の取扱い・停止手順を使い，復旧用アクセスを維持する．
+このページは機体の前で使うコマンド手順である．先に[計算機・ケーブル・IPアドレス・ソフトの説明](network-topology.ja.md)を読む．
+実際の実験をたどり，i7へのSSHは通ったが外付けSDKの直接受信は通らなかった理由を説明する．以下の手順は，
+実個体の確認済み情報を入れて使う雛形であり，全項目が既に成功した記録ではない．
 
-## 実測したUSB接続とその境界
+## 現在保存されている設定
 
-```text
-Mac -- existing Wi-Fi/Tailscale SSH --> external AGX Orin
-                                        |
-                                  Ethernet (1 Gbps)
-                                        |
-                             Anker USB Ethernet hub
-                                        |
-                                B2 USB-C host port
-                                        |
-                            onboard i7 development PC
-                       USB Ethernet       native Ethernet
-                             |                   |
-                     separate interface   robot service network
-                     no bridge found      state DDS domain 0
-```
+USB-C・Anker接続はi7のUSB Ethernet interfaceにつながり，scope付きIPv6によるSSH接続が通った．
+i7の機体内部networkは別のinterfaceで，両者をつなぐbridgeは見つからなかった．内蔵側の設定は維持する．
 
-この図は今回の配線であり，全B2共通の構成図ではない．到達したPCは**Intel Core i7-1265U，x86_64，
-論理CPU 12個**，Linuxから見えるRAM約**15.22 GiB**，**512,110,190,592バイトのNVMe**だった．
-Ubuntu 20.04.6，kernel 5.15.76-rt53である．このhostのPCI検査にはIntel graphicsがあり，NVIDIA GPUは
-表示されなかった．B2内部の他の計算機まで調べた結果ではない．公式の
-[B2ハードウェア説明](https://support.unitree.com/home/en/B2_developer/About%20B2)は，機体機能用・利用者開発用の
-計算機と追加のOrinを区別する．今回のi7は開発用の役割に整合するが，動作制御器と同定したものではない．
-制御器へのSSHは試していない．
+外付けJetsonのEthernet profileは`b2-research-link`一つで，有効・自動接続ありである．標準機体subnetの固定IPv4，
+IPv6 link-local，default gatewayなしを設定し，Wi-Fiをdefault routeとしている．このIPv4設定だけで，USB接続が
+DDS直接通信の経路になったわけではない．古い未使用profile二つは操作者の許可で退避・削除した．復旧用keyfileは非公開の
+`local/network-profile-cleanup-01`にある．管理者は確認後に`nmcli connection load`で読み込めるが，両方を同時に有効化しない．
 
-scope付きIPv6でUSB側の相手へ届き，許可された既存の認証でログインできた．i7のUSB adapterと別のadapterには，
-同じIPv4アドレス・subnetと異なる経路metricが設定されていた．標準Ethernetとのbridgeはなかった．
-IP forwardingが有効なだけではDDS経路は完成しない．返信経路，発見情報のlocator，multicastも通る必要がある．
-これらの内蔵設定は変更していない．
-
-外付けJetsonだけに，新しい`b2-research-link`で資料の標準LAN用client IPを一時設定した．重複検査には応答が
-なかったが，停止中の重複機器まで否定できない．このUSB経路では標準serviceのIPv4試験が失敗した．最後に元の
-有効な有線profileへ戻し，新profileは自動接続を無効にして保存した．Wi-Fiはdefault routeを維持した．
-資料と似たsubnetだからという理由だけで，別の保存済みprofileを有効にしない．
-
-i7の標準Ethernetからは資料のservice IPへpingが通り，RTPSの発見情報でdomain **0**を観測した．
-既存のFoxy／Cyclone DDSによる12秒の受信専用検査で，`unitree_go/msg/SportModeState`型の
-`/sportmodestate`を**5,994件**，`/lf/sportmodestate`を**240件**受信した．検査した位置・速度・yaw速度・姿勢は
-全件で有限だった．証明したのは内蔵PCでの受信であり，座標規約，取得元の時計との対応，経路品質，
-外付け側の受信，指令の受理は別である．カメラ・odometryのtopic名の発見だけでは中身や所有関係を確認できない．
-生の構成・状態の証拠は非公開`local/b2-connection-01`へ置く．
-
-外付けSDKを直接使うには，標準の機体LANへつながる正規の**Network／Ethernet／GbE変換ケーブル**を特定する．
-操作者は現在の付属品から見つけられなかった．USB hubだけでは代用できない．別案として，i7上の明示的な
-プログラム・routerで状態や要求を中継できるが，構成変更として別途検討するものであり，まだ導入していない．
-bridge，NAT，指令中継を自動的な対処として有効にしない．公式資料は航空コネクターの通電中の抜き差しを禁止する．
-その種の端子を変更する場合は研究室の電源を切った取扱い手順に従う．この図は内部のモーターバスを表していない．
-
-## アドレスとprofile：この接続の読み方
-
-IPアドレスはinterfaceに付けるもので，通信の方向を決めない．外付けJetsonのclient IPは送信にも受信にも使う．
-内蔵PCはEthernetごとに別のアドレスを持てる．標準LAN側とUSB側のIPは，同じPCの異なる接続口を識別する．
-USBケーブル側のJetsonへ標準LANのsubnetを設定しても，そのケーブルが標準switchへ接続されたことにはならない．
-
-説明用にJetsonが`192.0.2.10/24`，i7の標準側が`192.0.2.20/24`，USB側が`198.51.100.20/24`とする．
-最初の二つは数値上同じsubnetでも，実際の配線・転送経路が必要である．USBと標準LANが同じhostにあるだけでは通らない．
-ここは例示であり，個体の実アドレスは非公開の記録に置く．
-
-IPv4とIPv6は，同じEthernetケーブルで使える二種類のIPアドレス・通信の仕組みである．`192.0.2.10`のような形式はIPv4で，
-`fe80::…`はIPv6のlink-localである．今回のIPv6にinternet・Wi-Fi・VPNは必要ない．物理的につながるだけでは目的のIP経路は
-完成しない．送信元IP，宛先のinterface，返信経路，filterも関係する．
-
-scope付きIPv6 link-localなら，内蔵側のIPv4設定を変更せず直結の開発PCへ届く場合がある．
-`fe80::…%INTERFACE`の末尾は，**接続元**の出口を指定する．直結区間の通信であり，Macから大学経由でrouteするIPではない．
-後の確認では，同じi7が既に持つ別のIPv6へ，保存済みSSH host keyと既存認証を照合して接続できた．
-古いIPも割当は残っており，到達性が違った理由は未確定である．IPだけで別の計算機と判定しない．
-
-NetworkManagerの**profile**は保存した設定の組で，`eth0`はinterfaceである．保存設定が複数あっても端子や通信路は増えない．
-整理前には有線設定が三つあり，古い二つも自動接続候補だった．操作者の許可で，使っていない古い設定をバックアップ後に削除した．
-残る有線設定は`b2-research-link`一つで，有効・自動接続あり，標準subnetの固定client IPv4，IPv6 link-local，
-default gatewayなしである．Wi-Fiはdefault routeを維持する．これは後の再確認時点で，以下の初回試験終了時には一度
-元の設定へ戻していた．内蔵側のアドレス・routeは変更していない．
-
-当面はこの一つを有効なまま使う．現在のUSB管理接続はIPv6を利用し，保存した標準subnetのIPv4だけではSDK直接到達を
-証明しない．標準の機体接続か，検証した中継が引き続き必要である．復元用keyfileとmanifestは非公開
-`local/network-profile-cleanup-01`に残す．管理者は`nmcli connection load`で戻し，自動接続を確認してから有効にできる．
-通常起動で古い二つを両方読み戻さない．
-
-その後の移動前調査では，具体的な返信経路の問題を確認した．ケーブルはUSB Ethernetへ入るが，i7は外付けJetsonの
-標準subnetのIPv4へ返す際に**機体側の標準Ethernet**を選ぶ．ARPでMACが分かっても，IPで正常に往復できるとは限らない．
-直接のIPv4 pingは失敗し，外付け状態containerの3秒の検査も両sport状態topicで受信**0件**だった．移動要求は送っていない．
-SDK接続が完成した結果と扱わない．
-
-scope付きSSHでi7へ入り，一時的な標準interfaceのROS 2診断で有限な状態162件を受信した．sport serviceへ版情報だけを
-読む要求を一回送り，status 0，API版`1.0.0.1`の返答を得た．ID 1は固定版の[SDK内部API](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/internal.py)と
-[版情報の照会実装](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/client.py)に基づく．
-内蔵側の要求・応答が通る根拠であり，外付け直接DDS，firmware版，移動の受理，停止挙動の確認ではない．
-その版照会だけの検査では，lease・mode・姿勢・移動・停止の要求は送らず，内蔵設定も変更していない．証拠は非公開`local/b2-pre-motion-01`に置く．
-一時的なclientは終了した．
+実測したi7のソフト・service応答・hardwareは[仕組みの説明](network-topology.ja.md)にまとめる．
+非公開inventoryは`local/b2-connection-01`，版だけの照会は`local/b2-pre-motion-01`，後の既にダンピング中の単発要求と
+センサー検査は`local/b2-damping-sensors-01`にある．これらの検査で内蔵network・package・firmwareは変更していない．
+研究室の取扱い・停止手順に従う．
 
 ## 1．ケーブルを挿す前
 

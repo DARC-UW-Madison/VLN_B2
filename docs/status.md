@@ -147,7 +147,7 @@ bounded SSH/Chrome maintenance and the editor install are separately recorded. S
 | Robot | Unitree B2 without wheels, reported by the operator | Firmware, actual computers/services, authority and stopping |
 | External Jetson | AGX Orin 64 GB class, native CUDA and container GPU operations; real model load, recorded-image profiling and bounded camera shadow inference | Real B2 state, time/frame alignment, continuous cache availability and longer operation |
 | Onboard development PC | Intel i7-1265U x86_64, 12 logical CPUs, about 15.22 GiB visible RAM, 512 GB-class NVMe; native ROS 2 state reception passed | Sensor ownership and a reviewed external DDS path; additional Jetson unverified |
-| Motion controller | Separate computer suspected | Actual device, public control interface and ownership |
+| Platform computer / motion implementation | Official standard configuration lists Core i5 for platform functions; not inspected on this unit | Actual hardware/OS, service host, actuator path and ownership |
 | Camera | ZED 2i, USB 5 Gbps; SDK/binding and one 1280×720 left RGB capture passed | Mounted view, sustained capture and source-clock alignment |
 | LiDAR | Livox Mid-360 reported | Existing driver/network and defined use outside RGB model input |
 | Management | eduroam/Tailscale/SSH/RDP software-reboot recovery passed with HDMI disconnected | Physical power cycle, mobile network recovery and node-key policy |
@@ -208,7 +208,9 @@ Hardware availability is not sensor or navigation validation. The
 
 ## Next deliverable
 
-1. At the next powered visit, choose a supported native-LAN connection or an
+1. At the next powered visit, record missing i7 SDK/DDS versions, inspect firewall
+   rules without changing them, and match physical connector labels to the manual.
+   Then choose a supported native-LAN connection or an
    explicitly reviewed i7 relay, using the [field card](field-card.md) and [Ethernet runbook](field-network.md)
    to map the actual B2 network, computers, sensors and receive-only SDK path.
    Preserve management Wi-Fi and keep the robot LAN separate from campus.

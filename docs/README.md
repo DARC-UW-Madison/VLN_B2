@@ -13,8 +13,9 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 1. For a new Jetson, follow [initial setup](setup-from-scratch.md), in dependency order.
 2. For the prepared Jetson, start with [the short updating camera/path demo](live-camera-demo.md).
    Use [one recorded-image prediction](run-camera-demo.md) to inspect each step separately.
-3. Before connecting B2, read [the milestone](milestone-2026-11-03.md) and
-   [the field card](field-card.md). The next stage is state inspection, not walking.
+3. To understand B2, read [how the computers and connections work](network-topology.md).
+   Then use [the field card](field-card.md) and connection commands at the robot.
+   [The milestone](milestone-2026-11-03.md) is a historical preparation record.
 4. Learn the mechanisms with deployment choices, terminology, TIC-VLA and build fundamentals below.
 5. Use the engineering records for version decisions, failed attempts and detailed evidence.
 6. Before collaboration/publication, read development, contributing and licensing below.
@@ -38,7 +39,7 @@ local storage and promote reviewed conclusions into the relevant paired guide.
 | [From files to motion](runtime-flow.md) | How do this repository, separate upstream/model inputs, container processes and communications connect? |
 | [Build fundamentals](build-fundamentals.md) | What are compilation, linking, wheels, CUDA compilation, image layers and rebuilds? |
 | [Architecture](architecture.md) | What are the proposed timing, coordinate frames, plan tracking and control boundaries? |
-| [Computers and network](network-topology.md) | How do Ethernet/IP, SDK2/DDS, ROS 2 and management links differ? What remains unknown inside B2? |
+| [Computers and connections, step by step](network-topology.md) | Follow the actual cable, IP/SSH login, i7 program and robot request; explain SDK/ROS 2/DDS, versions and Docker filtering |
 | [Offline operation without an AP](offline-operation.md) | Why is Mac optional? How could Jetson provide a local hotspot? What do the B2 remote and link-loss policies need to establish? |
 
 ## Verified state and engineering records

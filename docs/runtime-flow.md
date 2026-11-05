@@ -76,7 +76,7 @@ Future relative XY positions -> our validated Plan object
 ```
 
 These are Python calls and local file reads in the same inference process, not
-requests to GitHub, a cloud model API, or the onboard Jetson. Network access is
+requests to GitHub, a cloud model API, or an onboard PC. Network access is
 not needed once all reviewed code/assets are installed. Upstream and model Python
 code executes locally; offline flags do not make that code a security sandbox.
 
@@ -226,15 +226,15 @@ validate drivers and measured timing before selecting it.
   ZED SDK/Python binding → RGB frames. Inside Docker, the matching SDK and device
   permissions must be provided explicitly; a host installation does not appear
   automatically in the image.
-- ZED connected to the onboard Jetson: that machine must expose a usable image
+- If ZED is instead connected to an onboard PC: that machine must expose a usable image
   stream, with a defined transport, compression, timestamp and camera/body
   transform. Plugging Ethernet into B2 does not forward USB automatically.
 - Mid-360: Ethernet sensor packets → the actual attached host/driver → optional
   point clouds/localization. This project has no direct LiDAR input adapter;
   depth/obstacle processing is not added merely by attaching the sensor.
 
-The onboard Jetson may supply sensors/localization; the motion-control system
-retains walking/balance. Their actual services and mutual connection are unknown.
-We can concentrate application changes on the external Jetson only if the
-required interfaces are reachable. The next physical survey must identify cable
-endpoints, service hosts and a working receive-only path before motion work.
+The accessible onboard Intel i7 already provided state and video through a
+temporary ROS 2 program. The external Jetson runs model inference; the existing
+motion-control system retains walking/balance. The complete internal board
+layout and direct external DDS path remain open. See [the actual communication
+sequence](network-topology.md) before choosing a direct connection or relay.

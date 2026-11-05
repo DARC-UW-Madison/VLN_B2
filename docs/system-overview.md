@@ -319,39 +319,20 @@ path. No account deletion, credential rotation or data erasure has been done her
 For source synchronization, the upstream/model boundary and the layer-by-layer
 communication path, read [the runtime flow guide](runtime-flow.md).
 
-## Four computer roles and the next steps
+## Computers and current connection
 
-```text
-Mac -- Wi-Fi/internet + Tailscale/SSH --> External AGX Orin
-                                                |
-                                    planned robot Ethernet
-                                                |
-                                   B2 internal network (unknown)
-                                      /                 \
-                           reported onboard Jetson   motion-control system
-                           sensor/localization?       existing walking/balance
-```
+The working path is Mac → external Jetson → USB Ethernet → onboard Intel i7.
+The i7 has a separate internal Ethernet interface, where the temporary ROS 2
+program received robot state/video and obtained the single already-damped
+response. External direct DDS remains unresolved; model inference runs on the
+external Jetson. [The step-by-step explanation](network-topology.md) distinguishes
+this measured path from the official i5/i7 standard configuration and the
+unconfirmed additional Jetson. That chapter also explains IP addresses,
+SDK/ROS 2/DDS, versions and the earlier Docker forwarding problem.
 
-Only the Mac–external-Jetson connection is verified. Internal identities,
-services and cable endpoints remain unverified. Unitree's
-[B2 specifications](https://www.unitree.com/b2/) list Intel platform/development
-computers and optional Orin NX configurations; they do not identify this lab's
-installed configuration. The [published B2 SDK](https://github.com/unitreerobotics/unitree_sdk2/blob/main/include/unitree/robot/b2/sport/sport_client.hpp)
-supports the proposed high-level command path, not a claim of successful control.
-
-The goal is external perception/planning with the existing B2 walking controller.
-This may require modifying only the external Jetson if state, sensor and motion
-services are accessible. It does not grant access to every robot function.
-The robot Ethernet link is local wiring, separate from a campus wired network.
-Campus Ethernet availability is not a prerequisite for that link. SDK2 uses DDS;
-ROS 2 is optional on the external host. See [network design](network-topology.md).
-
-Finish the GPU runtime checks and unattended-access test, then agree on model
-assets/loading, map the actual onboard computers and sensor connections, receive
-images/state without commands, and validate command ownership and independent
-stopping before controlled motion. Keep the onboard software intact until its
-role and interfaces are understood.
-
+[The field procedure](field-network.md) contains commands for the next visit.
+Identify the actual network access point and inspect missing software/firewall
+facts before selecting a direct SDK connection or an application relay.
 
 ## Diagnosing access loss and desktop failures
 

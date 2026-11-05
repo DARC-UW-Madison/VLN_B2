@@ -11,7 +11,9 @@
 1. 新規Jetsonでは[初期構築](setup-from-scratch.ja.md)を依存順に進める．
 2. 準備済みJetsonでは[更新するカメラ・経路の短いデモ](live-camera-demo.ja.md)から始める．
    個別に切り分ける場合は[保存画像1回の予測](run-camera-demo.ja.md)を使う．
-3. B2接続前に[マイルストーン](milestone-2026-11-03.ja.md)と[現地カード](field-card.ja.md)を読む．次は状態調査であり，歩行ではない．
+3. B2を理解するには[計算機と通信を順に理解する](network-topology.ja.md)を読む．
+   その後，機体の前で[現地カード](field-card.ja.md)と接続コマンドを使う．
+   [マイルストーン](milestone-2026-11-03.ja.md)は準備段階の過去の記録である．
 4. 仕組みは下の配置方針，用語，TIC-VLA，ビルドの基礎で学ぶ．
 5. 版の判断，失敗，詳しい証拠は構築・検証記録を参照する．
 6. 共同開発・公開の前に，下の開発，共同開発，ライセンスを読む．
@@ -35,7 +37,7 @@
 | [ファイルから動作まで](runtime-flow.ja.md) | 独自レポ，本家・モデルの別入力，コンテナのプロセス，通信はどう結び付くか |
 | [ビルドの基礎](build-fundamentals.ja.md) | コンパイル，結合，wheel，CUDAコンパイル，イメージレイヤ，再ビルドとは何か |
 | [構成と仕組み](architecture.ja.md) | 時刻，座標系，経路追従，制御境界の提案は何か |
-| [計算機とネットワーク](network-topology.ja.md) | Ethernet・IP，SDK2・DDS，ROS 2，管理通信はどう違うか．B2内部の何が未確認か |
+| [計算機と通信を順に理解する](network-topology.ja.md) | 実際のケーブル，IP・SSHログイン，i7上のプログラム，機体への要求をたどり，SDK・ROS 2・DDS，版，Dockerのfilteringを説明 |
 | [別のAPなしのオフライン運用](offline-operation.ja.md) | なぜMacを任意にできるか．Jetsonのホットスポット案，B2リモコン，通信断時の方針に何が必要か |
 
 ## 確認済み状態と構築・検証記録

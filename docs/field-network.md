@@ -1,138 +1,33 @@
 # Field visit: Ethernet, onboard computers and independent operation
 
-[日本語](field-network.ja.md) · [Field card](field-card.md) · [Network concepts](network-topology.md)
+[日本語](field-network.ja.md) · [Field card](field-card.md) · [How the connection works](network-topology.md)
 
-The first physical attachment was inspected on **2026-11-03**. Onboard state
-reception passed; a subsequent already-damped Damp acknowledgement and
-front/back image decoding also passed. Direct external-Jetson DDS, posture
-transitions and locomotion remain unvalidated.
-The numbered sections are operating procedures, not proof that every step has
-been completed. Use the lab's handling/stop procedure and preserve recovery access.
+Use this page for commands at the robot. First read [the explanation of the
+computers, cable, IP addresses and software](network-topology.md). It follows the
+actual experiment and explains why SSH into the i7 succeeded while direct
+external SDK reception did not. The procedures below are templates to complete
+with verified unit information, not a record that every check has passed.
 
-## Measured USB connection and its boundary
+## Current saved configuration
 
-```text
-Mac -- existing Wi-Fi/Tailscale SSH --> external AGX Orin
-                                        |
-                                  Ethernet (1 Gbps)
-                                        |
-                             Anker USB Ethernet hub
-                                        |
-                                B2 USB-C host port
-                                        |
-                            onboard i7 development PC
-                       USB Ethernet       native Ethernet
-                             |                   |
-                     separate interface   robot service network
-                     no bridge found      state DDS domain 0
-```
+The USB-C/Anker connection reaches the i7's USB Ethernet interface. Existing
+scoped IPv6 SSH access worked. The i7's internal robot network is a separate
+interface; no bridge between them was found. Preserve the onboard settings.
 
-This diagram describes this attachment, not every B2 configuration. The accessible
-PC is **Intel Core i7-1265U, x86_64, 12 logical CPUs**, about **15.22 GiB** visible
-RAM and a **512,110,190,592-byte NVMe**. It runs Ubuntu 20.04.6 and kernel
-5.15.76-rt53. PCI inspection listed Intel graphics; no NVIDIA GPU was listed on
-this host. This does not survey other computers inside B2. The manufacturer's
-[B2 hardware description](https://support.unitree.com/home/en/B2_developer/About%20B2)
-distinguishes platform and user-development computers and optional Orin modules.
-This i7 is consistent with a user-development role; it is not identified as the
-motion controller. No controller SSH access was attempted.
+The external Jetson has one Ethernet profile, `b2-research-link`, active with
+autoconnect enabled: static native-subnet IPv4, IPv6 link-local, no default
+gateway. Wi-Fi remains the default route. That IPv4 configuration has not made
+the USB connection a working direct DDS path. Two inactive legacy profiles were
+backed up and removed with the operator's authorization. Private recovery
+keyfiles are in `local/network-profile-cleanup-01`. An administrator can review
+and load one with `nmcli connection load`; do not activate both legacy profiles.
 
-Scoped IPv6 reached this USB peer and existing authorized credentials worked.
-The USB adapter and another adapter on the i7 had the same IPv4 address/subnet,
-with different route metrics. Neither was bridged to native Ethernet. IP forwarding
-being enabled does not create a working DDS path: return routes, discovery
-locators and multicast transport must also work. We did not change those settings.
-
-Only the external Jetson was temporarily assigned a documented native-LAN client
-address using a new `b2-research-link` profile. Address-conflict probes received
-no reply, but do not rule out an offline duplicate. The direct native-service
-IPv4 test failed over this USB path. The original active wired profile was then
-restored; the new profile remains saved with autoconnect disabled. Wi-Fi stayed
-the default route. Never activate an unrelated saved profile merely because its
-subnet resembles a manufacturer example.
-
-On the i7's native Ethernet, the documented service address answered ping and
-RTPS discovery advertised domain **0**. A 12-second receive-only check using the
-existing Foxy/Cyclone DDS installation received **5,994** `/sportmodestate` and
-**240** `/lf/sportmodestate` messages of type `unitree_go/msg/SportModeState`.
-All checked position, velocity, yaw-rate and attitude values were finite.
-This proves onboard reception only. It does not establish coordinate conventions,
-source-clock alignment, navigation quality, external reception or command acceptance.
-Discovered camera/odometry topic names alone do not validate their payloads or ownership.
-Raw inventories and state evidence remain private under `local/b2-connection-01`.
-
-For direct external SDK use, identify the supported **Network/Ethernet/GbE
-breakout** that reaches the native robot network. The operator could not locate
-one among the available accessories. The USB hub alone is not a substitute.
-Alternatively, a separately reviewed program/router on the i7 could relay data
-and requests; that changes the deployment and is not installed. Do not enable
-bridging, NAT or a command relay as an automatic workaround. The manufacturer
-prohibits hot-swapping aviation connectors; follow the lab's powered-down handling
-procedure when changing that kind of connector. The diagram does not map motor buses.
-
-## Addresses and profiles: how to read this connection
-
-An IP address belongs to an interface, not to a connection direction. The
-external Jetson's client address identifies Jetson for both sending and receiving.
-An onboard PC can have a different address on each Ethernet interface. Its
-native-network address and USB-adapter address identify different attachment
-points of the same PC. Assigning the native subnet to Jetson's USB cable does
-not connect that cable to the native switch.
-
-For illustration only, suppose Jetson has `192.0.2.10/24`, the i7's native
-interface has `192.0.2.20/24`, and its USB interface has `198.51.100.20/24`.
-The first two share a subnet on paper, but still need a physical/forwarding path.
-The USB attachment does not provide that path by sharing a host with native LAN.
-Actual unit addresses are retained privately, not in these examples.
-
-IPv4 and IPv6 are two IP addressing/protocol systems that can use the same
-Ethernet cable. Addresses such as `192.0.2.10` are IPv4; `fe80::…` identifies
-an IPv6 link-local address. IPv6 here does not require internet, Wi-Fi or a VPN.
-Physical Ethernet connectivity alone does not establish the intended IP path:
-the source address, destination interface, return route and filtering all matter.
-
-Scoped IPv6 link-local access can reach the directly attached user PC without
-changing its IPv4 configuration. In `fe80::…%INTERFACE`, the suffix selects the
-**client's** outgoing interface. This is link-local access, not an address to
-route from Mac through campus. A later check reached another existing IPv6
-address of the same i7, verified with the previously pinned SSH host key and
-existing authentication. The old address remained assigned; why reachability
-differed is unverified. Do not infer a different computer from an address alone.
-
-A NetworkManager **profile** is a saved configuration recipe; `eth0` is an
-interface. Multiple saved profiles do not create multiple ports or IP paths.
-Before cleanup there were three saved Ethernet recipes, including two old
-automatic candidates. The inactive legacy recipes were backed up and removed
-with the operator's authorization. The only remaining Ethernet recipe is
-`b2-research-link`, active with autoconnect enabled, a static native-subnet client
-IPv4 address, IPv6 link-local and no default gateway. Wi-Fi remains the default
-route. This describes the later review; the first test below had temporarily
-restored the original recipe. No onboard addresses or routing were changed.
-
-Leave this single profile active for now. USB management currently uses IPv6;
-the saved native-subnet IPv4 does not establish direct SDK reachability. A native
-robot connection or a reviewed relay is still needed. Recovery keyfiles and a
-manifest are private in `local/network-profile-cleanup-01`; an administrator can
-load an archived keyfile with `nmcli connection load` and review its autoconnect
-before activation. Do not load both legacy recipes during ordinary startup.
-
-The subsequent pre-motion inspection confirmed a concrete return-path problem:
-the i7 selects its **native robot-facing Ethernet** when replying to the external
-Jetson's native-subnet IPv4, although the cable arrives at USB Ethernet. An ARP
-reply can still identify a MAC without establishing usable round-trip IP traffic.
-The direct IPv4 ping failed, and a three-second external state-container probe
-received **zero** samples on both sport-state topics. No motion request was sent.
-Do not interpret these results as a functioning SDK connection.
-
-Over scoped SSH to the i7, a temporary native-interface ROS 2 diagnostic received
-162 finite state samples and sent exactly one read-only sport-service API-version
-request. The service replied with status 0 and API version `1.0.0.1`. The request
-used ID 1, as defined by the pinned [SDK internal API](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/internal.py)
-and [version-query implementation](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/rpc/client.py).
-This establishes an onboard request/response path, not external direct DDS,
-firmware version, motion acceptance or stopping behavior. During that version-only check, no lease, mode,
-posture, movement or stop request was sent; onboard configuration was unchanged.
-Evidence is private in `local/b2-pre-motion-01`. The temporary clients exited.
+The measured i7 software, service responses and hardware are summarized in
+[the explanation](network-topology.md). Private inventories are under
+`local/b2-connection-01`, the version-only check under `local/b2-pre-motion-01`,
+and the later single already-damped request and sensor checks under
+`local/b2-damping-sensors-01`. No onboard network/package/firmware changes were
+made during these checks. Follow the lab's handling and stop procedure.
 
 ## 1. Before connecting the cable
 

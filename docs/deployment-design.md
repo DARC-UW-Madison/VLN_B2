@@ -3,10 +3,11 @@
 [日本語](deployment-design.ja.md) · [Documentation](README.md) · [Terminology](glossary.md)
 
 This guide explains the proposed division of work and the choices behind the
-prepared environment. A design is not a measurement: only the external Jetson's
-host inventory, management access, model-free checks, strict actual GPU model
-loading and one synthetic inference are verified. Real sensor acquisition, B2
-connectivity, asynchronous control and motion remain unverified. No motion sender or autonomous service is installed.
+prepared environment. The external Jetson now runs the model with ZED images;
+onboard i7 state/video reception and one already-damped request also passed.
+Direct external DDS and model-driven control remain unfinished. First read
+[the measured computers and communication sequence](network-topology.md) for the
+current hardware and software, then use this page for design choices.
 
 ## 1. Where computation happens
 
@@ -21,7 +22,7 @@ it does not move the model's GPU computation to Mac.
 |---|---|---|
 | Mac | Edit/review code and documents, initiate remote work, view selected results | No; optional monitoring must follow the experiment's supervision policy |
 | External AGX Orin | Acquire observations, run TIC-VLA, track plans, supervise one future command sender, save logs | Yes |
-| Reported onboard Jetson | Continue existing drivers/services; possibly provide onboard images, pose or localization | Depends on the measured data path; do not disable it |
+| Onboard Intel i7 development PC | Existing internal state/video access; possible application relay | Required for the measured SSH/i7 path; an additional onboard Jetson is unconfirmed |
 | Existing motion-control system | Walking, balance and actuator control behind B2's supported interface | Yes; physical host/internal implementation still unknown |
 | GitHub | Reviewable source history and collaboration | No internet dependency during a prepared local run |
 | Hugging Face or another approved artifact source | Acquire approved model assets before trials | No dependency during a fully prepared offline run |
@@ -163,7 +164,7 @@ inference container with a narrow IPC interface; another is an explicitly
 configured robot-facing container. Neither is implemented or selected as final.
 Do not create several services simply because Docker can run them.
 
-## 6. Which cameras will be used, and why keep the onboard Jetson?
+## 6. Which cameras will be used, and what does the onboard PC do?
 
 The first test candidate is the external ZED 2i directly connected by USB to the
 external Jetson. This reduces the first image path to one cable, one host and one
@@ -192,9 +193,9 @@ instruction and expected robot-state features. Depth or LiDAR may later supply
 localization/obstacle checks, which require a separate validated pipeline.
 Neither predicted paths nor velocity clipping constitute obstacle avoidance.
 
-The onboard Jetson may keep driving existing sensors, localization and network
-services even if the external Jetson executes TIC-VLA. Its role must be observed,
-not invented. If a built-in stream is suitable, it may replace or complement the
+The accessible onboard PC is Intel i7. It provided access to existing state
+and camera streams without running TIC-VLA. Additional onboard compute and
+localization ownership remain unconfirmed. If a built-in stream is suitable, it may replace or complement the
 external camera after view/mount/time compatibility is evaluated. Replacing a
 camera changes learned visual input and camera-to-body geometry; merely seeing
 a JPEG is not model suitability evidence. The internal motion controller also
