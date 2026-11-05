@@ -94,7 +94,7 @@ The main interface is numerical. It is not a parser looking for the word “left
 An attention calculation forms a **query** for information to retrieve, **keys** for comparing context positions, and **values** carrying information from those positions. A common form is:
 
 $$
-\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\!\left(\frac{QK^\mathsf{T}}{\sqrt d}\right)V.
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^\mathsf{T}}{\sqrt d}\right)V.
 $$
 
 $Q$, $K$ and $V$ are matrices of vectors; $d$ is the key-vector dimension. $QK^\mathsf{T}$ gives comparison scores. Softmax converts them to nonnegative weights summing to one per query. Multiplication by $V$ combines information with those weights. These learned operations do not expose a list of human-readable reasons.

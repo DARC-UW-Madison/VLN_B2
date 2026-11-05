@@ -94,7 +94,7 @@ TIC-VLAは，最新の画像と機体の動き，VLMが作った古い数値表�
 アテンションでは，取り出したい情報を表す**query**，文脈中の各位置と比較するための**key**，その位置の情報を運ぶ**value**を計算する．代表的な式は次である．
 
 $$
-\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\!\left(\frac{QK^\mathsf{T}}{\sqrt d}\right)V.
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^\mathsf{T}}{\sqrt d}\right)V.
 $$
 
 $Q$ ・ $K$ ・ $V$ はベクトルを並べた行列， $d$ はkeyベクトルの次元である． $QK^\mathsf{T}$ で比較の点数を求め，softmaxで各queryについて合計1となる非負の重みへ変える．それを $V$ へ掛け，文脈の情報を重み付きで組み合わせる．学習した数値計算であり，人が読める理由の一覧が出るわけではない．
