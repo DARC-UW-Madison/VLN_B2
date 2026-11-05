@@ -62,6 +62,21 @@ def render(report, image):
     instruction = html.escape(str(report.get('instruction', '')))
     state = html.escape(str(report.get('state_source', '')))
     digest = html.escape(report['image_sha256'])
+    model = report.get('model', {})
+    if not isinstance(model, dict):
+        raise ValueError('Model metadata must be an object')
+    response = model.get('vlm_response')
+    if response is not None and (not isinstance(response, str) or len(response) > 65536):
+        raise ValueError('VLM response must be text of at most 65536 characters')
+    response_html = ('<pre class="response">%s</pre>' % html.escape(response)
+                     if response else '<p>No VLM response was recorded. Start a new prediction with the updated tools; older reports cannot reconstruct it.</p>')
+    endpoint = points[-1]
+    endpoint_distance = math.hypot(endpoint['x'], endpoint['y'])
+    path_length = 0.
+    previous = (0., 0.)
+    for point in points:
+        path_length += math.hypot(point['x'] - previous[0], point['y'] - previous[1])
+        previous = (point['x'], point['y'])
     return '''<!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TIC-VLA recorded-image prediction</title>
@@ -70,11 +85,12 @@ main{max-width:1200px;margin:auto;padding:32px}h1{line-height:1.2}.notice{backgr
 .panels{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{background:white;padding:20px;border-radius:12px;margin:20px 0;min-width:0}
 img,svg{width:100%%;height:auto}svg{background:#f5f8fc}table{border-collapse:collapse;width:100%%;font-variant-numeric:tabular-nums}
 th,td{padding:8px;text-align:right;border-bottom:1px solid #d6dee8}code{overflow-wrap:anywhere}.muted{color:#52667b}
+.response{white-space:pre-wrap;overflow-wrap:anywhere;max-height:360px;overflow:auto;background:#f5f8fc;padding:16px}
 @media(max-width:760px){main{padding:16px}.panels{grid-template-columns:1fr}}</style>
 <main><h1>TIC-VLA recorded-image prediction</h1><p class="notice"><strong>Assumed stationary state. No robot commands.</strong><br>
 This is an offline numerical prediction, not validated navigation or obstacle clearance.</p>
 <p><strong>Instruction:</strong> %s</p><p class="muted">State source: %s</p>
-<div class="panels" id="prediction-panels"><section><h2>Input camera image</h2><img alt="Exact recorded model input" src="data:%s;base64,%s">
+<div id="prediction-panels"><div class="panels"><section><h2>Input camera image</h2><img alt="Exact recorded model input" src="data:%s;base64,%s">
 <p class="muted">The photo is not a calibrated path overlay.</p></section><section><h2>Predicted path: model top view</h2>
 <svg role="img" aria-label="Model-relative trajectory; forward x points up and left y points left" viewBox="0 0 600 600">
 <path d="M 80,565 L 80,515 M 80,565 L 30,565" stroke="#45556a" stroke-width="2" fill="none"/>
@@ -83,13 +99,21 @@ This is an offline numerical prediction, not validated navigation or obstacle cl
 <g fill="#2268ba">%s</g><circle cx="%.3f" cy="%.3f" r="7" fill="#c23b32"><title>Assumed robot origin (0, 0)</title></circle>
 <text x="300" y="28" text-anchor="middle" fill="#45556a">Distance scale: %.2f m across 480 pixels</text></svg>
 <p class="muted">Red: assumed origin. Blue: future XY positions in metres, without cumulative sum.
-B2/camera coordinate alignment is unverified. Hover over points for coordinates.</p></section></div>
+B2/camera coordinate alignment is unverified. Hover over points for coordinates.</p>
+<p><strong>Endpoint:</strong> x=%.3f m, y=%.3f m.<br>
+Straight-line distance from origin: %.3f m. Sampled path length from origin: %.3f m.<br>
+Final sample time: %.2f s (assumed interval).</p></section></div>
+<section><h2>Generated VLM response</h2><p>This text belongs to the exact input above.
+It may contain scene reasoning and separate 3/6/9-second text targets. The blue path is the action expert's numerical output;
+it is not parsed from those text targets. Check claims against the image.</p>%s
+<p class="muted">This is model-generated text, not verified perception or a complete view of internal computation.</p></section></div>
 <section><h2>Prediction coordinates</h2><p>Time uses the adapter's assumed waypoint interval.
 It is not a measured control period. See the JSON report for model/timing provenance.</p>
 <table><thead><tr><th>Point</th><th>Forward x (m)</th><th>Left y (m)</th><th>Assumed time (s)</th></tr></thead><tbody>%s</tbody></table>
 <p>Input SHA256: <code>%s</code></p></section></main></html>''' % (
         instruction, state, mime, base64.b64encode(image).decode(), line, circles,
-        origin_x, origin_y, 480. / scale, rows, digest)
+        origin_x, origin_y, 480. / scale, endpoint['x'], endpoint['y'],
+        endpoint_distance, path_length, endpoint['time_from_now'], response_html, rows, digest)
 
 
 def main(argv=None):

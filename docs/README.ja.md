@@ -2,94 +2,72 @@
 
 [English](README.md) · [プロジェクト](../README.ja.md)
 
-研究の目的，ソフト・機器の仕組み，実際に行ったこと，次に行うことを説明するマニュアルである．
-チャットの履歴ではなく，学習・運用の目的ごとに整理する．提案・雛形と記したコマンドは実行記録ではない．
-個別の計測は承認した非公開の保存先へ置き，レビューした結論を該当する日英ガイドへ反映する．
+## 読む目的から選ぶ
 
-## 推奨する読む順序
+- 仕組みを理解する：下の**解説**を読む．用語をその場で定義し，入力から出力まで説明する．
+- 手を動かす：**操作手順**を使う．前提，実行場所，コマンド，期待する結果，終了・復旧を記す．
+- 実装や設定値を調べる：**参照資料**を使う．コードの担当，データ形式，環境・設定の条件をまとめる．
+- 何を実行し，何が起きたか調べる：[実験・構築記録](records/README.ja.md)を読む．日時，版，手法，結果，限界を保存する．
+- 現在の到達点と次の作業を確認する：[進捗](status.ja.md)を読む．履歴の代用にはしない．
 
-1. 新規Jetsonでは[初期構築](setup-from-scratch.ja.md)を依存順に進める．
-2. 準備済みJetsonでは[更新するカメラ・経路の短いデモ](live-camera-demo.ja.md)から始める．
-   個別に切り分ける場合は[保存画像1回の予測](run-camera-demo.ja.md)を使う．
-3. B2接続前に[マイルストーン](milestone-2026-11-03.ja.md)と[現地カード](field-card.ja.md)を読む．次は状態調査であり，歩行ではない．
-4. 仕組みは下の配置方針，用語，TIC-VLA，ビルドの基礎で学ぶ．
-5. 版の判断，失敗，詳しい証拠は構築・検証記録を参照する．
-6. 共同開発・公開の前に，下の開発，共同開発，ライセンスを読む．
+## 初めて読む順序
 
-## 操作チュートリアルとマイルストーン
+1. [モデル内部](explanations/ticvla-explained.ja.md)：画素と指示のトークンから，文章生成，数値の意味特徴，30個の予測位置まで追う．
+2. [学習の仕組み](explanations/ticvla-training.ja.md)：お手本，ラベル，文章の教師学習，遅延付き模倣学習，強化学習を，実行時と区別する．
+3. [経路からB2の動作へ](explanations/control-loop.ja.md)：一点から速度・旋回を計算し，要求の符号化，通信，測定の戻り，Go2とB2の違いを追う．
+4. [計算機間の通信](explanations/network-topology.ja.md)：SSH，IPv4・IPv6，DDS，ネットワーク転送の選択肢をさらに詳しく読む．
+5. [短いカメラデモ](how-to/live-camera-demo.ja.md)：準備済みJetsonで実行する．新規導入なら[初期構築](how-to/setup-from-scratch.ja.md)を先に行う．
 
-| ガイド | 目的 |
-|---|---|
-| [未準備のJetsonからの初期構築](setup-from-scratch.ja.md) | 対応OS，保存先，Docker／GPU構築，別管理のソース・資材・変換，カメラ前提，新規導入の未確認点 |
-| [カメラ・経路の短いデモ](live-camera-demo.ja.md) | 確認，起動，表示，cameraを動かす比較，正確な予測入力，終了．robot指令なし |
-| [カメラ予測の実行と表示](run-camera-demo.ja.md) | 実行可能な撮影・推論・描画コマンド，保存先，結果の読み方 |
-| [2026-11-03までのマイルストーン](milestone-2026-11-03.ja.md) | 準備全体，実測，問題，保守更新，到達範囲 |
+最初の三章は起動コマンドではなく，仕組みを説明する．具体例を使い，論文，固定した公開版，この実装，設計案のどれを述べているか区別する．
+表示された経路を機体指令と解釈する前に，順に読む．
 
-## 概念と設計
+## 仕組みを学ぶ
 
-| ガイド | 答える問い |
-|---|---|
-| [配置方針](deployment-design.ja.md) | 各計算機の役割は何か．Macにソース・重み・Dockerが必要か．コンテナの理由，ROS・センサーの配置，コンテナ間通信はどうするか |
-| [用語集](glossary.ja.md) | PyTorch，HF，wheel，pyenv，venv，CUDA，checkpoint，image，SDK，DDS，watchdogとは何か |
-| [TIC-VLAの仕組み](ticvla-explained.ja.md) | 言語・画像の推論，行動予測，学習，遅延補償はどう関係するか |
-| [ファイルから動作まで](runtime-flow.ja.md) | 独自レポ，本家・モデルの別入力，コンテナのプロセス，通信はどう結び付くか |
-| [ビルドの基礎](build-fundamentals.ja.md) | コンパイル，結合，wheel，CUDAコンパイル，イメージレイヤ，再ビルドとは何か |
-| [構成と仕組み](architecture.ja.md) | 時刻，座標系，経路追従，制御境界の提案は何か |
-| [計算機とネットワーク](network-topology.ja.md) | Ethernet・IP，SDK2・DDS，ROS 2，管理通信はどう違うか．B2内部の何が未確認か |
-| [別のAPなしのオフライン運用](offline-operation.ja.md) | なぜMacを任意にできるか．Jetsonのホットスポット案，B2リモコン，通信断時の方針に何が必要か |
+| 文書 |
+|---|
+| [ビルドで何を作り，どう実行するか](explanations/build-fundamentals.ja.md) |
+| [予測経路からB2が動くまで](explanations/control-loop.ja.md) |
+| [配置方針：計算機，コンテナ，ROS，センサー](explanations/deployment-design.ja.md) |
+| [用語：Pythonパッケージからロボットまで](explanations/glossary.ja.md) |
+| [ケーブル接続からロボットへの要求まで](explanations/network-topology.ja.md) |
+| [TIC-VLAの中で画像と指示が経路になるまで](explanations/ticvla-explained.ja.md) |
+| [TIC-VLAはどうやってナビゲーションを学習するのか](explanations/ticvla-training.ja.md) |
+| [遠隔操作の画面・ログイン・通信](explanations/remote-access.ja.md) |
 
-## 確認済み状態と構築・検証記録
+## 操作する
 
-| ガイド | 答える問い |
-|---|---|
-| [進捗](status.ja.md) | 完了したこと，障害・未検証事項，次の成果は何か |
-| [Jetsonの実測構成](target-baseline.ja.md) | CPU・GPU，メモリ，保存先，OS，SDK，通信のどの事実を確認したか |
-| [システム全体像と無人起動](system-overview.ja.md) | 何のパス・設定を変えたか．何を分離したか．起動通信，認証情報，共有・返却，手動更新とGUI通知はどうするか |
-| [Jetsonの初期設定](jetson-bootstrap.ja.md) | ユーザー，SSH・Tailscale，Python，依存の境界をどう準備するか |
-| [Jetsonの実行環境構築](jetson-runtime.ja.md) | SSD・Docker保存先，ネイティブCUDA，Python，実行環境をどうビルド・復旧したか |
-| [モデル資材と読込計画](model-artifacts.ja.md) | 承認するファイル・版・サイズ・条件は何か．別のCPU変換で古いTorchのpickle読込をどう避けるか |
-| [ローカルのチェックポイント変換](checkpoint-conversion.ja.md) | 分離したCPU環境の構築，制限，検証とGPU推論との境界は何か？ |
-| [オフラインモデル確認](model-runtime.ja.md) | 承認資材，変換，GPU権限，隔離した読込・推論で何が通り，移動まで何が残るか？ |
-| [外付けZEDカメラ](camera-runtime.ja.md) | SDK・bindingの読込と初回の実画像取得をどう確認し，何を隔離したか？ |
-| [非同期cacheと観測実験](asynchronous-runtime.ja.md) | 正確な参照，cache期限，現在画像，制限付きの意味情報処理を，移動指令なしでどう一貫させるか |
-| [Unitree状態受信環境](unitree-runtime.ja.md) | どのSDK・DDS sourceとネイティブbuildがオフライン検査を通り，実B2受信に何が残るか |
-| [実行環境の互換性](runtime-compatibility.ja.md) | 候補の版とモデル不要の検査は何が通ったか．なぜチェックポイント読込が保留か |
-| [RDPのビルドと導入確認](rdp-build.ja.md) | なぜ別の固定版をビルドするか．ホストの利用前に何を出力・設定・検証するか |
-| [Macからの遠隔画面](remote-desktop.ja.md) | Windows App・RDP・xrdpのセッションはVNCと何が違うか．通常のHDMI利用を省く前に何を確認するか |
+| 文書 |
+|---|
+| [内蔵センサー画像の表示と取得](how-to/built-in-sensors.ja.md) |
+| [次回のB2訪問：構成を調べ，Jetsonで状態を受信する](how-to/next-visit.ja.md) |
+| [B2訪問の確認表](how-to/field-card.ja.md) |
+| [現地作業：Ethernet・内蔵計算機・独立した運用](how-to/field-network.ja.md) |
+| [Jetsonのアカウント，Tailscale SSH，作業環境の分離](how-to/jetson-bootstrap.ja.md) |
+| [操作手順：カメラと予測経路を確認する短いデモ](how-to/live-camera-demo.ja.md) |
+| [別のAPを使わないオフライン運用](how-to/offline-operation.ja.md) |
+| [現地での確認手順](how-to/onsite.ja.md) |
+| [Macからのリモートデスクトップ](how-to/remote-desktop.ja.md) |
+| [ZED画像をTIC-VLAに入力し，予測経路を表示する](how-to/run-camera-demo.ja.md) |
+| [JetsonでTIC-VLAを動かすための初期構築](how-to/setup-from-scratch.ja.md) |
 
-過去の調査日付を，現在も同じ状態であるという主張へ自動的に読み替えない．SSH・GPUの過去の
-成功は，その検査の証拠であり，常時の到達性やTIC-VLA・実機の性能を示すものではない．
+## 設定・仕様を調べる
 
-## 現地作業と実験手順
+| 文書 |
+|---|
+| [構成と仕組み](reference/architecture.ja.md) |
+| [非同期推論：workerの前に参照情報を整える](reference/asynchronous-runtime.ja.md) |
+| [外付けZEDカメラの準備](reference/camera-runtime.ja.md) |
+| [ローカルでのチェックポイント変換](reference/checkpoint-conversion.ja.md) |
+| [導入前に集める情報](reference/deployment-intake.ja.md) |
+| [開発と実験の手引き](reference/development.ja.md) |
+| [独自成果物と上流の研究用ソフトウェアのライセンス](reference/licensing.ja.md) |
+| [モデル資材と検証した読込経路](reference/model-artifacts.ja.md) |
+| [リポジトリのファイルから機体の動作まで](reference/runtime-flow.ja.md) |
+| [システム全体像と無人起動](reference/system-overview.ja.md) |
+| [Unitree状態受信用の独立した環境](reference/unitree-runtime.ja.md) |
 
-| ガイド | 答える問い |
-|---|---|
-| [初回訪問カード](field-card.ja.md) | 操作者は機体の前でどの順序で進めるか |
-| [Ethernet・内蔵調査](field-network.ja.md) | ケーブル，IP，経路，DDS，内部サービスの所有者をどう調べるか |
-| [現地での準備](onsite.ja.md) | 画像・状態，組にした記録，任意のオフライン推論をどう実行し，結果を読むか |
-| [導入前に集める情報](deployment-intake.ja.md) | 推測した既定値を使わず，研究室・実機から何を得る必要があるか |
-| [開発と実験の手引き](development.ja.md) | ツールの実行，段階的検証，失敗の記録，実験の再現をどう行うか |
+## 記録と共同開発
 
-次の雛形はGit対象外の保存先へコピーしてから使う．
-[空の訪問記録](../examples/onsite-notes.json)，
-[commissioning例](../examples/commissioning.json)，
-[合成再生入力](../examples/replay.json)．
-値は実機の運転許可やB2の上限を示すものではない．
+[実験・構築記録の一覧](records/README.ja.md) · [共同開発ルール](../CONTRIBUTING.ja.md) · [第三者資料と利用条件](../THIRD_PARTY.ja.md)
 
-## 共同開発，利用条件，ソースの案内
-
-| 文書・ソース | 用途 |
-|---|---|
-| [共同開発ルール](../CONTRIBUTING.ja.md) | Gitのブランチ・コミット・レビュー，日英文書，AIレビュー，範囲を区切った並行作業 |
-| [ライセンスの説明](licensing.ja.md) | 独自部分のMITと別に制限された本家の条件が共存する理由．コピー・派生物，将来の研究，成果物の公開 |
-| [外部資料の一覧](../THIRD_PARTY.ja.md) | 確認した正確な出典，条件，来歴，未解決の許可 |
-| [独自部分のライセンス](../LICENSE) | 本プロジェクトの独自部分に対する実際のMIT許諾本文 |
-| [Pythonパッケージ](../src/b2_tic_vla/) | 独立したアダプター，CLI，推論検査，再生，追従候補 |
-| [ツール](../tools/) | 対象機調査と，操作者が実行するWi-Fiヘルパー |
-| [配置用レシピ](../deploy/) | 候補環境の定義と，モデル不要の検査 |
-| [テスト](../tests/) | 合成・模擬入力の動作検査．実機の検証ではない |
-
-公開の基準言語は英語とし，日本語版は`.ja.md`と`，`・`．`を使う．前提，コマンド，
-不確実性，限界を含め，両言語を同時に更新する．ガイドを追加したらこの目次へ登録し，
-プロジェクトREADMEへ別の一覧を増やさない．各仕組みの詳しい説明は担当する文書にまとめて
-関連項目へリンクし，増え続けるチャット記録を複写しない．
+英語版を公開の基本とし，日本語版を同時に維持する．文書種別と記述の分け方は共同開発ルールに従う．

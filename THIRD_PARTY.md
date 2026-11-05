@@ -80,7 +80,7 @@ their own terms. This is not a full binary-redistribution clearance.
 Existing NoMachine 8.20.1-5 was discovered on the target; it was not installed,
 modified or bundled by this project. Its commercial/vendor conditions are
 separate from this source repository. No license or client-access entitlement is
-inferred from package presence. See [RDP build details](docs/rdp-build.md).
+inferred from package presence. See [RDP build details](docs/records/rdp-build.md).
 
 ## Optional host management and Python tooling
 
@@ -98,7 +98,7 @@ Python package. Host setup uses official pyenv `v2.8.14` at
 `3fb25668b463ad38ac2db6092dbf476ef744c0ca`, outside Git.
 [CPython 3.11.18](https://www.python.org/downloads/release/python-31118/)
 is installed per user under the [PSF License Agreement and included notices](https://github.com/python/cpython/blob/v3.11.18/LICENSE).
-No interpreter binary is redistributed. See [runtime setup](docs/jetson-runtime.md).
+No interpreter binary is redistributed. See [runtime setup](docs/records/jetson-runtime.md).
 Review updated for these references: 2026-10-27.
 
 
@@ -108,7 +108,7 @@ this repository or model image. Its [Microsoft binary license](https://code.visu
 and [privacy terms](https://privacy.microsoft.com/en-us/privacystatement) apply;
 the MIT license of this project or the Code OSS source does not relicense that
 distributed binary. No extension/account/sync setup was performed. See
-[installation and clipboard operation](docs/remote-desktop.md).
+[installation and clipboard operation](docs/how-to/remote-desktop.md).
 
 ## CPU conversion candidate
 
@@ -140,4 +140,4 @@ no SDK wheel is installed and its full NumPy/OpenCV dependency declaration is
 explicitly unsatisfied. The narrow state path passed an offline synthetic
 serialization test. Other SDK features and physical B2 compatibility need review.
 No vendor source, wheel or resulting binary image is distributed here. See
-[build provenance and limits](docs/unitree-runtime.md).
+[build provenance and limits](docs/reference/unitree-runtime.md).

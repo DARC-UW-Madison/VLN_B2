@@ -14,7 +14,7 @@ The available setup is B2, an external Jetson AGX Orin, ZED 2i and Livox Mid-360
 The intended deployment keeps perception/inference and eventual high-level
 control on Jetson; Mac is for development and optional result display. A prepared
 local run should not require Mac, campus Wi-Fi or a cloud inference service.
-The onboard sensor/service roles and control path still require inspection.
+Onboard i7 state/video access passed; continuous external state and control integration remain unfinished.
 
 The repository provides target inventory, synthetic replay, camera/state
 acquisition adapters, paired recording and optional synchronous offline inference.

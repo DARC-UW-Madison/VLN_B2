@@ -115,6 +115,26 @@ class ImageDemoTests(unittest.TestCase):
                            '--output', str(output)])
         self.assertEqual(output.read_text(), 'Keep existing result')
 
+    def test_generated_response_is_escaped_and_distance_uses_the_numeric_path(self):
+        report = self.report()
+        report['model'] = {'vlm_response': '<script>untrusted</script>\nText target: (99, 99)'}
+        page = renderer.render(report, self.image.read_bytes())
+        self.assertIn('Generated VLM response', page)
+        self.assertIn('&lt;script&gt;untrusted&lt;/script&gt;', page)
+        self.assertNotIn('<script>', page)
+        self.assertIn('Text target: (99, 99)', page)
+        self.assertIn('x=2.000 m, y=0.400 m', page)
+        self.assertIn('distance from origin: 2.040 m', page)
+        self.assertIn('path length from origin: 2.040 m', page)
+        self.assertIn('Final sample time: 0.20 s', page)
+
+    def test_old_reports_do_not_invent_a_response_and_invalid_text_is_rejected(self):
+        report = self.report()
+        self.assertIn('No VLM response was recorded', renderer.render(report, self.image.read_bytes()))
+        report['model'] = {'vlm_response': ['not', 'text']}
+        with self.assertRaisesRegex(ValueError, 'VLM response'):
+            renderer.render(report, self.image.read_bytes())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -35,7 +35,7 @@ git switch -c docs/experiment-guide
 # Edit the relevant English and Japanese documents.
 git diff --check
 git diff
-git add docs/development.md docs/development.ja.md
+git add docs/reference/development.md docs/reference/development.ja.md
 git diff --cached
 git commit -m "Clarify experiment prerequisites"
 ```
@@ -64,6 +64,32 @@ Use relative links, portable commands, SI units, and defined symbols. Cite
 primary sources. Do not present unrun commands or a paper's results as local
 validation. Record significant design decisions with reasons and alternatives
 in the relevant guide; create a separate decision record only when needed.
+
+
+### Document roles and locations
+
+- `docs/explanations/`: develop mechanisms from defined terms, with variable meanings, units and worked examples; do not insert an execution history.
+- `docs/how-to/`: complete one task with execution location, prerequisites, commands, expected results and shutdown/recovery.
+- `docs/reference/`: provide settings, data formats, code responsibilities and build requirements for lookup.
+- `docs/records/`: preserve dates, revisions, execution locations, methods, results and open questions. Identify the event explicitly rather than referring to a chat or an unspecified earlier incident.
+- `docs/status.md`: summarize current implementation and next work without duplicating the history or hardware inventory.
+
+Define a specialist term before its first use and state prerequisites explicitly.
+Explanations must connect inputs, intermediate steps and outputs, with reasons
+and concrete examples; a glossary link does not replace that explanation.
+Procedures must explain the purpose of non-obvious steps and how to verify their
+result. Records must state the objective, why the method was chosen, what was
+executed, the conditions, results, interpretation and remaining uncertainty.
+No page may require the reader to reconstruct a chat.
+
+Do not impose a uniform file length or shorten a mechanism to fit an arbitrary
+word budget. A paragraph naming components is not an explanation of their
+connection. Trace one concrete example through intermediate representations,
+units, timing, execution location and communication. Split chapters by learning
+objective and document role, not to make every page equally short. Clearly mark
+educational examples, source discrepancies and unknown implementation details.
+
+Create a linked record instead of appending experiment history to an explanation or procedure. Keep one authoritative location for inventories and measurements. Register pages in the appropriate index and check both translations and all links when relocating files.
 
 ## AI and parallel work
 
