@@ -124,6 +124,7 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | File | Responsibility |
 |---|---|
 | `tools/probe_onboard_sensors.py` | Standalone Python 3.8+ bounded native ROS 2 sensor subscriptions; optional private video previews, no actuator requests |
+| `tools/field_visit.py`, `tools/inspect_onboard.py` | Private-profile, pinned-SSH field inventory and bounded state JSONL with Jetson receipt times; no command publisher |
 | `tools/inspect_target.py` | Standalone Python 3.8+ inventory; no install or robot messages |
 | `src/b2_tic_vla/types.py` | Explicit image, state, plan, and velocity contracts |
 | `src/b2_tic_vla/hardware.py` | Lazy ZED capture and Unitree state subscriptions only |

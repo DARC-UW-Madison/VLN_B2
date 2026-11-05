@@ -8,6 +8,8 @@
 実際の実験をたどり，i7へのSSHは通ったが外付けSDKの直接受信は通らなかった理由を説明する．以下の手順は，
 実個体の確認済み情報を入れて使う雛形であり，全項目が既に成功した記録ではない．
 
+準備済みの研究室Jetsonでは，[次回の実行手順](next-visit.ja.md)から始める．このページの汎用network設定例を，現在のprofileへ重ねて実行しない．
+
 ## 現在保存されている設定
 
 USB-C・Anker接続はi7のUSB Ethernet interfaceにつながり，scope付きIPv6によるSSH接続が通った．
@@ -18,7 +20,7 @@ IPv6 link-local，default gatewayなしを設定し，Wi-Fiをdefault routeと�
 DDS直接通信の経路になったわけではない．古い未使用profile二つは操作者の許可で退避・削除した．復旧用keyfileは非公開の
 `local/network-profile-cleanup-01`にある．管理者は確認後に`nmcli connection load`で読み込めるが，両方を同時に有効化しない．
 
-実測したi7のソフト・service応答・hardwareは[仕組みの説明](../explanations/network-topology.ja.md)にまとめる．
+実測したi7のソフト・service応答・hardwareは[接続記録](../records/b2-connection-2026-11-03.ja.md)にまとめる．
 非公開inventoryは`local/b2-connection-01`，版だけの照会は`local/b2-pre-motion-01`，後の既にダンピング中の単発要求と
 センサー検査は`local/b2-damping-sensors-01`にある．これらの検査で内蔵network・package・firmwareは変更していない．
 研究室の取扱い・停止手順に従う．

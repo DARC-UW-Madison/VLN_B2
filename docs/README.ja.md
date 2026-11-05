@@ -27,7 +27,6 @@
 | [用語：Pythonパッケージからロボットまで](explanations/glossary.ja.md) |
 | [ケーブル接続からロボットへの要求まで](explanations/network-topology.ja.md) |
 | [TIC-VLAを理解する：一枚の画像から実際の移動まで](explanations/ticvla-explained.ja.md) |
-
 | [遠隔操作の画面・ログイン・通信](explanations/remote-access.ja.md) |
 
 ## 操作する
@@ -35,7 +34,8 @@
 | 文書 |
 |---|
 | [内蔵センサー画像の表示と取得](how-to/built-in-sensors.ja.md) |
-| [B2接続訪問の確認カード](how-to/field-card.ja.md) |
+| [次回のB2訪問：構成を調べ，Jetsonで状態を受信する](how-to/next-visit.ja.md) |
+| [B2訪問の確認表](how-to/field-card.ja.md) |
 | [現地作業：Ethernet・内蔵計算機・独立した運用](how-to/field-network.ja.md) |
 | [Jetsonのアカウント，Tailscale SSH，作業環境の分離](how-to/jetson-bootstrap.ja.md) |
 | [操作手順：カメラと予測経路を確認する短いデモ](how-to/live-camera-demo.ja.md) |

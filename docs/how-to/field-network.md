@@ -10,6 +10,8 @@ actual experiment and explains why SSH into the i7 succeeded while direct
 external SDK reception did not. The procedures below are templates to complete
 with verified unit information, not a record that every check has passed.
 
+On the prepared lab Jetson, start with [the executable visit procedure](next-visit.md). Do not apply this page's generic network-setup examples on top of the current profile.
+
 ## Current saved configuration
 
 The USB-C/Anker connection reaches the i7's USB Ethernet interface. Existing
@@ -25,7 +27,7 @@ keyfiles are in `local/network-profile-cleanup-01`. An administrator can review
 and load one with `nmcli connection load`; do not activate both legacy profiles.
 
 The measured i7 software, service responses and hardware are summarized in
-[the explanation](../explanations/network-topology.md). Private inventories are under
+[the connection record](../records/b2-connection-2026-11-03.md). Private inventories are under
 `local/b2-connection-01`, the version-only check under `local/b2-pre-motion-01`,
 and the later single already-damped request and sensor checks under
 `local/b2-damping-sensors-01`. No onboard network/package/firmware changes were

@@ -27,7 +27,6 @@
 | [Terminology: from Python packages to a robot](explanations/glossary.md) |
 | [From an Ethernet cable to a robot request](explanations/network-topology.md) |
 | [Understanding TIC-VLA: from an image to movement](explanations/ticvla-explained.md) |
-
 | [Remote access: screen, login and transport](explanations/remote-access.md) |
 
 ## Perform a task
@@ -35,7 +34,8 @@
 | Document |
 |---|
 | [View and capture built-in sensor images](how-to/built-in-sensors.md) |
-| [B2 connection visit: field card](how-to/field-card.md) |
+| [Next B2 visit: collect facts and receive state on Jetson](how-to/next-visit.md) |
+| [B2 visit checklist](how-to/field-card.md) |
 | [Field visit: Ethernet, onboard computers and independent operation](how-to/field-network.md) |
 | [Jetson account, Tailscale SSH, and isolated workspaces](how-to/jetson-bootstrap.md) |
 | [Operator tutorial: a short camera and predicted-path demo](how-to/live-camera-demo.md) |

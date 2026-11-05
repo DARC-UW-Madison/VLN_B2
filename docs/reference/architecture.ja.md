@@ -111,6 +111,7 @@ synthetic replay fixture -> PathTracker -> candidate velocity + acceptance reaso
 | ファイル | 役割 |
 |---|---|
 | `tools/probe_onboard_sensors.py` | Python 3.8以上の単独・時間制限付きnative ROS 2購読．任意の非公開映像preview，作動要求なし |
+| `tools/field_visit.py`, `tools/inspect_onboard.py` | 非公開profileと固定SSH鍵を使う受信専用の現地診断．i7のinventoryとJetson受信時刻付き状態JSONL．指令送信なし |
 | `tools/inspect_target.py` | Python 3.8以上の単独調査スクリプト．インストール・機体指令なし |
 | `src/b2_tic_vla/types.py` | 画像，状態，計画，速度の明示的なデータ形式 |
 | `src/b2_tic_vla/hardware.py` | 必要時だけ読み込むZED画像取得とUnitree状態購読 |

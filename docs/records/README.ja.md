@@ -23,3 +23,4 @@
 | [推論ランタイムの互換性](runtime-compatibility.ja.md) |
 | [SDK状態イメージの検査記録](sdk-build-checks.ja.md) |
 | [外付けJetsonの確認済み構成](target-baseline.ja.md) |
+| [次回訪問に向けた準備確認：2026-11-04](previsit-readiness-2026-11-04.ja.md) |

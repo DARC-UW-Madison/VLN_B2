@@ -23,3 +23,4 @@ Records preserve completed builds, inspections and experiments, including histor
 | [Inference runtime compatibility](runtime-compatibility.md) |
 | [SDK state-image checks](sdk-build-checks.md) |
 | [External Jetson baseline](target-baseline.md) |
+| [Pre-visit readiness review, 2026-11-04](previsit-readiness-2026-11-04.md) |

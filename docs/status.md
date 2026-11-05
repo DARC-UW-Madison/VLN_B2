@@ -6,7 +6,7 @@
 
 As of **2026-11-04**, model/camera observation and an onboard B2 diagnostic work
 as separate experiments. They are not a connected navigation controller. B2
-was shut down by the operator; documentation work has not changed its settings.
+was shut down by the operator; off-robot preparation has not changed its settings.
 
 | Capability | Current boundary | Evidence |
 |---|---|---|
@@ -19,8 +19,10 @@ was shut down by the operator; documentation work has not changed its settings.
 | Path tracking and commands | Offline candidate tracker exists; no commissioned movement sender | [Architecture](reference/architecture.md) |
 | Physical feedback/stopping/navigation | Not validated | [Development procedure](reference/development.md) |
 
-The existing 184 ordinary tests passed on Mac and Jetson before this
-documentation-only restructuring. They do not measure robot execution.
+The pre-visit review repeated real-camera prediction and added field diagnostics.
+All 201 ordinary tests passed on Mac; new-tool target checks follow synchronization.
+Methods/results are in [the readiness record](records/previsit-readiness-2026-11-04.md).
+Ordinary tests do not measure robot execution.
 The deployed source revision is recorded privately in `local/source-revision.txt`.
 Source is shared in the public lab repository
 [DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2).
@@ -45,3 +47,5 @@ identifiers stay outside Git.
 connection choices; [the control loop](explanations/control-loop.md) explains
 state, metric scale, feedback and inference timing. Use [field commands](how-to/field-network.md)
 for operations and [records](records/README.md) for completed work.
+
+Use [the executable visit procedure](how-to/next-visit.md) for the next session.
