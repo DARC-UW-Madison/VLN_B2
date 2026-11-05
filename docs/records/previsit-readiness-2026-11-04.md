@@ -33,7 +33,7 @@ verified i7 link-local endpoints; neither contains a password.
 | Runtime cleanup | Camera/model container exits both 0, no cleanup errors; no movement sent |
 | SDK/DDS image | Synthetic import/serialization verifier passed in an explicitly network-disabled, read-only container |
 | Local software tests | 201 passed, including malformed/truncated output, timeout, zero samples, gaps, batching, key/profile scope and metadata permissions |
-| Target tests and prepared profile plan | Pending synchronization of the new tools; completion is recorded in the follow-up below |
+| Target tests and prepared profile plan | 201 passed on Jetson; both no-connection profile plans passed |
 
 The fresh model trial used assumed stationary state and did not evaluate
 navigation accuracy or continuous control. It ran the existing reviewed GPU
@@ -55,3 +55,9 @@ commissioned by this review.
 Proceed with [the next-visit procedure](../how-to/next-visit.md), saving the
 failed checks as evidence as well as successes. A readable report or passing
 synthetic test is not acceptance of an untested physical path.
+
+## Target follow-up
+
+All 176 source files at `cedb622` were hash-verified on Jetson, where the full 201-test suite passed.
+Both profile plans and an inventory self-test also ran under system Python 3.8.10. The self-test inspected only the external Jetson; it did not test the i7 inventory or ROS state reception.
+Private results are under `local/previsit-tool-check-01`. No B2 connection or movement request was made.

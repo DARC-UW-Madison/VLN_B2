@@ -30,7 +30,7 @@ bridge，経路，firewall rule，system service，package，機体firmwareは�
 | 終了処理 | カメラ・モデル両containerの終了コード0，cleanup errorなし，移動送信なし |
 | SDK・DDS image | networkを無効化し読取専用にしたcontainerで，合成データのimport・符号化検査が成功 |
 | ローカルのソフト試験 | 201件成功．不正・途中で切れた出力，timeout，受信0件，空白，一括到着，鍵・profileの範囲，metadata権限を検査 |
-| 対象機のテスト・準備profileのplan | 新toolの同期後に実施予定．完了は下の追記で記録する |
+| 対象機のテスト・準備profileのplan | Jetsonでも201件成功．二つのprofileの接続しないplan確認が成功 |
 
 新しいモデル試行は静止仮定で，ナビゲーション精度や継続制御を評価していない．既存の確認済みGPU imageを使った．
 非公開の証拠はJetsonの`local/previsit-camera-check-01`と`local/previsit-sdk-check-01`にあり，画像・生成文はMacへ移していない．
@@ -43,3 +43,9 @@ SDK検査の隔離確認flagは未検証と報告される．隔離の根拠は�
 実状態のモデル結合，物理的フィードバック・停止が，この確認で完成したわけではない．
 
 [次回手順](../how-to/next-visit.ja.md)に従い，成功だけでなく失敗も記録する．報告を読めることや合成テストの成功を，未試験の物理経路の合格にはしない．
+
+## 対象機での追記
+
+source `cedb622`の176ファイルをhash照合して配置し，Jetsonで通常テスト201件を実行して成功した．
+さらにsystem Python 3.8.10で両profileのplanとinventoryを自己検査した．自己検査の対象は外付けJetsonだけで，i7の構成・ROS状態受信を試した記録ではない．
+結果は非公開`local/previsit-tool-check-01`にある．B2への接続・動作要求は行っていない．

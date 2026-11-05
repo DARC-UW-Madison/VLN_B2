@@ -18,7 +18,7 @@
 | 経路追従と指令 | オフライン候補追従器あり．実機移動用の送信部は未完成 | [構成の参照資料](reference/architecture.ja.md) |
 | 実際のフィードバック・停止・走行 | 未検証 | [開発手順](reference/development.ja.md) |
 
-準備再確認で実カメラ予測を一回実行し，現地診断を追加した．Macの通常テスト201件が成功し，Jetsonでの新tool検査は同期後に行う．
+準備再確認で実カメラ予測を一回実行し，現地診断を追加した．通常テスト201件がMac・Jetsonで成功し，接続しないprofile確認とnative Pythonでの自己検査も完了した．
 実行条件・結果は[訪問前確認の記録](records/previsit-readiness-2026-11-04.ja.md)に記す．通常テストは実機動作を測らない．
 配置したソースの版は非公開の`local/source-revision.txt`に記録する．ソースは研究室の公開リポジトリ[DARC-UW-Madison/VLN_B2](https://github.com/DARC-UW-Madison/VLN_B2)で共有している．
 公開済みの`main`，作業ブランチ，Jetsonへ配置した版は別に確認する．

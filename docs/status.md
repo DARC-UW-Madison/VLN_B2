@@ -20,7 +20,8 @@ was shut down by the operator; off-robot preparation has not changed its setting
 | Physical feedback/stopping/navigation | Not validated | [Development procedure](reference/development.md) |
 
 The pre-visit review repeated real-camera prediction and added field diagnostics.
-All 201 ordinary tests passed on Mac; new-tool target checks follow synchronization.
+All 201 ordinary tests passed on Mac and Jetson; no-connection profile plans
+and native-Python self-checks also completed.
 Methods/results are in [the readiness record](records/previsit-readiness-2026-11-04.md).
 Ordinary tests do not measure robot execution.
 The deployed source revision is recorded privately in `local/source-revision.txt`.
