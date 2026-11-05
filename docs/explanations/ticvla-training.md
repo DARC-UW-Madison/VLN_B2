@@ -33,11 +33,14 @@ For a current observation time $t$, imagine a record containing:
 
 A **pose** combines position and orientation. To express a future position in the current robot frame, subtract the current world position and rotate into the current heading:
 
-$$
+```math
 p_{\mathrm{target},i}^{B_t}
 =R(\psi_t)^\mathsf{T}\big(p_{t+i}^{W}-p_t^{W}\big),\qquad
-R(\psi)=\begin{bmatrix}\cos\psi&-\sin\psi\\\sin\psi&\cos\psi\end{bmatrix}.
-$$
+R(\psi)=\begin{bmatrix}
+\cos\psi&-\sin\psi \\
+\sin\psi&\cos\psi
+\end{bmatrix}.
+```
 
 $W$ denotes the trajectory's world frame, $B_t$ the robot frame at time $t$, $p$ a position in metres and $\psi$ a heading in radians. If a robot faces world +y and subsequently moves 1 m in world +y, its target is 1 m forward, not 1 m left. The rotation is what makes examples collected under different headings comparable.
 
@@ -88,11 +91,13 @@ The [policy dataset](https://github.com/ucla-mobility/TIC-VLA/blob/9fa6f8b66b9e1
 
 The **Smooth L1 loss** compares predicted and target numerical coordinates. With threshold $\beta>0$, its scalar form is:
 
-$$
+```math
 \ell_\beta(e)=
-\begin{cases}e^2/(2\beta),&|e|<\beta,\\ |e|-\beta/2,&\text{otherwise}.
+\begin{cases}
+\frac{e^2}{2\beta}, & |e|<\beta, \\
+|e|-\frac{\beta}{2}, & |e|\ge\beta.
 \end{cases}
-$$
+```
 
 $e=\hat p-p$ is coordinate error in the numeric representation used for training. With $\beta=1$, error 0.2 gives loss 0.02; error 2 gives loss 1.5. Small errors have a quadratic penalty and larger errors a linear penalty. The optimizer reduces their mean over the selected batch and coordinates. A low average loss is useful evidence but does not itself prove collision-free behavior.
 

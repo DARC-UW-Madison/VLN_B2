@@ -154,6 +154,15 @@ $$
 \Delta p_r=R(\psi_r)^\mathsf{T}(p_t-p_r).
 $$
 
+Here $R(\psi)$ rotates planar coordinates through heading $\psi$; its transpose performs the inverse rotation:
+
+```math
+R(\psi)=\begin{bmatrix}
+\cos\psi&-\sin\psi \\
+\sin\psi&\cos\psi
+\end{bmatrix}.
+```
+
 This displacement describes the robot's motion since the image represented by the cached features. It must not be computed from the newest requested-but-unfinished semantic job's pose. Heading changes need corresponding treatment where the model interface includes them. The released six-scalar input does not have a separate heading-displacement slot, unlike the paper description.
 
 Old path points need a similar correction. For a target $q_r$ in the old reference frame:

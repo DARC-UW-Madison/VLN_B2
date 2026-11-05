@@ -33,11 +33,14 @@
 
 ここでの**姿勢，pose**は位置と向きを合わせたものである．将来位置を現在の機体座標で表すには，世界座標で現在位置を引き，現在の向きに合わせて回転する．
 
-$$
+```math
 p_{\mathrm{target},i}^{B_t}
 =R(\psi_t)^\mathsf{T}\big(p_{t+i}^{W}-p_t^{W}\big),\qquad
-R(\psi)=\begin{bmatrix}\cos\psi&-\sin\psi\\\sin\psi&\cos\psi\end{bmatrix}.
-$$
+R(\psi)=\begin{bmatrix}
+\cos\psi&-\sin\psi \\
+\sin\psi&\cos\psi
+\end{bmatrix}.
+```
 
 $W$ は軌跡の世界座標， $B_t$ は時刻 $t$ の機体座標， $p$ はメートル単位の位置， $\psi$ はラジアン単位の向きである．世界の+yを向くロボットが世界の+yへ1 m移動したなら，正解は「前方1 m」であって「左方1 m」ではない．回転によって，異なる向きで記録したお手本を同じ規約で扱える．
 
@@ -88,11 +91,13 @@ $\phi$ は更新する言語の重み， $p_\phi$ は次の正解トークンへ
 
 **Smooth L1損失**は，予測と正解の数値座標を比較する．境界値 $\beta>0$ について，一つの成分では次になる．
 
-$$
+```math
 \ell_\beta(e)=
-\begin{cases}e^2/(2\beta),&|e|<\beta,\\ |e|-\beta/2,&\text{otherwise}.
+\begin{cases}
+\frac{e^2}{2\beta}, & |e|<\beta, \\
+|e|-\frac{\beta}{2}, & |e|\ge\beta.
 \end{cases}
-$$
+```
 
 $e=\hat p-p$ は学習に使う数値表現上の座標誤差である． $\beta=1$ なら，誤差0.2の損失は0.02，誤差2の損失は1.5となる．小さな誤差には二乗，大きな誤差には線形の罰則を使う．選んだバッチや座標の平均を減らす方向へ重みを更新する．平均損失が小さいのは有用な根拠だが，それだけで衝突しない証明にはならない．
 
