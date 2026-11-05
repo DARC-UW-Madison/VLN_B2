@@ -45,6 +45,10 @@ frame rate. LowState exposed 20 joint-state slots; that is a message layout,
 not evidence of 20 physical joints. Zero reception does not establish that a
 sensor is absent: publisher activity, QoS and available message bindings need
 separate checks. Topic names alone do not establish sensor ownership.
+The saved discovery snapshot counted no panorama/LIO publishers and one wireless
+publisher. `/pctoimage_local` could not be subscribed to because the existing
+Python environment lacked `unitree_interfaces`; its publisher count was also
+zero. These are separate findings, not a verified absence of the hardware.
 
 ## View the saved images without powering B2
 

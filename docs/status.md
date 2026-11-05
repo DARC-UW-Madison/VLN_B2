@@ -4,11 +4,13 @@
 
 ## Current stage
 
-Updated **2026-11-04**. B2 has been shut down by the operator; no further
-robot requests are planned in this session. The latest changes remain on Mac:
-external Jetson SSH requested renewed Tailscale authentication, so source sync
-and the target test rerun are pending. The previously synchronized archive is
-`de26854`; the private capture files already reside on Jetson.
+Updated **2026-11-04**. The operator shut down B2 after the inspection.
+Follow-up work accessed only the external Jetson; no further robot requests
+were sent. After Tailscale reauthentication, all 141 source files were
+hash-verified on Jetson and its 184 ordinary tests passed. Both Mac and Jetson
+now pass that suite. The deployed source revision is recorded privately in
+`local/source-revision.txt`; captures and the operator observation remain
+private on Jetson. GitHub publication remains deferred.
 
 After the earlier version-only check, exactly **one Damp request (API 1001)**
 was acknowledged with status 0 while the robot was already damped. Fresh state
@@ -106,8 +108,7 @@ The host remains AGX Orin 64 GB class / Ubuntu 20.04 / L4T 35.4.1 / CUDA 11.4.
 The existing GPU container uses Python 3.11.18, Torch 2.2.2 and Transformers 4.44.2.
 A separate Torch 2.15.0+cpu container converted the approved checkpoint to
 safetensors; the older GPU runtime never decoded the original pickle checkpoint.
-The previous **180 tests** passed on Mac and Jetson. The expanded **184-test**
-suite passed on Mac; its Jetson rerun is pending renewed management access. See [model inputs and loading](model-artifacts.md)
+The expanded **184-test** suite passed on both Mac and Jetson. See [model inputs and loading](model-artifacts.md)
 and [conversion](checkpoint-conversion.md) for methods, evidence and limitations.
 
 A bounded real-camera asynchronous shadow trial completed 35 actions with
@@ -207,9 +208,8 @@ Hardware availability is not sensor or navigation validation. The
 
 ## Next deliverable
 
-1. Restore authorized management access and synchronize the reviewed source;
-   B2 can stay powered off for this work. At the next powered visit, follow
-   the [field card](field-card.md) and [Ethernet runbook](field-network.md)
+1. At the next powered visit, choose a supported native-LAN connection or an
+   explicitly reviewed i7 relay, using the [field card](field-card.md) and [Ethernet runbook](field-network.md)
    to map the actual B2 network, computers, sensors and receive-only SDK path.
    Preserve management Wi-Fi and keep the robot LAN separate from campus.
    Required images/local model inputs were rechecked, the converted checkpoint
@@ -234,8 +234,8 @@ No real-time, navigation-quality or physical-safety claim follows from this smok
 
 Read this page, the relevant guide and Git diff first. Use a bounded branch and
 keep English/Japanese conclusions aligned. Before target use, commit reviewed source and hash-synchronize it to the Jetson
-archive. The current pending-sync boundary is recorded above; GitHub publication
-remains deferred.
+archive. The deployed revision is recorded privately in `local/source-revision.txt`;
+GitHub publication remains deferred.
 Detailed setup/build/asset/load/inference records stay in ignored `local/` on
 Jetson, including failed attempts. Preserve source revisions, image IDs, hashes,
 inputs, limits and limitations; do not turn this page into a chat transcript.

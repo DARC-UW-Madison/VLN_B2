@@ -37,6 +37,8 @@ fieldを選んだが，**名前だけで解像度を確定できない**．実�
 件数は**DDSメッセージ数**であり，映像frame数やcameraの実測frame rateではない．LowStateは関節状態のslotを
 20個持っていたが，これはmessageの配列形式で，実関節数が20という意味ではない．受信ゼロだけでセンサーがないとは
 いえない．配信の稼働，QoS，message bindingを別々に確認する．topic名だけで所有する機器も確定しない．
+保存した発見情報では，panorama・LIOのpublisherは0，wirelessは1だった．`/pctoimage_local`は既存Python環境に
+`unitree_interfaces`がなく購読できず，publisherも0だった．それぞれ別の事実であり，hardwareの不存在を確認したわけではない．
 
 ## B2を起動せず保存画像を見る
 
